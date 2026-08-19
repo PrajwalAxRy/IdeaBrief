@@ -25,11 +25,14 @@
 1. Find the first phase in the [progress table](#progress) that is not `DONE`.
 2. Read **only** the spec files that phase lists. Do not read the whole
    `WebsiteLayoutDesc/` folder — it will not fit alongside the work.
-3. Read [Standing rules](#standing-rules) and [The prototype contract](#the-prototype-contract).
-   These apply to every phase and are not repeated per phase.
+3. Read [Standing rules](#standing-rules), [The prototype contract](#the-prototype-contract),
+   and [Tooling](#tooling). These apply to every phase and are not repeated per phase.
 4. Build exactly the files that phase lists. Do not build ahead. A later phase
    depending on your output is fine; you building that later phase early is not.
-5. Run the phase's **exit test**. If it fails, fix it before stopping.
+5. Run the phase's **exit test**. Use the **Playwright MCP** against the running
+   dev server to actually verify it — navigate, screenshot, click, tab through
+   keyboard flows — rather than reading compiled output. If it fails, fix it
+   before stopping.
 6. **Update this file before you finish:** set the phase's status in the
    progress table, and add a line under
    [Build log](#build-log) noting anything the next session needs to know —
@@ -94,8 +97,42 @@ The typed idea is carried through so the run doesn't feel canned:
 
 `app/api/*` route handlers, `app/actions/create-run.ts` as a real server
 action (it becomes a client-side slug generator), `lib/db/client.ts`, and any
-Playwright E2E. Everything else in
+committed Playwright E2E suite (no `tests/e2e/`). The Playwright *MCP* is still
+used live during the build to verify exit tests — see [Tooling](#tooling) —
+that's a session tool, not a test suite in the repo. Everything else in
 [`15-project-structure.md`](WebsiteLayoutDesc/15-project-structure.md) gets built.
+
+---
+
+## Tooling
+
+Two MCP servers are available for every phase. Use them; don't treat them as
+optional.
+
+**Context7 MCP — pull current docs before writing against an unfamiliar API.**
+The stack in `14-tech-stack.md` mixes fast-moving libraries (Tailwind v4,
+Radix primitives, Zod, Vitest, the `motion` package) with a Next.js version
+newer than most training data — see the `AGENTS.md` note at the repo root,
+which is not boilerplate. Before writing code against any API you're not
+certain of, resolve the library with `resolve-library-id` and pull the
+relevant doc with `query-docs` rather than guessing from memory. This matters
+most in **P0** (Tailwind v4's `@theme` config), **P1** (Radix primitive APIs),
+**P2** (Zod/Vitest), and **P11** (the `motion` package's enter/exit API).
+
+**Playwright MCP — the actual verification tool for every exit test.**
+Every exit test in this plan describes something that only exists in a
+browser: a screenshot, a hover state, a keyboard-only flow, a cross-fade,
+focus restored after a drawer closes, a clipboard payload. Run `next dev`,
+then use the Playwright MCP to navigate, screenshot, click, and tab through
+the real page — don't mark an exit test passed from reading compiled
+CSS/HTML alone. Screenshot at both 1440px and 1280px per the desktop-only
+rule. Where an exit test says "keyboard alone," drive it with keyboard-only
+actions (`Tab`, `Shift+Tab`, `Enter`, `Esc`), not clicks. Where it says "no
+console errors," check the console/network output, not just the visual.
+
+This is separate from the Playwright *E2E* suite, which stays out of scope
+per [the prototype contract](#the-prototype-contract) — the MCP is a live
+session tool, not something committed to the repo.
 
 ---
 
@@ -136,6 +173,12 @@ spot, not logged.
     need one, log it and ask rather than installing.
 11. **Never render model text as markdown.** Everything renders through typed
     components from validated fields.
+12. **Consult the Context7 MCP** before writing against an unfamiliar API in
+    the tech stack — Tailwind v4, Radix primitives, Zod, Vitest, `motion`.
+    See [Tooling](#tooling).
+13. **Verify every exit test with the Playwright MCP** against the running
+    dev server — screenshot, click, keyboard-drive it. Don't mark an exit
+    test passed from reading compiled output alone. See [Tooling](#tooling).
 
 ---
 
@@ -143,9 +186,9 @@ spot, not logged.
 
 | Phase | Name | Status | Session |
 |---|---|---|---|
-| P0 | Scaffold + design tokens | `TODO` | 1 |
-| P1 | Tier-1 UI primitives | `TODO` | 1 |
-| P2 | Schemas + fixture layer | `TODO` | 1 |
+| P0 | Scaffold + design tokens | `DONE` | 1 |
+| P1 | Tier-1 UI primitives | `DONE` | 1 |
+| P2 | Schemas + fixture layer | `DONE` | 1 |
 | P3 | Run Shell, routing, layout | `TODO` | 2 |
 | P4 | Entry page `/` | `TODO` | 2 |
 | P5 | Define — conversation + Brief Panel | `TODO` | 2 |
@@ -190,8 +233,10 @@ a single product component exists.
 
 **Exit test:** `/proof` renders and the multi-layer amber glow, the borderless
 card elevation with its inset top highlight, and the grain overlay all look
-right. Screenshot it. **This is the phase most worth getting slowly right —
-every screen inherits it.**
+right. Screenshot it with the **Playwright MCP** at 1440px and 1280px — this
+is the phase where a real rendered screenshot matters most, not a read of
+compiled CSS. **This is the phase most worth getting slowly right — every
+screen inherits it.**
 
 **Also:** read `17-open-questions.md` and log in the build log any open
 question that would cause rework if answered differently later.
@@ -231,7 +276,9 @@ Plus `app/kitchen-sink/page.tsx` rendering every one in every variant and state.
 
 **Exit test:** `/kitchen-sink` shows all primitives; every interactive one has
 visible hover, focus-visible, and active states; keyboard alone opens and
-closes the drawer, modal, popover, and accordion with focus correctly restored.
+closes the drawer, modal, popover, and accordion with focus correctly
+restored — drive this with the **Playwright MCP** (`Tab`/`Enter`/`Esc`), not
+mouse clicks, and screenshot the focus-visible states.
 
 ---
 
@@ -517,7 +564,8 @@ run renders the thin variant correctly.
 
 **Exit test:** all 6 questions and 5 steps render; clicking a dependency chip
 scrolls, expands, and pulses the target in both directions; `Copy script`
-puts clean plain text on the clipboard.
+puts clean plain text on the clipboard — verify the actual clipboard payload
+via the **Playwright MCP** rather than assuming from the label swap.
 
 ---
 
@@ -574,7 +622,10 @@ white screen.
 
 **Exit test:** the full journey — `/` → type → conversation → approve → run →
 report → citation → drawer → roadmap → copy script — completes by keyboard
-alone, with reduced motion on, with no console errors. Delete `/proof` and
+alone, with reduced motion on, with no console errors. Run this whole journey
+through the **Playwright MCP**: keyboard-only navigation end to end, checking
+the console/network panel at each step, and screenshot the report and roadmap
+pages at both breakpoints as the final record. Delete `/proof` and
 `/kitchen-sink`.
 
 ---
@@ -605,7 +656,161 @@ session needs.
 - Decision: …
 -->
 
-_(empty — no phases completed yet)_
+### P0 — 2026-08-20
+- Deviation: the repo root already had planning docs (`executive_summary.md`,
+  `WebsiteLayoutDesc/`, etc.), which `create-next-app` refuses to scaffold
+  into. Scaffolded in a throwaway subdir and merged the generated files
+  (`app/`, `public/`, configs) up to the root instead of scaffolding in place.
+  No effect on the result.
+- Deviation: used `next@16.3.1` / `react@19.2.8` (current latest stable as of
+  build time) instead of the "15.x" version target named in `14-tech-stack.md`.
+  The dependency list and every API used (`app/`, Server Components, route
+  conventions) is unaffected — Next 16's only relevant change is cosmetic
+  (an `AGENTS.md` note to check `node_modules/next/dist/docs/` for
+  breaking changes, which was checked; nothing in P0–P2's scope was affected).
+- Deviation: `styles/tokens.css` renames the 16px body font-size token to
+  `--text-body-size`. The spec (`02-visual-direction.md` §2.2 and §2.5) defines
+  **two different tokens under the same name** `--text-body` — one is the body
+  *text colour* (`#8a8070`), the other is the 16px *font size*. These collide
+  in a single `:root` block. Kept `--text-body` as the colour (referenced by
+  name throughout the four-text-roles table) and renamed the font-size token.
+  **Flagging per P0's instruction to log open questions that would cause
+  rework** — if a later phase or the design owner intended the opposite
+  convention, every consumer of `--text-body-size` needs a rename.
+- Deviation: fonts loaded via `next/font/google` (Inter, JetBrains Mono) rather
+  than the CSS `@import url(...)` in the skill/spec, for self-hosting and no
+  render-blocking external request. `tokens.css` points `--font-sans` /
+  `--font-mono` at the `next/font`-generated CSS variables, set on `<html>` in
+  `app/layout.tsx`. Functionally equivalent, more robust.
+- Deviation: `app/page.tsx` still holds the default `create-next-app` starter
+  content (light-theme, Geist fonts, next.svg). Not touched — building the
+  real Entry page is explicitly P4's job and touching it now would be
+  building ahead. It will look inconsistent with the dark-luxury system until
+  P4.
+- Decision: `tailwind.config.ts` adds only `maxWidth` layout utilities
+  (`marketing` 1200px, `app` 1360px, `prose` 68ch, `conversation` 64ch) — no
+  `colors` key, per the Tailwind-for-layout-only rule. Wired into
+  `styles/globals.css` via `@config` since Tailwind v4 doesn't auto-load a
+  JS/TS config.
+- Verified: `/proof` builds, renders, and the compiled CSS chunk contains the
+  amber glow pulse, the token values, and the grain overlay's
+  `mix-blend-mode`. No visual/browser screenshot tool was available in this
+  session — verified via HTML/CSS output inspection, not a rendered
+  screenshot. Recommend a human/browser check before trusting the aesthetic
+  fully.
+
+### P1 — 2026-08-20
+- Tooling note: this phase was built **without** the Playwright MCP or
+  Context7 MCP that this plan now asks for (neither was connected in-session;
+  the user chose to proceed without them for this session rather than pause
+  to wire them up). Verification instead used: `next build` (typecheck +
+  compile), a `next dev` + `curl` pass against `/kitchen-sink` checking for
+  the expected classes/markup in the SSR HTML and compiled CSS chunk, and
+  `biome check` for lint/format. **No real browser was used — no hover/focus
+  visual check, no keyboard-nav check, no screenshot at 1440/1280px.** The
+  exit test ("every interactive one has visible hover, focus-visible, and
+  active states; keyboard alone opens/closes drawer, modal, popover,
+  accordion with focus restored") is therefore **not fully verified** and
+  should be re-run with the Playwright MCP once connected, before trusting
+  P1 as done in the browser sense.
+- Decision — client-component budget: only `Accordion`, `CopyButton`, and
+  `FilterPill` from this phase carry `'use client'`, matching the 13-name
+  allowlist. `Drawer`, `Modal`, `Popover`, `Tooltip` are hook-free wrappers
+  around Radix primitives (which self-declare `'use client'` in their own
+  package files), so they stay Server Components and pick up interactivity
+  only when rendered inside an already-client ancestor. `TextArea`,
+  `InlineEditableField`, `InlineEditableList` are fully **controlled** (no
+  internal state) for the same reason — the future Tier-2 owners
+  (`Composer`/`BriefField`/`BriefPanel`) hold the state.
+- Deviation (14th client component, logged per standing rule 3):
+  `app/kitchen-sink/kitchen-sink-client.tsx` — page-local `'use client'` demo
+  plumbing (holds `useState` for the Drawer/Modal/InlineEditableField/
+  InlineEditableList demos on `/kitchen-sink`). Scoped entirely to the
+  throwaway kitchen-sink page; deleted alongside it at the end of P11, so it
+  never becomes a real 14th product component.
+- Decision: `Accordion` uses Radix `Collapsible` for ARIA/keyboard/state, but
+  ignores Radix's own height-animation model — a plain `grid-template-rows:
+  0fr -> 1fr` wrapper (per spec) drives the visual expand/collapse, with
+  `Collapsible.Content` `forceMount`ed and hidden via the `inert` HTML
+  attribute when closed (so clipped content isn't Tab-reachable). `inert` as
+  a prop requires React 19, which this project already has.
+- Decision: `TextArea` auto-grows via CSS `field-sizing: content` rather than
+  a JS height-measuring hook, specifically so it stays hook-free (out of the
+  13-component client budget). `field-sizing` is a modern-browser-only CSS
+  property; flagging in case cross-browser auto-grow becomes an issue —
+  Composer/TheBox (P4/P5) can layer a JS fallback later without changing
+  `TextArea`'s public props.
+- Decision: `Button`, `TextAction`, `IconButton` accept `ref` as a plain
+  React 19 prop (no `forwardRef`) so they work as Radix `asChild` trigger
+  children (e.g. `Tooltip` wrapping `IconButton` in the kitchen sink).
+- Fixed while building (not deferred): added the missing `:active` state on
+  `.filter-pill` (standing rule 6 — every interactive element needs hover /
+  focus-visible / active, no exceptions). `:focus-visible` is handled once,
+  globally, in `styles/globals.css`.
+- Not built: no CSS for `Select`/`Checkbox`/`Radio`/`DatePicker`/`Form`/
+  `Table`/`Tabs`/`Toast`/`Avatar`/`Breadcrumb`, per the explicit "build none
+  of these" list in `10-component-system.md`.
+
+### P2 — 2026-08-20
+- Tooling note: same as P1 — built without the Playwright/Context7 MCP
+  (still not connected this session). Not a gap here in the same way,
+  though: P2 has no browser surface to check. Verified with `npx vitest run`
+  (26 tests, 4 files), `tsc --noEmit`, `next build`, and `biome check`, all
+  clean.
+- **Deviation (flagged for the design owner, real arithmetic conflict in the
+  spec):** the plan's own sentence gives both "47 verified findings" and
+  per-dimension counts `[12, 9, 6, 11, 2]` — which sum to **40**, not 47.
+  Resolved by keeping the total at 47 (it's also the exact number baked into
+  `02-visual-direction.md`'s own canonical Meta Line example, "47 VERIFIED",
+  which P0 and P1 both already used) and adjusting the distribution to
+  `[14, 11, 7, 13, 2]` — Practical stays at 2 (deliberately thin), shape
+  preserved. `lib/fixtures/evidence.ts` has the full reasoning in a comment.
+  **Revisit if the per-dimension array was actually the intended source of
+  truth** — every downstream fixture (report meta counts, run-events count)
+  was built against 47/`[14,11,7,13,2]`, so reverting would touch four files.
+- Gap-fill beyond the literal P2 file list (both logged as small, necessary
+  additions, not scope creep):
+  - `lib/fixtures/run.ts` + a `Run`/`RunEvent` union in `lib/schemas/run.ts`
+    — `getRun(slug)` needs something to return; the plan's fixture list
+    never named a `run.ts` fixture file. The one fixture run's `status` is
+    `'complete'`, matching a fully-populated report/roadmap.
+  - `lib/schemas/conversation.ts` — the plan's P2 schema list is only
+    run/brief/evidence/report/roadmap (conversation isn't in it), but the
+    seam contract ("every fixture object is parsed through its Zod schema
+    at the seam") applies to the conversation seam too, so a small
+    `ConversationTurnSchema` was added. `one_liner` is excluded from the
+    fillable-field enum since it's always echoed from the user's typed idea.
+- Decision: `ReportSchema.dimensions` is an explicit `z.object({ PROBLEM:
+  ..., WHAT_EXISTS: ..., ... })` with all 5 dimension keys required, **not**
+  `z.record(DimensionSchema, DimensionSectionSchema)`. The record form
+  type-checks each dimension as possibly-undefined, which forces optional
+  chaining at every call site — directly violating the exit test's "no
+  optional-chaining guesswork needed." Caught by running `tsc --noEmit`
+  against a real usage in `tests/unit/queries.test.ts`, not by inspection —
+  worth remembering that Zod schema shape choices should always be checked
+  against actual call-site ergonomics, not just "does it parse."
+- Decision: `CitedTextSchema` (summary + every dimension's prose) is
+  `.refine()`d so every `[n]` in the text has a matching entry in
+  `citations` and vice versa — a real, enforced check, not just a comment.
+  This only validates *some* citation exists and the two lists match; it
+  does not verify literally *every sentence* has one (sentence-splitting by
+  regex was judged too fragile for a schema-layer check). Rendering-time
+  enforcement of the stronger per-sentence claim is P8's job.
+  `lib/citations.ts` (`extractCitationNumbers`) is the shared primitive both
+  this refinement and later rendering code should reuse.
+- Decision: citation numbers are derived from the finding id's own numeric
+  suffix (`EV_12` → citation `12`) rather than array position — see
+  `lib/citations.ts`. Stable under re-sorting or filtering by construction,
+  which is what R4 in `17-open-questions.md` flags as the risk to guard
+  against.
+- Decision: all fictional company/product/domain names in the evidence
+  fixture (`ChairSync`, `Recall360`, `FrontDeskPro`, and all 31 source
+  URLs) are invented and don't resemble real companies — deliberately, to
+  avoid fabricating quotes/reviews attributed to real businesses.
+- Not deferred, but worth flagging for whoever builds P8: the report
+  fixture's `FrontDeskPro` competitor entry is the one with `moat` and
+  `ignore` both absent (2 missing optional fields), per the P2 spec's
+  requirement to exercise "not established from available evidence."
 
 ---
 

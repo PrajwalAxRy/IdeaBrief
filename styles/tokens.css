@@ -1,0 +1,88 @@
+/* The only file in the codebase permitted to contain colour values. */
+
+:root {
+  /* Surfaces — four levels, used strictly per WebsiteLayoutDesc/02 §2.3 */
+  --bg-base: #0a0907;
+  --bg-surface: #100f0d;
+  --bg-card: #161412;
+  --bg-footer: #141210;
+
+  /* Borders */
+  --border-subtle: rgba(255, 248, 230, 0.07);
+  --border-medium: rgba(255, 248, 230, 0.13);
+  --border-accent: rgba(212, 160, 60, 0.55);
+
+  /* Text — four levels, used strictly per §2.5 */
+  --text-primary: #f0ebe0;
+  --text-body: #8a8070;
+  --text-muted: #5a544a;
+  --text-tertiary: #524c42;
+
+  /* Accent */
+  --accent: #d4a03c;
+  --accent-bright: #e8b84e;
+  --accent-glow: rgba(212, 160, 60, 0.18);
+  --accent-subtle: rgba(212, 160, 60, 0.08);
+
+  /* Semantic */
+  --success: #3d9e5c;
+
+  /* Product-specific semantic tokens — derived from tokens above, no new hues */
+  --conf-solid: var(--text-primary);
+  --conf-mixed: var(--text-body);
+  --conf-thin: var(--text-muted);
+  --stance-supports: var(--text-body);
+  --stance-contests: var(--text-body);
+
+  /* Fonts — variables populated by next/font in app/layout.tsx */
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+
+  /* Type scale */
+  --text-display: clamp(52px, 7vw, 96px);
+  --text-h1: clamp(36px, 4.5vw, 60px);
+  --text-h2: clamp(28px, 3vw, 44px);
+  --text-h3: clamp(17px, 1.6vw, 20px);
+  --text-body-size: 16px;
+  --text-sm: 14px;
+  --text-label: 11px;
+  --tracking-tight: -0.03em;
+  --tracking-widest: 0.10em;
+  --leading-tight: 1.1;
+  --leading-relaxed: 1.65;
+
+  /* Texture */
+  --grain-opacity: 0.04;
+
+  /* Radius */
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-enter: 600ms;
+
+  /* Spacing — --sp-N = N * 4px */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-24: 96px;
+  --sp-32: 128px;
+
+  /* Reading measure */
+  --measure-prose: 68ch;
+  --measure-conversation: 64ch;
+
+  /* Container widths */
+  --container-marketing: 1200px;
+  --container-app: 1360px;
+}
