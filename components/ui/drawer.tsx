@@ -1,7 +1,13 @@
+'use client';
+
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { IconButton } from './icon-button';
+
+/** Matches `--ease-out` (`cubic-bezier(0.16, 1, 0.3, 1)`) — tokens.css can't be read at the JS layer. */
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
 interface DrawerProps {
   open: boolean;
@@ -22,10 +28,16 @@ interface DrawerProps {
 }
 
 /**
- * Right-side, 480px, focus-trapped, Esc to close, focus restored on close —
- * all handled by Radix Dialog. This wrapper holds no state of its own (the
- * open/close state lives in the one global Evidence context), so the file
- * needs no 'use client' — Radix's own package already declares it.
+ * Right-side, 480px, focus-trapped, Esc to close — all handled by Radix
+ * Dialog. Enter/exit now driven by the `motion` package (P11 scope: "the
+ * motion package used only for Drawer and Modal enter/exit") rather than the
+ * CSS `[data-state]` keyframes P6 shipped with — `forceMount` on the Portal
+ * and `asChild` on Overlay/Content hand the actual mount timing to
+ * `AnimatePresence` instead of Radix's own show/hide, per the documented
+ * Radix+Motion integration pattern. `AnimatePresence` needs real client
+ * lifecycle (not just a client-marked import), so this file now carries
+ * `'use client'` — a logged addition beyond the 13-name allowlist, but one
+ * this exact phase's scope calls for.
  */
 export function Drawer({
   open,
@@ -37,31 +49,54 @@ export function Drawer({
 }: DrawerProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="drawer-overlay" />
-        <Dialog.Content className="drawer-content" onCloseAutoFocus={onCloseAutoFocus}>
-          <div
-            className="flex items-center justify-between px-6 py-4"
-            style={{ borderBottom: '1px solid var(--border-subtle)' }}
-          >
-            <Dialog.Title style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-              {title}
-            </Dialog.Title>
-            <Dialog.Description className="sr-only">{title}</Dialog.Description>
-            <Dialog.Close asChild>
-              <IconButton label="Close">
-                <X size={18} />
-              </IconButton>
-            </Dialog.Close>
-          </div>
-          <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
-          {footer && (
-            <div className="px-6 py-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-              {footer}
-            </div>
-          )}
-        </Dialog.Content>
-      </Dialog.Portal>
+      <AnimatePresence>
+        {open && (
+          <Dialog.Portal forceMount>
+            <Dialog.Overlay asChild forceMount>
+              <motion.div
+                className="drawer-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: EASE_OUT }}
+              />
+            </Dialog.Overlay>
+            <Dialog.Content asChild forceMount onCloseAutoFocus={onCloseAutoFocus}>
+              <motion.div
+                className="drawer-content"
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ duration: 0.26, ease: EASE_OUT }}
+              >
+                <div
+                  className="flex items-center justify-between px-6 py-4"
+                  style={{ borderBottom: '1px solid var(--border-subtle)' }}
+                >
+                  <Dialog.Title style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                    {title}
+                  </Dialog.Title>
+                  <Dialog.Description className="sr-only">{title}</Dialog.Description>
+                  <Dialog.Close asChild>
+                    <IconButton label="Close">
+                      <X size={18} />
+                    </IconButton>
+                  </Dialog.Close>
+                </div>
+                <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
+                {footer && (
+                  <div
+                    className="px-6 py-4"
+                    style={{ borderTop: '1px solid var(--border-subtle)' }}
+                  >
+                    {footer}
+                  </div>
+                )}
+              </motion.div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        )}
+      </AnimatePresence>
     </Dialog.Root>
   );
 }
