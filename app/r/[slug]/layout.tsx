@@ -1,5 +1,6 @@
 import { RunShell } from '@/components/layout/run-shell';
-import { getRun, getRunSummary } from '@/lib/db/queries';
+import { EvidenceProvider } from '@/components/validate/evidence/evidence-context';
+import { getEvidence, getRun, getRunSummary } from '@/lib/db/queries';
 import { formatClockTime } from '@/lib/format';
 import { getStageStates } from '@/lib/run-stage';
 import type { Run } from '@/lib/schemas/run';
@@ -36,10 +37,16 @@ export default async function RunLayout({
   const run = await getRun(slug);
   const stageStates = getStageStates(run.status);
   const metaParts = await buildMetaParts(run);
+  /* Mounted here so every page under /r/[slug]/* gets CitationChip and drawer
+     behaviour just by being inside it — the provider renders the one
+     EvidenceDrawer instance itself. */
+  const evidence = await getEvidence(slug);
 
   return (
-    <RunShell slug={slug} stageStates={stageStates} metaParts={metaParts}>
-      {children}
-    </RunShell>
+    <EvidenceProvider evidence={evidence}>
+      <RunShell slug={slug} stageStates={stageStates} metaParts={metaParts}>
+        {children}
+      </RunShell>
+    </EvidenceProvider>
   );
 }
