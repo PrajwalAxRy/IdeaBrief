@@ -190,16 +190,23 @@ spot, not logged.
 | P1 | Tier-1 UI primitives | `DONE` | 1 |
 | P2 | Schemas + fixture layer | `DONE` | 1 |
 | P3 | Run Shell, routing, layout | `DONE` | 2 |
-| P4 | Entry page `/` | `TODO` | 2 |
-| P5 | Define — conversation + Brief Panel | `TODO` | 2 |
-| P6 | Evidence system + `/sources` | `TODO` | 3 |
-| P7 | Validate — Run Console | `TODO` | 3 |
-| P8 | Validate — the Report | `TODO` | 3 |
-| P9 | Roadmap | `TODO` | 4 |
-| P10 | Supporting pages + state matrix | `TODO` | 4 |
-| P11 | Motion, a11y floor, DoD sweep | `TODO` | 4 |
+| P4 | Entry page `/` | `DONE` | 2 |
+| P5 | Define — conversation + Brief Panel | `DONE` | 2 |
+| P6 | Evidence system + `/sources` | `DONE` | 3 |
+| P7 | Validate — Run Console | `DONE` | 3 |
+| P8 | Validate — the Report | `DONE` | 3 |
+| P9 | Roadmap | `DONE` | 4 |
+| P10 | Supporting pages + state matrix | `DONE` | 4 |
+| P11 | Motion, a11y floor, DoD sweep | `DONE` | 4 |
+| — | Deep Canopy visual overhaul | `DONE` | 5 |
 
 Status values: `TODO` · `IN PROGRESS` · `PARTIAL` · `DONE`
+
+P4–P11 were built across sessions 2–4 and were still marked `TODO` here when
+session 5 began; the files exist and every page was read in the browser during
+the overhaul, so they are marked `DONE` on that evidence. The individual
+per-phase exit tests were **not** re-run one by one — see the overhaul entry in
+the build log.
 
 ---
 
@@ -655,6 +662,68 @@ session needs.
 - Deferred: …
 - Decision: …
 -->
+
+### Deep Canopy visual overhaul — 2026-08-20
+
+Not a numbered phase. A user-requested re-skin of the whole app, taking its
+design language from vev.design: deep forest-green surfaces, cold-white type, a
+single light-blue accent, Inter Tight throughout, IBM Plex Mono for metadata
+only. No product behaviour, routing, schema, seam, or fixture changed.
+
+Eight decisions were locked with the user before any code was written: full
+palette swap · sans everywhere · every page in scope · annotated media
+placeholders plus real CSS motion · a lean landing section list · Inter Tight ·
+a new project skill that becomes the default · the accent carries verification
+semantics and there is no second hue.
+
+- Decision: landing page section order is now `Hero` → `WhatYouGet` ("the three
+  things") → `BoxSection` → `TrustSection` → `RecentRunsList` → `FooterPanel`.
+  `TheBox` moved **out** of the hero into its own `BoxSection`, which was the
+  explicit ask. `BoxSection` deliberately carries no `MediaSlot` — the textarea
+  is the focal object and wears the bloom itself.
+- Decision: `dark-luxury-design` (amber/gold) is **superseded**. The new system
+  is `.claude/skills/deep-canopy-design/`, and `CLAUDE.md` now names it as the
+  one to read before producing visible pixels. Amber or serif styling found in
+  the tree from here on is a leftover to fix, not a valid fallback.
+- Decision: the prototype ships no photography or video. Every image/video
+  position is a `MediaSlot` — a labelled, correctly-sized frame carrying a
+  visible art-direction brief (what to shoot, at what resolution, where the
+  file goes). Motion that code alone can carry is real CSS. A `MediaSlot` is a
+  spec for an asset someone still owes; don't delete one as cleanup.
+- Deviation: `styles/globals.css` and `styles/components.css` were **deleted and
+  rewritten**, not edited. Both held uncommitted modifications from a second
+  agent that was writing to this tree concurrently; those modifications are
+  lost. The committed versions are recoverable via `git show HEAD:styles/…`.
+  The user was asked and chose to stop the other writer.
+- Deviation: `biome.json` now ignores `design_inspiration/` (untracked scratch
+  reference material, already excluded from `tsconfig.json`). Its four a11y and
+  self-closing-element errors were the only lint failures left after formatting
+  and are not ours to fix.
+- Deviation: `.gitignore` now ignores root `*.png` and `.playwright-mcp/`.
+  Verification screenshots were accumulating in the repo root; 56 were deleted.
+- Deviation: 110 files were reformatted by `biome check --write`. Files written
+  during the overhaul were saved CRLF while biome defaults to `lf`, so the lint
+  gate showed 115 errors that were line endings, not style. Committed files
+  were already LF and passed untouched. This inflates the overhaul's diff — see
+  `git_commit_plan.md`, which maps the tree onto per-phase commits.
+- Deferred: the per-phase exit tests for P4–P11 were not re-run individually.
+  What was done instead is a full-app visual pass at **1440px and 1280px** over
+  landing, Define, Validate, Roadmap, Sources and `/style-guide`, plus green
+  `npm run build`, `npm run lint`, and `npm test` (39 tests).
+- Fix: `.citation-hint` was rendering **inline**, injecting the sentence "Hover
+  any [n] to see the source" into report prose between two chips where it read
+  as body copy. It is now an absolutely-positioned, `pointer-events: none`
+  overlay pill anchored to a `position: relative` `.citation-chip-wrap`.
+- Fix: `components/style-guide/sections/entry.tsx` seeded its demo run with
+  `new Date(0)` through the *real* `upsertRecentRun`, so the epoch timestamp
+  persisted into the app's live `sv.runs` key and rendered on `/` as "57 years
+  ago". Now seeds `Date.now() - 2h`.
+- Standing rule, learned twice the hard way: **an undefined CSS custom property
+  silently voids its entire declaration.** After editing `components.css`, diff
+  used-vs-defined variables against `tokens.css` and check every `animation:`
+  name against a real `@keyframes` before believing a rule applied. Caught
+  `--bg-elevated`, `--dur-slow` and a nonexistent `fade-in` keyframe this way.
+  The audit currently returns clean.
 
 ### P0 — 2026-08-20
 - Deviation: the repo root already had planning docs (`executive_summary.md`,

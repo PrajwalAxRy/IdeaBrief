@@ -44,3 +44,7 @@ next-env.d.ts
 a16z_13.html
 to_ask.md
 rought_plan.md
+
+# verification artifacts (Playwright MCP screenshots)
+/*.png
+/.playwright-mcp/

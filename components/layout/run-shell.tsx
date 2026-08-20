@@ -1,11 +1,11 @@
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { MetaLine } from '@/components/ui/meta-line';
 import type { StageStates } from '@/lib/run-stage';
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { PageContainer } from './page-container';
 import { RunFooterBar } from './run-footer-bar';
 import { StageRail } from './stage-rail';
+import { Wordmark } from './wordmark';
 
 interface RunShellProps {
   slug: string;
@@ -26,9 +26,7 @@ export function RunShell({ slug, stageStates, metaParts, children }: RunShellPro
         <PageContainer variant="app">
           <div className="flex items-center justify-between gap-8 py-4">
             <div className="flex items-center gap-8">
-              <Link href="/" className="run-shell-wordmark">
-                ◆ Startup Validator
-              </Link>
+              <Wordmark />
               <StageRail slug={slug} stageStates={stageStates} />
             </div>
             <CopyLinkButton slug={slug} />

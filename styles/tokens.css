@@ -1,70 +1,103 @@
-/* The only file in the codebase permitted to contain colour values. */
+/* The only file in the codebase permitted to contain colour values.
+   System: Deep Canopy — see .claude/skills/deep-canopy-design/SKILL.md */
 
 :root {
-  /* Surfaces — four levels, used strictly per WebsiteLayoutDesc/02 §2.3 */
-  --bg-base: #0a0907;
-  --bg-surface: #100f0d;
-  --bg-card: #161412;
-  --bg-footer: #141210;
+  /* Surfaces — four levels, elevation reads through lightness + inset highlight */
+  --bg-base: #071613;
+  --bg-surface: #0c201a;
+  --bg-card: #112a22;
+  --bg-footer: #050f0d;
 
-  /* Borders */
-  --border-subtle: rgba(255, 248, 230, 0.07);
-  --border-medium: rgba(255, 248, 230, 0.13);
-  --border-accent: rgba(212, 160, 60, 0.55);
+  /* Borders — a last resort; prefer a surface change */
+  --border-subtle: rgba(224, 255, 244, 0.07);
+  --border-medium: rgba(224, 255, 244, 0.13);
+  --border-strong: rgba(224, 255, 244, 0.28);
+  --border-accent: rgba(127, 184, 232, 0.55);
 
-  /* Text — four levels, used strictly per §2.5 */
-  --text-primary: #f0ebe0;
-  --text-body: #8a8070;
-  --text-muted: #5a544a;
-  --text-tertiary: #524c42;
+  /* Text — four levels */
+  --text-primary: #ffffff;
+  --text-body: #a6c0b6;
+  --text-muted: #7b958a;
+  --text-tertiary: #6b857b;
+  /* Text that sits ON the accent (primary buttons) */
+  --text-on-accent: #04120f;
 
-  /* Accent */
-  --accent: #d4a03c;
-  --accent-bright: #e8b84e;
-  --accent-glow: rgba(212, 160, 60, 0.18);
-  --accent-subtle: rgba(212, 160, 60, 0.08);
+  /* Accent — one hue, three jobs: primary action, active nav, verification */
+  --accent: #7fb8e8;
+  --accent-bright: #a5d2f5;
+  --accent-glow: rgba(127, 184, 232, 0.18);
+  --accent-subtle: rgba(127, 184, 232, 0.1);
+  --accent-ring: rgba(127, 184, 232, 0.28);
 
-  /* Semantic */
-  --success: #3d9e5c;
+  /* Shadow / scrim — expressed here so components never write a colour */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --shadow-overlay: 0 24px 80px rgba(0, 0, 0, 0.65);
+  --highlight-inset: inset 0 1px 0 rgba(224, 255, 244, 0.08);
+  --highlight-inset-strong: inset 0 1px 0 rgba(224, 255, 244, 0.12);
+  --scrim: rgba(3, 10, 8, 0.72);
+  --nav-scrim: rgba(7, 22, 19, 0.72);
+  --hover-wash: rgba(224, 255, 244, 0.03);
 
-  /* Product-specific semantic tokens — derived from tokens above, no new hues */
-  --conf-solid: var(--text-primary);
-  --conf-mixed: var(--text-body);
+  /* Semantic — there is no second hue. Verification reads as accent. */
+  --success: var(--accent);
+  --conf-solid: var(--accent);
+  --conf-mixed: var(--text-primary);
   --conf-thin: var(--text-muted);
   --stance-supports: var(--text-body);
   --stance-contests: var(--text-body);
 
-  /* Fonts — variables populated by next/font in app/layout.tsx */
-  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  /* Fonts — variables populated by next/font in app/layout.tsx.
+     Sans everywhere; mono is metadata only (timestamps, counts, ids, domains). */
+  --font-display: var(--font-inter-tight), "Inter", system-ui, sans-serif;
+  --font-text: var(--font-inter-tight), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  /* Legacy alias — call sites still saying `--font-sans` mean the text face. */
+  --font-sans: var(--font-text);
 
-  /* Type scale */
-  --text-display: clamp(52px, 7vw, 96px);
-  --text-h1: clamp(36px, 4.5vw, 60px);
-  --text-h2: clamp(28px, 3vw, 44px);
-  --text-h3: clamp(17px, 1.6vw, 20px);
-  --text-body-size: 16px;
+  /* Type scale — bigger than feels comfortable, tracked tighter than feels safe */
+  --text-display: clamp(56px, 8vw, 112px);
+  --text-h1: clamp(40px, 5vw, 68px);
+  --text-h2: clamp(32px, 3.4vw, 48px);
+  --text-h3: clamp(19px, 1.7vw, 23px);
+  --text-lead: 20px;
+  --text-body-size: 17px;
   --text-sm: 14px;
-  --text-label: 11px;
-  --tracking-tight: -0.03em;
-  --tracking-widest: 0.10em;
+  --text-label: 12px;
+
+  /* Tracking — hard negative at display sizes, never on body */
+  --tracking-tight: -0.04em;
+  --tracking-snug: -0.02em;
+  --tracking-widest: 0.08em;
+  --leading-display: 0.95;
   --leading-tight: 1.1;
   --leading-relaxed: 1.65;
 
+  /* Weights — the hero pairs 800 display against 300 lead */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-display: 800;
+
   /* Texture */
-  --grain-opacity: 0.04;
+  --grain-opacity: 0.035;
 
   /* Radius */
-  --r-md: 10px;
-  --r-lg: 16px;
-  --r-xl: 20px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-xl: 28px;
   --r-pill: 999px;
 
-  /* Motion */
+  /* Motion — ambient is slow and infinite, structural is fast and triggered */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 150ms;
   --dur-base: 220ms;
   --dur-enter: 600ms;
+  --dur-strike: 420ms; /* the verification rule drawing itself under an excerpt */
+  --dur-ambient: 30s;
 
   /* Spacing — --sp-N = N * 4px */
   --sp-1: 4px;
@@ -77,6 +110,7 @@
   --sp-16: 64px;
   --sp-24: 96px;
   --sp-32: 128px;
+  --sp-48: 192px;
 
   /* Reading measure */
   --measure-prose: 68ch;
@@ -85,4 +119,102 @@
   /* Container widths */
   --container-marketing: 1200px;
   --container-app: 1360px;
+}
+
+/* ============================================================================
+   OBSIDIAN — the landing-page system. Scoped, not global.
+   ----------------------------------------------------------------------------
+   References: design_inspiration/Hyperstudio (hairline structure, weight-400
+   display type, no shadows) + design_inspiration/pageTheme (near-black canvas,
+   oversized headline over a perspective media collage, one electric-blue
+   accent).
+
+   This block is deliberately isolated behind [data-theme='obsidian'] so it
+   restyles `/` and nothing else — the /r/[slug]/* run pages keep Deep Canopy
+   until the system is ported inward as its own pass. Every name is prefixed
+   `--ob-` so a token can never be read by accident from outside the scope.
+
+   Colour values live here because this is the only file permitted to hold one.
+   Recipes that consume them live in styles/obsidian.css.
+   ============================================================================ */
+
+[data-theme="obsidian"] {
+  /* Surfaces — four levels. Elevation reads through lightness, never shadow. */
+  --ob-canvas: #0a0a0b;
+  --ob-void: #060607;
+  --ob-surface: #101012;
+  --ob-raised: #17171b;
+
+  /* Hairlines — the structural line work. This IS the layout. */
+  --ob-hairline: #232326;
+  --ob-hairline-strong: #34343c;
+  --ob-hairline-accent: rgba(45, 127, 249, 0.42);
+
+  /* Text — three levels and a dim. */
+  --ob-text: #f4f4f5;
+  --ob-muted: #8a8a93;
+  --ob-dim: #5b5b64;
+  --ob-on-accent: #ffffff;
+
+  /* Accent — one hue, two jobs: verification, and the single primary CTA.
+     Nothing else in the system is allowed to be blue. */
+  --ob-accent: #2d7ff9;
+  --ob-accent-bright: #5c9dff;
+  --ob-accent-wash: rgba(45, 127, 249, 0.12);
+  --ob-accent-ring: rgba(45, 127, 249, 0.3);
+  --ob-accent-glow: rgba(45, 127, 249, 0.4);
+
+  /* Discard state — the excerpt that failed verification. Never red; it is a
+     non-event, not an error. It simply goes grey and leaves. */
+  --ob-discard: #4a4a52;
+
+  /* Washes */
+  --ob-hover-wash: rgba(244, 244, 245, 0.04);
+  --ob-scrim: rgba(6, 6, 7, 0.72);
+
+  /* Fonts — Geist stands in for Aeonik: weight 400 at every size is the
+     signature. Geist Mono carries metadata only. Populated by next/font. */
+  --ob-font: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
+  --ob-font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Type scale — authority from scale and negative tracking, not weight. */
+  --ob-display: clamp(58px, 7.2vw, 104px);
+  --ob-h1: clamp(42px, 4.6vw, 68px);
+  --ob-h2: clamp(30px, 3vw, 44px);
+  --ob-h3: 23px;
+  --ob-lead: 21px;
+  --ob-body: 16px;
+  --ob-sm: 14px;
+  --ob-meta: 12px;
+
+  --ob-tracking-display: -0.035em;
+  --ob-tracking-h1: -0.03em;
+  --ob-tracking-h2: -0.025em;
+  --ob-tracking-snug: -0.015em;
+  --ob-tracking-meta: 0.1em;
+
+  --ob-leading-display: 0.98;
+  --ob-leading-tight: 1.08;
+  --ob-leading-body: 1.6;
+
+  /* Weight — 400 everywhere is the point. 500 exists for the meta layer only. */
+  --ob-weight: 400;
+  --ob-weight-meta: 500;
+
+  /* Radius — architectural, not soft. Pills are for buttons alone. */
+  --ob-r-tag: 4px;
+  --ob-r-card: 10px;
+  --ob-r-lg: 16px;
+  --ob-r-pill: 999px;
+
+  /* Motion */
+  --ob-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ob-fast: 180ms;
+  --ob-base: 320ms;
+  --ob-enter: 900ms;
+
+  /* Layout */
+  --ob-container: 1200px;
+  --ob-gutter: 40px;
+  --ob-section-gap: 160px;
 }

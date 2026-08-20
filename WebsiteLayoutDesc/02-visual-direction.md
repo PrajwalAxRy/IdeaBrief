@@ -24,8 +24,12 @@ emoji.
 
 ## 2.2 Colour system — tokens
 
-Copied from the skill's amber/gold variant. **These values are canonical.
-Do not re-derive, tweak, or "improve" them.**
+Copied from the skill's amber/gold variant, with the four text tokens
+brightened on 2026-08-20 to clear WCAG AA (4.5:1) against all three dark
+surfaces — see the resolved contrast gap in
+[13](13-responsive-and-accessibility.md#accessibility--the-floor-we-keep-anyway).
+**These values are canonical. Do not re-derive, tweak, or "improve" them
+without re-running the contrast check.**
 
 ```css
 :root {
@@ -40,11 +44,12 @@ Do not re-derive, tweak, or "improve" them.**
   --border-medium: rgba(255,248,230,0.13);
   --border-accent: rgba(212,160,60,0.55);
 
-  /* Text — four levels, used strictly per §2.5 */
-  --text-primary:  #f0ebe0;   /* headlines, key values */
-  --text-body:     #8a8070;   /* body copy */
-  --text-muted:    #5a544a;   /* de-emphasised headline words, inactive */
-  --text-tertiary: #524c42;   /* meta lines, timestamps */
+  /* Text — four levels, used strictly per §2.5. All four clear 4.5:1
+     against --bg-base, --bg-surface, and --bg-card. */
+  --text-primary:  #f0ebe0;   /* headlines, key values — 15–17:1 */
+  --text-body:     #a89c88;   /* body copy — 6.8–7.4:1 */
+  --text-muted:    #8a8272;   /* de-emphasised headline words, inactive — 4.8–5.2:1 */
+  --text-tertiary: #867e6c;   /* meta lines, timestamps — 4.6–4.9:1 */
 
   /* Accent */
   --accent:        #d4a03c;

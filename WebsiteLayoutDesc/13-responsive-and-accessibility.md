@@ -106,12 +106,19 @@ These are real and documented so nobody claims the product is accessible:
 
 | Gap | Impact | Cost to fix later |
 |---|---|---|
-| **Contrast is unverified and some tokens likely fail AA** | `--text-muted #5a544a` on `--bg-base #0a0907` is roughly **3.0:1** — below the 4.5:1 AA threshold for body text. It is used for de-emphasised headline words and inactive states, which is defensible, but it is not conformant. `--text-tertiary` on `--bg-base` is worse. | Low — a token adjustment, but it would visibly change the aesthetic, which is why it's deferred rather than done casually |
 | **No screen-reader testing** | Streaming content (conversation tokens, findings landing) is likely to be announced badly or not at all | Medium — needs `aria-live` regions with correct politeness on the `MessageStream` and `FindingStream` |
-| **The grain overlay + low-contrast palette** | Compounds the contrast issue for low-vision users | Low, same as above |
+| **The grain overlay** | Can compound legibility issues for low-vision users even with conformant text contrast | Low — opacity is already a token (`--grain-opacity`) |
 | **No skip link** | Keyboard users tab through the `StageRail` on every page | Trivial — add later |
 | **Citation chips are small targets** | ~20×16px, below the 24×24 minimum | Trivial — padding |
 | **Confidence conveyed by bars + text** | Actually *fine* — text always accompanies the bars, so it isn't colour-only. Noted because it's a common failure this design happens to avoid. | None |
+
+**Resolved (2026-08-20):** contrast was verified and fixed. `--text-muted`
+and `--text-tertiary` measured ~2.5–3.0:1 against the dark surfaces — well
+below the 4.5:1 AA threshold for normal text — and `--text-body` was passing
+but only barely (~4.7–5.1:1). All three were brightened in `styles/tokens.css`
+(kept in the same warm tan/gray hue family) and now measure 4.6:1 or better
+against every surface in the four-level hierarchy (`--bg-base`,
+`--bg-surface`, `--bg-card`). See [02 §2.2](02-visual-direction.md#22-colour-system--tokens).
 
 ### Two things worth doing anyway, at near-zero cost
 
