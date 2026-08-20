@@ -16,6 +16,7 @@ export const conversationFixture: ConversationTurn[] = [
     role: 'assistant',
     text: "Who's actually using this day to day — the dentist, the front-desk person, or someone else? And what size of practice are we talking about?",
     fills: ['customer'],
+    chips: ['The front-desk person', 'The dentist', 'An office manager'],
   },
   {
     role: 'assistant',

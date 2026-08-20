@@ -27,6 +27,13 @@ export const ConversationTurnSchema = z.object({
       ]),
     )
     .min(1),
+  /**
+   * One-click answers the AI offers alongside this turn (06 "Suggestion
+   * chips") — not in P2's original schema, added in P5 since the fixture
+   * needed real chip content for `suggestion-chip.tsx` to render. Optional
+   * and capped at 4, matching the spec's "max 4 chips, wrap to a second row."
+   */
+  chips: z.array(z.string().min(1)).max(4).optional(),
 });
 export type ConversationTurn = z.infer<typeof ConversationTurnSchema>;
 
