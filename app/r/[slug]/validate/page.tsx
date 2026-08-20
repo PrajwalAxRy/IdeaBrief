@@ -10,10 +10,17 @@ export default async function ValidatePage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ thin?: string }>;
+  searchParams: Promise<{ thin?: string; broken?: string }>;
 }) {
   const { slug } = await params;
-  const { thin: thinParam } = await searchParams;
+  const { thin: thinParam, broken } = await searchParams;
+
+  // Prototype-only QA affordance for exercising the root error boundary
+  // (app/error.tsx) — see the P10 build log. There is no real pipeline here
+  // that could throw, so this is the only honest way to demonstrate it.
+  if (broken === '1') {
+    throw new Error('Prototype-only QA trigger for the root error boundary (?broken=1).');
+  }
   const [run, brief, report, evidence, summary] = await Promise.all([
     getRun(slug),
     getBrief(slug),

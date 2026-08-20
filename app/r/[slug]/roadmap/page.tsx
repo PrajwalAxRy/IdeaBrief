@@ -27,11 +27,16 @@ export default async function RoadmapPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ thin?: string }>;
+  searchParams: Promise<{ thin?: string; broken?: string }>;
 }) {
   const { slug } = await params;
-  const { thin: thinParam } = await searchParams;
+  const { thin: thinParam, broken } = await searchParams;
 
+  // Prototype-only QA affordance for exercising this route's segment-scoped
+  // error boundary (roadmap/error.tsx) — see the P10 build log.
+  if (broken === '1') {
+    throw new Error('Prototype-only QA trigger for the roadmap error boundary (?broken=1).');
+  }
   const [roadmap, brief, evidence] = await Promise.all([
     getRoadmap(slug),
     getBrief(slug),
