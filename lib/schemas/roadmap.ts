@@ -34,6 +34,15 @@ export const RoadmapPhaseSchema = z.enum([
 ]);
 export type RoadmapPhase = z.infer<typeof RoadmapPhaseSchema>;
 
+/** Canonical display labels, exactly as named in the exec summary — shared by RoadmapStep's heading and DependencyChip's reverse "Changes:" link so the two can never drift apart. */
+export const ROADMAP_PHASE_LABEL: Record<RoadmapPhase, string> = {
+  BEFORE_YOU_BUILD: 'Before you build',
+  FIRST_THING_TO_BUILD: 'First thing to build',
+  THEN: 'Then',
+  LATER_AND_ONLY_IF: 'Later, and only if',
+  WHAT_WOULD_CHANGE_THIS_PLAN: 'What would change this plan',
+};
+
 export const RoadmapStepSchema = z.object({
   phase: RoadmapPhaseSchema,
   description: z.string().min(1),

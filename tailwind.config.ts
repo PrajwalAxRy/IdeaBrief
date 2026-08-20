@@ -14,6 +14,7 @@ export default {
         app: '1360px',
         prose: '68ch',
         conversation: '64ch',
+        roadmap: '900px',
       },
     },
   },
