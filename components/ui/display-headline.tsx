@@ -6,6 +6,8 @@ interface DisplayHeadlineProps {
   as?: ElementType;
   /** Puts the muted/bright halves on separate lines instead of one. */
   breakBetween?: boolean;
+  /** Renders the bright half first — some headlines (e.g. the trust section) lead with the emphasis. */
+  reverse?: boolean;
   className?: string;
 }
 
@@ -19,13 +21,28 @@ export function DisplayHeadline({
   bright,
   as: Tag = 'h1',
   breakBetween = false,
+  reverse = false,
   className = '',
 }: DisplayHeadlineProps) {
+  const mutedSpan = <span className="hl-muted">{muted}</span>;
+  const brightSpan = <span className="hl-bright">{bright}</span>;
+  const separator = breakBetween ? <br /> : ' ';
+
   return (
     <Tag className={['display-headline', className].filter(Boolean).join(' ')}>
-      <span className="hl-muted">{muted}</span>
-      {breakBetween ? <br /> : ' '}
-      <span className="hl-bright">{bright}</span>
+      {reverse ? (
+        <>
+          {brightSpan}
+          {separator}
+          {mutedSpan}
+        </>
+      ) : (
+        <>
+          {mutedSpan}
+          {separator}
+          {brightSpan}
+        </>
+      )}
     </Tag>
   );
 }
