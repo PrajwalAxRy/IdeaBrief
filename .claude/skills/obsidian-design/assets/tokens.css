@@ -1,0 +1,113 @@
+/* ============================================================================
+   OBSIDIAN — tokens.
+   ----------------------------------------------------------------------------
+   The only file in a project permitted to contain a colour value.
+
+   SCOPING. Declared on :root, which is right when the whole app is Obsidian.
+   To introduce it alongside an existing system, swap the selector for an
+   attribute scope and put that attribute on a wrapper element:
+
+       [data-theme='obsidian'] { … }        <div data-theme="obsidian">
+
+   Every name is prefixed `--ob-` so a token can never be read by accident from
+   outside the scope.
+
+   FONTS. `--ob-font` / `--ob-font-mono` expect Geist and Geist Mono to be
+   loaded as CSS variables. With next/font:
+
+       import { Geist, Geist_Mono } from 'next/font/google';
+       const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
+       const mono  = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
+       <html className={`${geist.variable} ${mono.variable}`}>
+
+   Substitutes if Geist is unavailable, in order: Instrument Sans, Schibsted
+   Grotesk, Onest. Avoid Inter — too neutral to carry weight-400 display type.
+   ============================================================================ */
+
+:root {
+  /* --- Surfaces — four levels ------------------------------------------
+     Note the direction: --ob-void is DARKER than the canvas. With no shadows
+     in the system, "recessed" and "elevated" are both lightness steps, and a
+     hero band reading darker than the page is what makes content float. */
+  --ob-canvas: #0a0a0b;
+  --ob-void: #060607;
+  --ob-surface: #101012;
+  --ob-raised: #17171b;
+
+  /* --- Hairlines — the structural line work.
+     --ob-hairline is the most-used value in the system: it IS the layout. */
+  --ob-hairline: #232326;
+  --ob-hairline-strong: #34343c;
+  --ob-hairline-accent: rgba(45, 127, 249, 0.42);
+
+  /* --- Text — three levels and a dim.
+     Body copy is --ob-muted, never --ob-text. The contrast between a white
+     headline and grey prose is doing real work. */
+  --ob-text: #f4f4f5;
+  --ob-muted: #8a8a93;
+  --ob-dim: #5b5b64;
+  --ob-on-accent: #ffffff;
+
+  /* --- Accent — one hue, three jobs: primary action, verification,
+     live/active. Nothing else in the system is allowed to be blue. */
+  --ob-accent: #2d7ff9;
+  --ob-accent-bright: #5c9dff;
+  --ob-accent-wash: rgba(45, 127, 249, 0.12);
+  --ob-accent-ring: rgba(45, 127, 249, 0.3);
+  --ob-accent-glow: rgba(45, 127, 249, 0.4);
+
+  /* --- Discard. There is no red in this system: a rejected thing is a
+     non-event, not an error. It goes grey and leaves. */
+  --ob-discard: #4a4a52;
+
+  /* --- Washes */
+  --ob-hover-wash: rgba(244, 244, 245, 0.04);
+  --ob-scrim: rgba(6, 6, 7, 0.72);
+
+  /* --- Fonts */
+  --ob-font: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
+  --ob-font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* --- Type scale — authority from scale and negative tracking, not weight */
+  --ob-display: clamp(58px, 7.2vw, 104px);
+  --ob-h1: clamp(42px, 4.6vw, 68px);
+  --ob-h2: clamp(30px, 3vw, 44px);
+  --ob-h3: 23px;
+  --ob-lead: 21px;
+  --ob-body: 16px;
+  --ob-sm: 14px;
+  --ob-meta: 12px;
+
+  /* Tracking. The slight negative on body is deliberate — it keeps the UI
+     feeling related to the headline. Do not push past -0.02em. */
+  --ob-tracking-display: -0.035em;
+  --ob-tracking-h1: -0.03em;
+  --ob-tracking-h2: -0.025em;
+  --ob-tracking-snug: -0.015em;
+  --ob-tracking-meta: 0.1em;
+
+  --ob-leading-display: 0.98;
+  --ob-leading-tight: 1.08;
+  --ob-leading-body: 1.6;
+
+  /* Weight — 400 everywhere is the point. 500 is the mono metadata layer only. */
+  --ob-weight: 400;
+  --ob-weight-meta: 500;
+
+  /* --- Radius — architectural, not soft. Only buttons are pills. */
+  --ob-r-tag: 4px;
+  --ob-r-card: 10px;
+  --ob-r-lg: 16px;
+  --ob-r-pill: 999px;
+
+  /* --- Motion. One easing curve in the whole system. */
+  --ob-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ob-fast: 180ms;
+  --ob-base: 320ms;
+  --ob-enter: 900ms;
+
+  /* --- Layout */
+  --ob-container: 1200px;
+  --ob-gutter: 40px;
+  --ob-section-gap: 160px;
+}

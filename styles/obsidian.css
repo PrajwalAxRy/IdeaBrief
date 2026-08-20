@@ -1,0 +1,1154 @@
+/* ============================================================================
+   OBSIDIAN — landing-page component recipes.
+   ----------------------------------------------------------------------------
+   Everything here is scoped under [data-theme='obsidian'] and reads a token
+   from tokens.css. No colour literal may appear in this file.
+
+   The rule the whole system rests on: sections are separated by a 1px hairline
+   and nothing else. No background bands, no gradients between sections, no
+   shadows anywhere. Elevation is a border. Hierarchy is scale and tracking.
+
+   Every custom property used below is defined in the [data-theme='obsidian']
+   block of tokens.css — an undefined one would silently void its declaration.
+   ============================================================================ */
+
+[data-theme="obsidian"] {
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
+  background: var(--ob-canvas);
+  color: var(--ob-muted);
+  font-family: var(--ob-font);
+  font-size: var(--ob-body);
+  font-weight: var(--ob-weight);
+  line-height: var(--ob-leading-body);
+  letter-spacing: var(--ob-tracking-snug);
+  font-feature-settings: "ss01" on, "cv11" on;
+  overflow-x: clip;
+}
+
+/* ------------------------------------------------------------------
+   Overrides for the two global `@layer base` rules in globals.css that
+   hard-code the Deep Canopy accent (`--accent`, #7FB8E8). Both are visible on
+   this page — a focus ring on anything without its own focus style, and every
+   text selection — and both would render a green-system colour on an obsidian
+   surface. Scoped here rather than changed there, because the run pages still
+   want the original.
+
+   These sit in `@layer components`, which Tailwind declares after `base`, so
+   the layer order alone wins; no specificity war.
+   ------------------------------------------------------------------ */
+
+[data-theme="obsidian"] :focus-visible {
+  outline-color: var(--ob-accent);
+}
+
+[data-theme="obsidian"] ::selection {
+  background: var(--ob-accent);
+  color: var(--ob-on-accent);
+}
+
+/* ============================================================
+   1. Backdrop — the only atmosphere in the system.
+   A single accent bloom behind the hero, drifting slowly. Fixed, so it
+   parallaxes against the page for free as content scrolls over it.
+   ============================================================ */
+
+.ob-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ob-backdrop::before {
+  content: "";
+  position: absolute;
+  top: -30vh;
+  left: 50%;
+  width: 120vw;
+  height: 110vh;
+  transform: translateX(-50%);
+  background: radial-gradient(50% 50% at 50% 50%, var(--ob-accent-wash) 0%, transparent 68%);
+  opacity: 0.85;
+  animation: ob-drift 34s var(--ob-ease) infinite;
+}
+
+/* A second, tighter bloom offset the other way so the field never reads as a
+   symmetrical blob. Counter-rotates on a longer period. */
+.ob-backdrop::after {
+  content: "";
+  position: absolute;
+  top: 8vh;
+  left: 22%;
+  width: 46vw;
+  height: 46vw;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, var(--ob-accent-wash) 0%, transparent 70%);
+  opacity: 0.5;
+  filter: blur(40px);
+  animation: ob-drift-alt 52s var(--ob-ease) infinite;
+}
+
+@keyframes ob-drift {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  50% {
+    transform: translateX(-46%) translateY(4vh) scale(1.08);
+  }
+}
+
+@keyframes ob-drift-alt {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(14vw, 6vh) scale(1.18);
+  }
+}
+
+/* Content sits above the backdrop. */
+.ob-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   2. Structure — container, hairline, section rhythm.
+   ============================================================ */
+
+.ob-container {
+  width: 100%;
+  max-width: var(--ob-container);
+  margin-inline: auto;
+  padding-inline: var(--ob-gutter);
+}
+
+/* The single most repeated element in the system. It IS the page structure. */
+.ob-rule {
+  border: 0;
+  border-top: 1px solid var(--ob-hairline);
+  margin: 0;
+}
+
+.ob-rule-v {
+  border: 0;
+  border-left: 1px solid var(--ob-hairline);
+  align-self: stretch;
+}
+
+/* ============================================================
+   3. Typography
+   ============================================================ */
+
+.ob-display {
+  font-family: var(--ob-font);
+  font-size: var(--ob-display);
+  font-weight: var(--ob-weight);
+  line-height: var(--ob-leading-display);
+  letter-spacing: var(--ob-tracking-display);
+  color: var(--ob-text);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.ob-h1 {
+  font-size: var(--ob-h1);
+  font-weight: var(--ob-weight);
+  line-height: var(--ob-leading-tight);
+  letter-spacing: var(--ob-tracking-h1);
+  color: var(--ob-text);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.ob-h2 {
+  font-size: var(--ob-h2);
+  font-weight: var(--ob-weight);
+  line-height: var(--ob-leading-tight);
+  letter-spacing: var(--ob-tracking-h2);
+  color: var(--ob-text);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.ob-h3 {
+  font-size: var(--ob-h3);
+  font-weight: var(--ob-weight);
+  line-height: 1.25;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+  margin: 0;
+}
+
+.ob-lead {
+  font-size: var(--ob-lead);
+  font-weight: var(--ob-weight);
+  line-height: 1.5;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+  margin: 0;
+}
+
+.ob-body {
+  font-size: var(--ob-body);
+  line-height: var(--ob-leading-body);
+  color: var(--ob-muted);
+  margin: 0;
+}
+
+.ob-body-bright {
+  color: var(--ob-text);
+}
+
+/* Metadata layer — mono, uppercase, wide. Labels, indices, counts, domains. */
+.ob-meta {
+  font-family: var(--ob-font-mono);
+  font-size: var(--ob-meta);
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--ob-dim);
+}
+
+.ob-meta-bright {
+  color: var(--ob-muted);
+}
+
+.ob-meta-accent {
+  color: var(--ob-accent);
+}
+
+/* Inline emphasis inside body copy. Not blue — blue is verification only. */
+.ob-em {
+  color: var(--ob-text);
+}
+
+/* ============================================================
+   4. Buttons — exactly one filled per viewport.
+   ============================================================ */
+
+.ob-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 24px;
+  font-family: var(--ob-font);
+  font-size: var(--ob-sm);
+  font-weight: var(--ob-weight);
+  letter-spacing: var(--ob-tracking-snug);
+  border-radius: var(--ob-r-pill);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--ob-text);
+  transition:
+    background var(--ob-base) var(--ob-ease),
+    border-color var(--ob-base) var(--ob-ease),
+    color var(--ob-base) var(--ob-ease),
+    box-shadow var(--ob-base) var(--ob-ease),
+    transform var(--ob-fast) var(--ob-ease);
+}
+
+.ob-btn:active {
+  transform: scale(0.98);
+}
+
+/* `transition: none` on purpose — the button animates box-shadow on hover, and
+   inheriting that here made the focus ring fade in over 320ms, which reads as
+   lag when tabbing. A focus ring should snap. */
+.ob-btn:focus-visible {
+  outline: none;
+  transition: none;
+  box-shadow: 0 0 0 2px var(--ob-canvas), 0 0 0 4px var(--ob-accent);
+}
+
+.ob-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Primary — the one saturated object on the screen. */
+.ob-btn-primary {
+  background: var(--ob-accent);
+  border-color: var(--ob-accent);
+  color: var(--ob-on-accent);
+}
+
+.ob-btn-primary:hover:not(:disabled) {
+  background: var(--ob-accent-bright);
+  border-color: var(--ob-accent-bright);
+  box-shadow: 0 0 0 4px var(--ob-accent-wash), 0 10px 40px var(--ob-accent-glow);
+}
+
+/* Secondary — ghost outline. Hyperstudio's default action. */
+.ob-btn-ghost {
+  border-color: var(--ob-hairline-strong);
+  color: var(--ob-text);
+}
+
+.ob-btn-ghost:hover:not(:disabled) {
+  border-color: var(--ob-text);
+  background: var(--ob-hover-wash);
+}
+
+/* Bare — text with an arrow, for tertiary placement. */
+.ob-btn-bare {
+  padding-inline: 0;
+  color: var(--ob-muted);
+}
+
+.ob-btn-bare:hover:not(:disabled) {
+  color: var(--ob-text);
+}
+
+.ob-btn-bare .ob-arrow {
+  transition: transform var(--ob-base) var(--ob-ease);
+}
+
+.ob-btn-bare:hover .ob-arrow {
+  transform: translate(3px, -3px);
+}
+
+/* ============================================================
+   5. Badge / pill — the hero eyebrow and status chips.
+   ============================================================ */
+
+.ob-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-pill);
+  background: var(--ob-surface);
+  color: var(--ob-muted);
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  transition: border-color var(--ob-base) var(--ob-ease);
+}
+
+.ob-badge:hover {
+  border-color: var(--ob-hairline-strong);
+}
+
+.ob-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--ob-r-pill);
+  background: var(--ob-accent);
+  color: var(--ob-on-accent);
+  font-family: var(--ob-font-mono);
+  font-size: 10px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  text-transform: uppercase;
+}
+
+/* Live dot — the only thing that pulses. */
+.ob-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ob-accent);
+  flex: none;
+  animation: ob-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ob-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--ob-accent-ring);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+/* ============================================================
+   6. Navigation — transparent, condenses to a bordered pill on scroll.
+   ============================================================ */
+
+.ob-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  padding-top: 18px;
+  transition: padding-top var(--ob-base) var(--ob-ease);
+}
+
+.ob-nav[data-scrolled="true"] {
+  padding-top: 10px;
+}
+
+.ob-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+  max-width: var(--ob-container);
+  margin-inline: auto;
+  padding: 12px var(--ob-gutter);
+  border: 1px solid transparent;
+  border-radius: var(--ob-r-pill);
+  transition: max-width var(--ob-base) var(--ob-ease), padding var(--ob-base) var(--ob-ease),
+    border-color var(--ob-base) var(--ob-ease), background var(--ob-base) var(--ob-ease);
+}
+
+.ob-nav[data-scrolled="true"] .ob-nav-inner {
+  max-width: 940px;
+  padding-inline: 20px;
+  border-color: var(--ob-hairline);
+  background: var(--ob-scrim);
+  backdrop-filter: blur(14px);
+}
+
+.ob-nav-link {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+  transition: color var(--ob-fast) var(--ob-ease);
+}
+
+.ob-nav-link:hover,
+.ob-nav-link:focus-visible {
+  color: var(--ob-text);
+  outline: none;
+}
+
+.ob-nav-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* The nav CTA is held back until the hero's primary button has scrolled away,
+   so only one filled button is ever on screen at once. */
+.ob-nav-cta {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
+}
+
+.ob-nav[data-past-hero="true"] .ob-nav-cta {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* Wordmark */
+.ob-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--ob-text);
+}
+
+/* Chalk, not accent. Blue is spent on verification and the primary action;
+   spending it on the logo too would make it mean nothing. */
+.ob-wordmark-glyph {
+  color: var(--ob-text);
+  flex: none;
+  transition: transform var(--ob-base) var(--ob-ease);
+}
+
+/* Skip link — obsidian-scoped so it doesn't inherit the Deep Canopy chrome. */
+.ob-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--ob-accent);
+  color: var(--ob-on-accent);
+  border-radius: 0 0 var(--ob-r-card) 0;
+  font-size: var(--ob-sm);
+}
+
+.ob-skip:focus {
+  left: 0;
+}
+
+.ob-wordmark:hover .ob-wordmark-glyph {
+  transform: rotate(90deg);
+}
+
+/* ============================================================
+   7. Hero
+   ============================================================ */
+
+.ob-hero {
+  position: relative;
+  padding-top: 180px;
+  padding-bottom: 120px;
+  background: var(--ob-void);
+  overflow: clip;
+}
+
+/* Collage — perspective media cards behind and beside the headline. They are
+   atmosphere: heavily darkened so the display type stays dominant. */
+.ob-collage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.ob-collage-card {
+  position: absolute;
+  overflow: hidden;
+  border-radius: var(--ob-r-card);
+  border: 1px solid var(--ob-hairline);
+  will-change: transform;
+}
+
+.ob-collage-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.35) contrast(1.05);
+}
+
+/* Every card carries its own scrim so the type never fights the photo. */
+.ob-collage-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ob-void);
+  opacity: 0.62;
+}
+
+/* Vignette that dissolves the collage into the canvas at every edge. */
+.ob-collage-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(120% 78% at 50% 46%, transparent 0%, var(--ob-void) 76%),
+    linear-gradient(
+      to bottom,
+      var(--ob-void) 0%,
+      transparent 22%,
+      transparent 58%,
+      var(--ob-void) 96%
+    );
+}
+
+.ob-hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Scroll cue at the foot of the hero. */
+.ob-scroll-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--ob-dim);
+}
+
+.ob-scroll-cue-track {
+  width: 1px;
+  height: 56px;
+  background: var(--ob-hairline);
+  position: relative;
+  overflow: hidden;
+}
+
+.ob-scroll-cue-track::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 18px;
+  background: var(--ob-accent);
+  animation: ob-cue 2.6s var(--ob-ease) infinite;
+}
+
+@keyframes ob-cue {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(56px);
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   8. Marquee — the five research dimensions, drifting.
+   ============================================================ */
+
+.ob-marquee {
+  position: relative;
+  overflow: hidden;
+  padding-block: 22px;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--ob-text) 12%,
+    var(--ob-text) 88%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--ob-text) 12%,
+    var(--ob-text) 88%,
+    transparent
+  );
+}
+
+.ob-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 0;
+  animation: ob-marquee 46s linear infinite;
+}
+
+.ob-marquee:hover .ob-marquee-track {
+  animation-play-state: paused;
+}
+
+.ob-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding-inline: 18px;
+  white-space: nowrap;
+}
+
+/* Dim, not accent. Blue has three jobs — verification, the primary action, and
+   "you are here". Decoration is not one of them. */
+.ob-marquee-sep {
+  color: var(--ob-dim);
+}
+
+@keyframes ob-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================
+   9. Section chrome — numbered head, sticky rail.
+   ============================================================ */
+
+.ob-section {
+  padding-block: var(--ob-section-gap);
+}
+
+.ob-section-tight {
+  padding-block: 120px;
+}
+
+.ob-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ob-eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--ob-hairline);
+}
+
+/* ============================================================
+   10. Pillars — sticky-left / scrolling-right scrollytelling.
+   ============================================================ */
+
+.ob-pillar-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ob-pillar-tick {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 12px 0 12px 16px;
+  border-left: 1px solid var(--ob-hairline);
+  color: var(--ob-dim);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  background: none;
+  transition: border-color var(--ob-base) var(--ob-ease), color var(--ob-base) var(--ob-ease);
+}
+
+.ob-pillar-tick:hover {
+  color: var(--ob-muted);
+  border-left-color: var(--ob-hairline-strong);
+}
+
+.ob-pillar-tick:focus-visible {
+  outline: none;
+  border-left-color: var(--ob-accent);
+  color: var(--ob-text);
+}
+
+.ob-pillar-tick[data-active="true"] {
+  border-left-color: var(--ob-accent);
+  color: var(--ob-text);
+}
+
+.ob-pillar-tick-label {
+  font-size: var(--ob-h3);
+  letter-spacing: var(--ob-tracking-snug);
+}
+
+.ob-pillar-panel {
+  border-top: 1px solid var(--ob-hairline);
+  padding-top: 36px;
+  transition: opacity var(--ob-base) var(--ob-ease);
+}
+
+.ob-pillar-panel[data-dim="true"] {
+  opacity: 0.42;
+}
+
+/* The one-line consequence under each pillar's body copy. */
+.ob-proof {
+  border-left: 1px solid var(--ob-hairline-strong);
+  padding-left: 20px;
+  color: var(--ob-text);
+}
+
+/* The index numeral on each panel. Chalk, not accent — all three would be blue
+   at once, which would make the rail's active-blue mean nothing. */
+.ob-pillar-index {
+  font-family: var(--ob-font-mono);
+  font-size: 13px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  color: var(--ob-text);
+}
+
+/* ============================================================
+   11. Product-fragment cards — code-drawn UI shown inside sections.
+   These are real product surfaces, not screenshots.
+   ============================================================ */
+
+.ob-frag {
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-card);
+  background: var(--ob-surface);
+  overflow: hidden;
+}
+
+.ob-frag-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--ob-hairline);
+  background: var(--ob-void);
+}
+
+.ob-frag-body {
+  padding: 20px;
+}
+
+.ob-frag-foot {
+  border-top: 1px solid var(--ob-hairline);
+}
+
+.ob-frag-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-block: 11px;
+}
+
+.ob-frag-row + .ob-frag-row {
+  border-top: 1px solid var(--ob-hairline);
+}
+
+.ob-frag-key {
+  flex: none;
+  width: 132px;
+}
+
+/* Small status chip — VERIFIED / DISCARDED / UNKNOWN inside fragments. */
+.ob-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 3px 8px;
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-tag);
+  font-family: var(--ob-font-mono);
+  font-size: 10px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ob-dim);
+  white-space: nowrap;
+}
+
+.ob-chip-verified {
+  border-color: var(--ob-hairline-accent);
+  color: var(--ob-accent);
+}
+
+/* Chat bubbles inside a fragment. */
+/* Capped by measure, not by percentage: a bubble that stretches to the width of
+   the card reads as a document, not a conversation. */
+.ob-bubble {
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-card);
+  padding: 13px 16px;
+  font-size: var(--ob-sm);
+  line-height: 1.55;
+  max-width: 48ch;
+  width: fit-content;
+}
+
+.ob-bubble-user {
+  margin-left: auto;
+  background: var(--ob-raised);
+  color: var(--ob-text);
+  border-bottom-right-radius: var(--ob-r-tag);
+}
+
+.ob-bubble-ai {
+  margin-right: auto;
+  background: transparent;
+  color: var(--ob-muted);
+  border-bottom-left-radius: var(--ob-r-tag);
+}
+
+/* Typing caret — the one blinking thing. */
+.ob-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  background: var(--ob-accent);
+  animation: ob-blink 1s steps(2, start) infinite;
+}
+
+@keyframes ob-blink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   12. Verification — the trust mechanic, animated.
+   ============================================================ */
+
+.ob-evidence {
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-card);
+  background: var(--ob-surface);
+  padding: 20px 22px;
+  transition: border-color var(--ob-base) var(--ob-ease), opacity var(--ob-base) var(--ob-ease),
+    transform var(--ob-base) var(--ob-ease);
+}
+
+.ob-evidence[data-state="verified"] {
+  border-color: var(--ob-hairline-accent);
+}
+
+.ob-evidence[data-state="discarded"] {
+  opacity: 0.42;
+  transform: translateY(6px);
+}
+
+.ob-excerpt {
+  font-size: 18px;
+  line-height: 1.5;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+
+.ob-evidence[data-state="discarded"] .ob-excerpt {
+  color: var(--ob-discard);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+/* The rule that draws itself under a matched excerpt — the literal moment of
+   verification. Scales from the left over --ob-enter. */
+.ob-verify-rule {
+  height: 1px;
+  background: var(--ob-accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--ob-enter) var(--ob-ease);
+}
+
+.ob-evidence[data-state="verified"] .ob-verify-rule,
+.ob-evidence[data-state="discarded"] .ob-verify-rule {
+  transform: scaleX(1);
+}
+
+.ob-evidence[data-state="discarded"] .ob-verify-rule {
+  background: var(--ob-discard);
+}
+
+.ob-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
+}
+
+.ob-evidence[data-state="verified"] .ob-verdict,
+.ob-evidence[data-state="discarded"] .ob-verdict {
+  opacity: 1;
+  transform: none;
+}
+
+.ob-verdict-pass {
+  color: var(--ob-accent);
+}
+
+.ob-verdict-fail {
+  color: var(--ob-discard);
+}
+
+/* Which of the cycled excerpts is playing. */
+.ob-cycle-dot {
+  width: 26px;
+  height: 2px;
+  border: 0;
+  padding: 0;
+  background: var(--ob-hairline-strong);
+  cursor: pointer;
+  transition: background var(--ob-base) var(--ob-ease);
+}
+
+.ob-cycle-dot:hover {
+  background: var(--ob-muted);
+}
+
+.ob-cycle-dot[data-active="true"] {
+  background: var(--ob-accent);
+}
+
+.ob-cycle-dot:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ob-canvas), 0 0 0 4px var(--ob-accent);
+}
+
+/* Counter readout. */
+.ob-counter {
+  font-family: var(--ob-font-mono);
+  font-size: 40px;
+  font-weight: var(--ob-weight);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ob-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ob-counter-accent {
+  color: var(--ob-accent);
+}
+
+/* ============================================================
+   13. Composer — the live entry point in the chat section.
+   ============================================================ */
+
+.ob-composer {
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-lg);
+  background: var(--ob-surface);
+  transition: border-color var(--ob-base) var(--ob-ease), box-shadow var(--ob-base) var(--ob-ease);
+}
+
+.ob-composer:focus-within {
+  border-color: var(--ob-hairline-accent);
+  box-shadow: 0 0 0 4px var(--ob-accent-wash);
+}
+
+.ob-composer textarea {
+  width: 100%;
+  resize: none;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--ob-text);
+  font-family: var(--ob-font);
+  font-size: 18px;
+  line-height: 1.55;
+  letter-spacing: var(--ob-tracking-snug);
+}
+
+.ob-composer textarea::placeholder {
+  color: var(--ob-dim);
+}
+
+/* Seed chips under the composer. */
+.ob-seed {
+  padding: 7px 14px;
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-pill);
+  background: transparent;
+  color: var(--ob-muted);
+  font-size: 13px;
+  letter-spacing: var(--ob-tracking-snug);
+  cursor: pointer;
+  transition: border-color var(--ob-fast) var(--ob-ease), color var(--ob-fast) var(--ob-ease),
+    background var(--ob-fast) var(--ob-ease);
+}
+
+.ob-seed:hover {
+  border-color: var(--ob-hairline-strong);
+  color: var(--ob-text);
+  background: var(--ob-hover-wash);
+}
+
+.ob-seed:focus-visible {
+  outline: none;
+  border-color: var(--ob-accent);
+  color: var(--ob-text);
+}
+
+/* ============================================================
+   14. Footer
+   ============================================================ */
+
+.ob-footer {
+  background: var(--ob-void);
+  border-top: 1px solid var(--ob-hairline);
+}
+
+/* Oversized ghost wordmark closing the page. Clipped at the baseline so it
+   reads as a watermark rather than a heading. */
+.ob-footer-mark {
+  font-size: clamp(80px, 15vw, 220px);
+  line-height: 0.78;
+  font-weight: var(--ob-weight);
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--ob-hairline-strong);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ob-footer-link {
+  color: var(--ob-muted);
+  font-size: var(--ob-sm);
+  transition: color var(--ob-fast) var(--ob-ease);
+}
+
+.ob-footer-link:hover,
+.ob-footer-link:focus-visible {
+  color: var(--ob-text);
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ============================================================
+   15. Reveal primitives — driven by IntersectionObserver from JS, which sets
+   data-shown on the element. Kept in CSS so the transition is GPU-composited
+   and no per-frame JS runs.
+   ============================================================ */
+
+.ob-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(8px);
+  transition: opacity var(--ob-enter) var(--ob-ease), transform var(--ob-enter) var(--ob-ease),
+    filter var(--ob-enter) var(--ob-ease);
+  transition-delay: var(--ob-reveal-delay, 0ms);
+}
+
+.ob-reveal[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Per-word headline mask reveal. Each word rides up out of a clipped line. */
+.ob-word-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.ob-word {
+  display: inline-block;
+  transform: translateY(105%);
+  transition: transform var(--ob-enter) var(--ob-ease);
+  transition-delay: var(--ob-word-delay, 0ms);
+  white-space: pre;
+}
+
+[data-shown="true"] .ob-word {
+  transform: none;
+}
+
+/* ============================================================
+   16. Reduced motion — everything ambient stops, everything structural
+   resolves instantly to its end state. Nothing is left mid-transition.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="obsidian"] *,
+  [data-theme="obsidian"] *::before,
+  [data-theme="obsidian"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .ob-reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .ob-word {
+    transform: none;
+  }
+
+  .ob-verify-rule {
+    transform: scaleX(1);
+  }
+
+  .ob-verdict {
+    opacity: 1;
+    transform: none;
+  }
+}

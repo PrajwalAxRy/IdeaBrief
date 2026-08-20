@@ -663,6 +663,103 @@ session needs.
 - Decision: …
 -->
 
+### Obsidian landing-page rebuild — 2026-08-20
+
+Not a numbered phase. A user-requested rebuild of `/` from scratch, taking its
+design language from `design_inspiration/Hyperstudio` (near-black canvas,
+hairline borders as the entire layout system, weight-400 display type, no
+shadows anywhere) crossed with `design_inspiration/pageTheme` (oversized
+headline over a perspective media collage, one electric-blue accent). New
+structure, all new copy. No schema, seam, route, or fixture changed.
+
+Eight decisions were locked with the user before any code was written: the
+chat section is a live demo **and** the real entry point · landing-only scope
+with isolated tokens · obsidian + electric blue `#2D7FF9` · Unsplash
+placeholders now with a HiggsField swap plan · Geist + Geist Mono · a
+placeholder product name · one supporting section (verification proof) ·
+rich scroll-driven motion.
+
+- Decision: **scope is isolated, not global.** The new system lives behind
+  `[data-theme='obsidian']` — tokens in `styles/tokens.css`, recipes in the new
+  `styles/obsidian.css`, every custom property prefixed `--ob-`, every class
+  prefixed `.ob-`. `/r/[slug]/*` and `/style-guide` still render Deep Canopy,
+  verified in-browser. Porting the system inward is a separate pass.
+- Decision: page order is `Hero` → `DimensionMarquee` → `Pillars` (01) →
+  `Verification` (02) → `CofounderChat` (03) → `SiteFooter`. The user's stated
+  spine was Hero → three things → chat; verification was inserted before the
+  chat so the trust argument lands before the ask.
+- Decision: **one input on the page.** The old `TheBox` / `BoxSection` split is
+  gone. The composer lives inside the chat section, below the scripted
+  transcript, and calls the same `createRun` → `/r/[slug]/define` path. A hero
+  box plus a chat demo would have been two competing entry points.
+- Decision: blue has exactly three jobs — primary action, verification, and
+  live/active state. It is deliberately **not** used on the logo, section index
+  numerals, pillar panel indices, or marquee separators, all of which were
+  built blue first and changed back. The rail's active tick stays blue because
+  that is genuinely "you are here".
+- Deviation: **`'use client'` exceeds the 13-name allowlist** in `CLAUDE.md` by
+  seven, all under `components/landing/`: `SiteNav` (scroll-condense state),
+  `HeroCollage` (rAF parallax writer), `ScrollReveal` and `WordReveal` (shared
+  IntersectionObserver reveal primitives), `Pillars` (scrollytelling active
+  index), `Verification` (the cycle state machine), `CofounderChat` (typewriter
+  + live composer). The allowlist was written for the app shell, where server
+  rendering carries run data; a marketing page whose entire brief is
+  scroll-driven motion cannot be served from it. Everything static —
+  `Hero`, `SectionHead`, `DimensionMarquee`, `Fragment`, `SiteFooter` — stayed
+  a server component.
+- Deviation: `styles/obsidian.css` is imported as
+  `@import "./obsidian.css" layer(components)`, unlike `components.css` which is
+  unlayered. **This was a real bug, caught in-browser, not a preference.**
+  Unlayered rules beat every layered rule, so `.ob-h1 { margin: 0 }` was
+  silently winning against `mt-8` and `.ob-body { font-size }` against
+  `text-[15px]` — every colliding Tailwind utility on the page was dead.
+  Measured `marginTop: "0px"` on an element carrying `mt-8`, moved the import
+  into `components` (which Tailwind declares ahead of `utilities`), re-measured
+  `32px`. If `components.css` is ever ported to this system, it has the same
+  latent bug.
+- Deviation: two `@layer base` rules in `globals.css` hard-code the Deep Canopy
+  accent — `:focus-visible { outline: 2px solid var(--accent) }` and
+  `::selection`. Both were visibly leaking `#7FB8E8` onto the obsidian page.
+  Overridden scope-locally in `obsidian.css` rather than changed globally,
+  because the run pages still want the original.
+- Deviation: `app/actions/create-run.ts` was missing `markRunStarted` and
+  `readRunStartedAt`, which `components/define/define-conversation.tsx` and
+  `lib/hooks/use-run-stream.ts` already import. Pre-existing breakage in the
+  uncommitted tree — `npx tsc --noEmit` failed on it before this work started.
+  Both were added per the `sv.runStarted.*` convention documented in
+  `CLAUDE.md`, because the build could not be verified otherwise.
+- Deviation: the hero collage uses plain `<img>` with hotlinked Unsplash URLs,
+  not `next/image`. All five were HTTP-checked before being committed to. They
+  are explicitly temporary — routing throwaway art through the optimiser would
+  make the build depend on a remote fetch. `higgsfieldPlan.md` §1 briefs the
+  replacement, at which point local assets should use `next/image` or `<video>`.
+- Decision: product name **`Groundwork`** is a placeholder the user asked me to
+  pick. It appears in three places — `BRAND.name` in `lib/content/landing.ts`,
+  the `<title>` in `app/layout.tsx`, and the footer watermark. One
+  find-and-replace changes all three.
+- Decision: landing copy lives in `lib/content/landing.ts`, **not**
+  `lib/fixtures/`. The fixtures rule exists because `lib/db/queries.ts` is the
+  Postgres seam for run data; marketing copy will never be read from Postgres,
+  so faking a seam for it would be misleading.
+- Deferred: `components/entry/box-section.tsx`, `the-box.tsx`, and
+  `example-seed.tsx` are now unreferenced. Left in place, not deleted — the rest
+  of `components/entry/` is still imported by `app/r/[slug]/not-found.tsx`,
+  `components/validate/console/run-console.tsx`, and the style guide.
+- Deferred: `/style-guide`'s `entry` section still renders the **old** Deep
+  Canopy `Hero`/`WhatYouGet`/`TrustSection`, i.e. a landing page that no longer
+  exists. It builds and renders; it is just stale. Out of scope for a
+  landing-only pass.
+- Deferred: no `openGraph` metadata or OG image exists — see
+  `higgsfieldPlan.md` §6. This is the highest-value remaining gap.
+
+Verified: `npm run build` clean (`/` prerenders static) · `npx tsc --noEmit`
+clean · `npm run lint` clean across 173 files · `npm test` 39/39 · read at
+1440 and 1280 · every focusable tabbed and confirmed to carry a visible
+obsidian-blue indicator · `prefers-reduced-motion` confirmed to stop all
+ambient animation, render all three evidence cards instead of cycling, and
+render all six chat turns with no caret · composer confirmed to create a run
+and navigate.
+
 ### Deep Canopy visual overhaul — 2026-08-20
 
 Not a numbered phase. A user-requested re-skin of the whole app, taking its
