@@ -1,6 +1,6 @@
 'use client';
 
-import { readStoredIdeaText } from '@/app/actions/create-run';
+import { markRunStarted, readStoredIdeaText } from '@/app/actions/create-run';
 import { TwoColumn } from '@/components/layout/two-column';
 import { DisplayHeadline } from '@/components/ui/display-headline';
 import { upsertRecentRun } from '@/lib/hooks/use-recent-runs';
@@ -144,6 +144,7 @@ export function DefineConversation({ slug, run, brief, conversation }: DefineCon
       setApproving(false);
       setApproved(true);
       setApprovedAt(now);
+      markRunStarted(slug);
       upsertRecentRun({ slug, oneLiner: ideaText, stage: 'validating', updatedAt: now });
       setTimeout(() => {
         router.push(`/r/${slug}/validate`);

@@ -32,3 +32,26 @@ export function readStoredIdeaText(slug: string): string | null {
   if (typeof window === 'undefined') return null;
   return window.localStorage.getItem(`${IDEA_STORAGE_PREFIX}${slug}`);
 }
+
+const RUN_STARTED_PREFIX = 'sv.runStarted.';
+
+/**
+ * Records that the brief for this run was approved just now.
+ *
+ * The server fixture is always `status: 'complete'`, so nothing in the data
+ * can distinguish "arrived at a finished run" from "just kicked one off".
+ * `localStorage` is the only thing that knows, and this is where it's written.
+ */
+export function markRunStarted(slug: string): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(`${RUN_STARTED_PREFIX}${slug}`, String(Date.now()));
+}
+
+/** Epoch ms the run was started at, or null if this browser never started it. */
+export function readRunStartedAt(slug: string): number | null {
+  if (typeof window === 'undefined') return null;
+  const raw = window.localStorage.getItem(`${RUN_STARTED_PREFIX}${slug}`);
+  if (!raw) return null;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+}
