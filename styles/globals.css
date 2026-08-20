@@ -4,80 +4,84 @@
 @import "./tokens.css";
 @import "./components.css";
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/*
+ * Everything below lives in Tailwind's own `base` layer (not left unlayered)
+ * so that utility classes — which Tailwind puts in the higher-priority
+ * `utilities` layer — can actually override it. CSS cascade layers make
+ * unlayered styles beat ALL layered styles regardless of specificity, so an
+ * unlayered `padding: 0` here would silently zero out every `p-*`/`px-*`/
+ * `py-*` utility in the app. (Tailwind's own Preflight already resets
+ * box-sizing/margin/padding on `*` inside `@layer base` — the block below
+ * only adds what Preflight doesn't cover.)
+ */
+@layer base {
+  html {
+    color-scheme: dark;
+  }
 
-html {
-  color-scheme: dark;
-}
+  body {
+    background: var(--bg-base);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-size);
+    line-height: var(--leading-relaxed);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+    position: relative;
+  }
 
-body {
-  background: var(--bg-base);
-  color: var(--text-body);
-  font-family: var(--font-sans);
-  font-size: var(--text-body-size);
-  line-height: var(--leading-relaxed);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  min-height: 100vh;
-  position: relative;
-}
+  /* Grain texture overlay — required, global, non-interactive. §2.4 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: var(--grain-opacity);
+    mix-blend-mode: overlay;
+    background-size: 128px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
 
-/* Grain texture overlay — required, global, non-interactive. §2.4 */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: var(--grain-opacity);
-  mix-blend-mode: overlay;
-  background-size: 128px;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+    line-height: var(--leading-tight);
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: 700;
-  line-height: var(--leading-tight);
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  button {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+  }
 
-button {
-  font-family: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-}
+  /* Focus — visible, amber, consistent everywhere. §2.13 */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--r-md);
+  }
 
-/* Focus — visible, amber, consistent everywhere. §2.13 */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: var(--r-md);
-}
-
-/* Reduced motion kills idle/decorative animation only — orb breathe, button
-   pulse, marquee, skeleton shimmer, scroll-reveal transforms, finding slide.
-   Structural motion the user's action triggers directly (drawer slide,
-   accordion expand, card hover lift, colour transitions) stays — it
-   communicates state change rather than decorating. §2.12 / 11.7.6 */
-@media (prefers-reduced-motion: reduce) {
-  .btn-primary,
-  .skeleton {
-    animation: none;
+  /* Reduced motion kills idle/decorative animation only — orb breathe, button
+     pulse, marquee, skeleton shimmer, scroll-reveal transforms, finding slide.
+     Structural motion the user's action triggers directly (drawer slide,
+     accordion expand, card hover lift, colour transitions) stays — it
+     communicates state change rather than decorating. §2.12 / 11.7.6 */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary,
+    .skeleton {
+      animation: none;
+    }
   }
 }

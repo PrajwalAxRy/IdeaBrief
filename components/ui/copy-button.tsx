@@ -8,7 +8,14 @@ type CopyState = 'idle' | 'copied' | 'failed';
 
 interface CopyButtonProps {
   /** Called on click to produce the exact plain text to write — never HTML, never markdown. */
-  getText: () => string;
+  getText?: () => string;
+  /**
+   * Plain-string alternative to `getText`, for callers that are themselves
+   * Server Components (e.g. `CopyLinkButton`) — a function prop can't cross
+   * the server/client boundary, but a string can. Exactly one of `getText`
+   * or `text` must be given.
+   */
+  text?: string;
   label?: string;
   variant?: 'button' | 'text';
   className?: string;
@@ -23,6 +30,7 @@ interface CopyButtonProps {
  */
 export function CopyButton({
   getText,
+  text,
   label = 'Copy',
   variant = 'text',
   className = '',
@@ -32,9 +40,9 @@ export function CopyButton({
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function handleClick() {
-    const text = getText();
+    const resolvedText = getText ? getText() : (text ?? '');
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(resolvedText);
       setState('copied');
     } catch {
       setState('failed');

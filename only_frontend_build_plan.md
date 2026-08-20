@@ -189,7 +189,7 @@ spot, not logged.
 | P0 | Scaffold + design tokens | `DONE` | 1 |
 | P1 | Tier-1 UI primitives | `DONE` | 1 |
 | P2 | Schemas + fixture layer | `DONE` | 1 |
-| P3 | Run Shell, routing, layout | `TODO` | 2 |
+| P3 | Run Shell, routing, layout | `DONE` | 2 |
 | P4 | Entry page `/` | `TODO` | 2 |
 | P5 | Define — conversation + Brief Panel | `TODO` | 2 |
 | P6 | Evidence system + `/sources` | `TODO` | 3 |
@@ -811,6 +811,46 @@ session needs.
   fixture's `FrontDeskPro` competitor entry is the one with `moat` and
   `ignore` both absent (2 missing optional fields), per the P2 spec's
   requirement to exercise "not established from available evidence."
+
+### P3 — 2026-08-19
+- **Bug fixed on the spot (P0-era, affects every phase before this one):**
+  `styles/globals.css`'s custom reset (`*, *::before, *::after { margin: 0;
+  padding: 0; }`) was declared **unlayered**. Tailwind v4 puts its own
+  utilities inside `@layer utilities`, and per the CSS Cascade Layers spec,
+  unlayered rules always beat layered rules regardless of specificity — so
+  every `p-*`/`px-*`/`py-*`/`m-*` Tailwind utility in the app was silently a
+  no-op since P0 (confirmed via the compiled CSS and a live DOM check: a
+  `py-4` element had computed `padding: 0px`). P1's build log already flagged
+  "no real browser was used" as a risk; this is exactly the kind of bug that
+  gap allowed through. Fixed by moving the entire custom rule block (reset,
+  `body`, grain overlay, headings, `a`/`button` defaults, `:focus-visible`,
+  reduced-motion) into `@layer base`, Tailwind's own documented extension
+  point (confirmed via Context7) — Tailwind's Preflight already resets
+  margin/padding itself in that same layer, so nothing was lost. Re-verified
+  `/kitchen-sink` and `/proof` still render correctly after the fix.
+- Deviation (logged, additive, non-breaking): extended `lib/db/queries.ts`
+  with two new exports beyond P2's closed list (`getRun`/`getBrief`/
+  `getEvidence`/`getReport`/`getRoadmap`) — `getConversation` (P5 needs it)
+  and `getRunSummary` (derived query/page/verified/discarded counts for the
+  Meta Line, computed by a new pure `lib/run-summary.ts` from the evidence +
+  run-events fixtures). Only `queries.ts` touches `lib/fixtures/*`, so the
+  "no component imports fixtures directly" rule stays intact.
+- Decision: StageRail state is a pure function of `RunStatus`
+  (`lib/run-stage.ts`), not the current route — `RunStatus` has no distinct
+  "roadmap done" state, so a `complete` run shows all three segments `done`
+  everywhere, matching 12.6 ("Run complete, user on Define: Stage Rail shows
+  all done"). `resolveRunRedirect` reuses the same status→destination logic
+  for `/r/[slug]`'s redirect.
+- Decision: `CopyButton` (P1) gained an additive `text?: string` prop
+  alongside the existing `getText?: () => string`, so `CopyLinkButton` can be
+  an **async Server Component** (resolving the absolute URL from the
+  request's own `host` header via `next/headers`) instead of a 15th client
+  component — a function prop can't cross the Server→Client boundary, but a
+  plain string can.
+- Not built ahead: `PhaseStrip`/`CoverageBar`/`VerifiedBadge`/`ConfidenceNote`
+  exist now (P3 scope) but aren't exercised by any page yet — they're
+  consumed starting P6–P9. Verified via `tsc`/`biome` only for this phase;
+  their own exit tests belong to the phases that render them.
 
 ---
 

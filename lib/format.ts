@@ -36,3 +36,18 @@ export function formatCount(count: number): string {
   if (count < 1000) return String(count);
   return `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k`;
 }
+
+/** e.g. 72_000 -> "1:12". PhaseStrip shows elapsed time, never a percentage. */
+export function formatElapsed(ms: number): string {
+  const totalSeconds = Math.max(0, Math.round(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+const clockFormatter = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+/** e.g. "2026-08-14T09:12:00.000Z" -> "09:12". The Define Meta Line's "STARTED {time}". */
+export function formatClockTime(isoDate: string): string {
+  return clockFormatter.format(new Date(isoDate));
+}

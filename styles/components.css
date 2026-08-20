@@ -620,6 +620,216 @@
   }
 }
 
+/* ---------- Run Shell — persistent chrome on every /r/[slug]/* page ---------- */
+
+.run-shell-header {
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(10, 9, 7, 0.8);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
+
+.run-shell-wordmark {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  transition: color var(--dur-base) ease;
+}
+
+.run-shell-wordmark:hover {
+  color: var(--accent);
+}
+
+.run-footer-bar {
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ---------- Stage Rail — primary navigation, three segments ---------- */
+
+.stage-rail {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  list-style: none;
+}
+
+.stage-segment a,
+.stage-segment span[title] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur-base) ease, border-color var(--dur-base) ease;
+}
+
+.stage-segment--locked span[title] {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.stage-segment--active a {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+.stage-segment--done a {
+  color: var(--text-body);
+}
+
+.stage-segment--done a:hover {
+  color: var(--text-primary);
+}
+
+.stage-node {
+  display: inline-block;
+  width: 12px;
+  text-align: center;
+}
+
+.stage-segment--active .stage-node {
+  color: var(--accent);
+}
+
+.stage-segment--locked .stage-node {
+  color: var(--text-muted);
+}
+
+/* ---------- Status components ---------- */
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.04em;
+  color: var(--text-body);
+}
+
+.verified-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+.confidence-note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--text-sm);
+}
+
+.confidence-bars {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.confidence-bar {
+  width: 20px;
+  height: 3px;
+  border-radius: var(--r-pill);
+  background: var(--border-medium);
+}
+
+.confidence-bar--filled {
+  background: var(--text-primary);
+}
+
+.coverage-bar {
+  display: grid;
+  grid-template-columns: 140px 1fr 32px;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.coverage-bar-label {
+  font-size: var(--text-sm);
+  color: var(--text-body);
+}
+
+.coverage-track {
+  display: block;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.coverage-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--dur-enter) var(--ease-out);
+}
+
+.coverage-bar-count {
+  text-align: right;
+}
+
+.phase-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+.phase-strip-list {
+  display: flex;
+  gap: var(--sp-6);
+  list-style: none;
+}
+
+.phase-strip-item {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+
+.phase-strip-item--done {
+  color: var(--text-body);
+}
+
+.phase-strip-item--active {
+  color: var(--accent);
+}
+
+.stage-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.04em;
+  color: var(--success);
+}
+
+.status-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
 /* ---------- Rest indicator — AI composing, three dots, no text ---------- */
 
 .rest-indicator {
