@@ -45,6 +45,18 @@ export function formatElapsed(ms: number): string {
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/** e.g. "2026-08-14T09:12:00.000Z" -> "14 Aug 2026". The report's "Researched {date}". */
+export function formatDate(isoDate: string): string {
+  return dateFormatter.format(new Date(isoDate));
+}
+
 const clockFormatter = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' });
 
 /** e.g. "2026-08-14T09:12:00.000Z" -> "09:12". The Define Meta Line's "STARTED {time}". */
