@@ -6,12 +6,18 @@ from all six media plans — `higgsfieldPlan.md`, `higgsfieldPlan_shared.md`,
 `_define.md`, `_validate.md`, `_roadmap.md` and `_sources.md`. **Those files
 remain authoritative for *why*; this one is the *what, and in what order*.**
 
-**Every still prompt below is complete and self-contained at the model-agnostic
-level, not paste-ready for every endpoint.** Adapt it once to the selected
-model's positive/negative fields, remove Markdown emphasis, and record that exact
-submitted text in the ledger. Motion stays separate because the accepted still
-already supplies scene, lighting and style. **Seven prompt-correction classes
-affect multiple assets; every correction is recorded below.**
+**Standalone still generation is complete, with one named exception.** The
+remaining entries are optional image-to-video references: use the accepted local
+WebP as the source frame, send a motion-only prompt, and do not regenerate any
+still. **The exception is Batch 2** — the Run Console cold start has no still and
+never had one, so it cannot be reached by an i2v call. Read that batch before
+assuming everything is covered.
+
+**Two open items are not generations at all:** Batch 0 (`app/favicon.ico` is
+still the Next.js default) and Batch 1's swap-in (three approved fieldwork stills
+sit in `public/media/roadmap/` while `ASSETS` is `{}`, so the page still renders
+three `MediaSlot`s). Both are code, both are free, and both are worth more than
+anything below Gate B.
 
 ### Codebase truth overrides stale plan-file paths
 
@@ -48,12 +54,10 @@ quality by roughly 5–10%, and about 80% of that sits in batches 1 and 3.**
 |---|---|---|---|---|
 | **0** | **App mark / favicon** | — | **0** | Highest quality-per-effort item in the backlog. Not a generation. |
 | **C** | **Captures of the real app** | 1–3 | **0** | Planning may run in parallel; final capture waits for frozen surfaces and fixtures. C1 is on hold. |
-| **1** | Fieldwork band | 3 | **≤13** | **Biggest visible before/after in the queue.** Three empty slots become the page's editorial moment. |
-| **2** | Console cold start | 1 | **≤5** | ~0% visual. Real product-feel gain in one 6-second window. Cheap enough to just do. |
-| **3** | Hero collage | 5 / **2** | **≤15** | Real, but half-hidden. Ship the five stills first; motion is an optional second pass. |
-| — | **↓ GATE B ↓** | | | *Stay at or below 33 paid calls; this buys essentially all available gain.* |
-| 4 | The MEDIUM fields | 3 | ~11 | **~0%.** By their own briefs: *"if it is visible, it is wrong."* 4b carries real downside. |
-| 5 | The LOW tail | 3 | ~12 | **~0% to negative.** Two of three say "default answer: no" in their own plan files. |
+| **1** | Fieldwork band | 3 | **≤7 video calls** | **The one real gap left.** Three approved stills exist but `ASSETS` is still `{}`, so three `MediaSlot`s render instead. Wiring them costs nothing. |
+| **2** | Console cold start | 1 | **BLOCKED** | No source still exists and none is queued — see the batch. Decide it before budgeting it. |
+| **3** | Hero collage | 5 / **2** | **≤5 video calls** | The local stills are retained; motion is an optional second pass. |
+| — | **↓ GATE B ↓** | | | *Stay at or below 15 paid calls; this buys essentially all available gain.* |
 
 ### Why batch 1 outranks batch 3
 
@@ -64,18 +68,12 @@ something already hidden under a 62% scrim.
 
 ### Why the hero collage is worth doing anyway — and it isn't the pixels
 
-The five hotlinked Unsplash stills are the only place the current state is
-**actively wrong** rather than merely plainer: generic "people working" stock
-inside a system whose entire argument is *not stock*. But they render at
-`opacity: 0.62` under a scrim **plus** a radial veil, so most of that sin is
-already laundered — you are replacing barely-visible stock with barely-visible
-better.
+The five hero stills are retained locally as approved WebP assets. They remain
+the static treatment; no hero still generation or remote fetch is owed.
 
-**The stronger argument is robustness.** Those five photo IDs are hotlinked to
-someone else's CDN via the `UNSPLASH()` helper at `lib/content/landing.ts:59`. If
-they rot or get rate-limited, the hero breaks in production. That is a
-reliability fix wearing a design upgrade's clothes, and it is worth more than the
-visual delta.
+**The stronger argument was robustness.** The local copies remove the runtime
+dependency on a third-party CDN — a reliability fix wearing a design upgrade's
+clothes.
 
 ### Why Gate B is where it is
 
@@ -88,7 +86,14 @@ below the line rather than merely last.
 
 ---
 
-## Index — every asset, in execution order
+## Index — remaining work, in execution order
+
+**Queue update — 2026-08-21:** standalone stills are complete or retained
+locally and are no longer generation tasks. This includes the three fieldwork
+stills, the five local hero stills, and the standalone stills for the ambient
+and empty-state surfaces. The detailed entries below remain only as optional
+image-to-video references; use the existing local still as the source frame
+and do not regenerate it.
 
 | # | Asset | Where it lives on the site | Deliver to | Budget |
 |---|---|---|---|---|
@@ -96,22 +101,10 @@ below the line rather than merely last.
 | **C1 · HOLD** | Capture — Run Console stream | `/` — **new section; design approval required** | `public/media/capture/console.{mp4,webm}` | BC |
 | **C2 · SCRIPT** | Capture — brief + `I don't know` | `/` Pillars, replaces a static `Fragment` | `public/media/capture/brief.{mp4,webm}` | BC |
 | **C3 · SCRIPT** | Capture — roadmap card interactions | `/` Pillars, replaces a static `Fragment` | `public/media/capture/roadmap-card.{mp4,webm}` | BC |
-| 1.1 | Fieldwork — `conversation` | `/r/[slug]/roadmap`, band panel 1 | `public/media/roadmap/conversation.{mp4,webm,webp}` | B1 |
-| 1.2 | Fieldwork — `expo` | `/r/[slug]/roadmap`, band panel 2 | `public/media/roadmap/expo.{mp4,webm,webp}` | B1 |
-| 1.3 | Fieldwork — `front-desk` | `/r/[slug]/roadmap`, band panel 3 | `public/media/roadmap/front-desk.{mp4,webm,webp}` | B1 |
-| 2 | Console cold start | `/r/[slug]/validate` Mode A, behind `RunConsole` | `public/media/validate/console-coldstart.{mp4,webm,webp}` | B2 |
-| 3.1 | Hero collage — `far-left` | `/` hero, notebook card | `public/media/hero/far-left.{mp4,webm,webp}` | B3 |
-| 3.2 | Hero collage — `left` | `/` hero, two-people card | `public/media/hero/left.{mp4,webm,webp}` | B3 |
-| 3.3 | Hero collage — `centre` | `/` hero, **behind the 104px headline** | `public/media/hero/centre.{mp4,webm,webp}` | B3 |
-| 3.4 | Hero collage — `right` | `/` hero, laptop card | `public/media/hero/right.{mp4,webm,webp}` | B3 |
-| 3.5 | Hero collage — `far-right` | `/` hero, monitor-texture card | `public/media/hero/far-right.{mp4,webm,webp}` | B3 |
-| — | **↓ Gate B — everything below is optional ↓** | | | |
-| 4a | Hero ambient field | `/` — replaces `.ob-backdrop` CSS blooms | `public/media/backdrop-field.{mp4,webm,webp}` | B4a |
-| 4b | Report ambient field | `/r/[slug]/validate` Mode B, behind the report | `public/media/validate/report-field.{mp4,webm,webp}` | B4b |
-| 4c | Invalid-run field | `/r/[slug]` not-found + `/` 404 | `public/media/app/not-found.{mp4,webm,webp}` | B4c |
-| 5a | Zero-results field | `/r/[slug]/sources`, empty facet combination | `public/media/sources/zero-results.{mp4,webm,webp}` | B5a |
-| 5b | Roadmap ambient field | `/r/[slug]/roadmap` backdrop | `public/media/roadmap/backdrop.{mp4,webm,webp}` | B5b |
-| 5c | Explorer ambient field | `/r/[slug]/sources` backdrop | `public/media/sources/field.{mp4,webm,webp}` | B5c |
+| **1 · SWAP** | Fieldwork band — wire the three existing stills | `/r/[slug]/roadmap` band | `ASSETS` in `components/roadmap/fieldwork-band.tsx` | **0** |
+| **2 · BLOCKED** | Console cold start — no still exists | `/r/[slug]/validate` Mode A | undecided; see Batch 2 | — |
+| — | **Integrated stills** | `backdrop-field` · `app/not-found` · `hero/`×5 · `roadmap/backdrop` · `sources/field` · `sources/zero-results` · `validate/report-field` | Shipped; no generation | — |
+| — | **Generated, not yet wired** | `roadmap/{conversation,expo,front-desk}.webp` | Blocked only on the row above | — |
 
 ### Hard call budgets
 
@@ -122,38 +115,33 @@ roll into a later batch without renewed approval.
 | Budget | Draft stills | Final reruns | i2v calls | Contingency | Hard cap |
 |---|---:|---:|---:|---:|---:|
 | B0 / BC | 0 | 0 | 0 | 0 | **0** |
-| B1 fieldwork | 3 | 3 | 3 | 4 | **13** |
-| B2 console | 1 | 1 | 2 | 1 | **5** |
-| B3 hero | 5 | 5 | 2 | 3 | **15** |
-| B4a hero field | 1 | 1 | 1 | 0 | **3** |
-| B4b report field | 1 | 1 | 1 | 1 | **4** |
-| B4c invalid run | 1 | 1 | 1 | 1 | **4** |
-| B5a zero results | 2 | 1 | 1 | 2 | **6** |
-| B5b roadmap field | 1 | 1 | 1 | 0 | **3** |
-| B5c explorer field | 1 | 1 | 1 | 0 | **3** |
+| B1 fieldwork | 0 | 0 | 3 | 4 | **7** |
+| B2 console | 0 | 0 | 2 | 1 | **3** |
+| B3 hero | 0 | 0 | 2 | 3 | **5** |
 
-`B5a`'s second draft is reserved for `drawer` and remains locked unless
-`archive` fails a named criterion. `B3`'s two i2v calls are the total hero cap,
-not two calls per card. If a native high-resolution rerun is unavailable, move
+There is no `B5a` row: every below-the-line still is already integrated, so
+batches 4 and 5 carry no budget of their own and must draw from a renewed
+approval if motion is ever authorized. `B3`'s two i2v calls are the total hero
+cap, not two calls per card. If a native high-resolution rerun is unavailable, move
 that call to contingency; do not silently add a paid upscale. Model bake-offs
 also consume contingency — there is no free pilot outside these caps.
 
 **The legacy full brief contains 15 clips and roughly 60 generations. It is not
-the shipping plan.** The revised hero cap lowers the maximum shipped set to 12
-clips and lowers spend with it. Recommended scope (batches 1–3): nine approved
-stills first, below 25 paid calls; then only the clips that pass a separate
-performance and value gate, staying at or below 33. Batch C is outside both counts
-because it costs no generation credits.
+the shipping plan.** The approved stills are already local. Remaining paid work
+is optional image-to-video only: use the stills already in `public/media/` and
+stay within the reduced caps above. Batch C is outside both counts because it
+costs no generation credits.
 
-**A stills-only pass is viable across the board** and stays below 25 paid calls for
-batches 1–3. It is not code-free:
+**The stills-only pass is already the shipped state and cost zero Higgsfield
+calls.** It is not code-free, and the fieldwork row below is the part still
+outstanding:
 
 | Family | Still-only implementation | Video-only addition |
 |---|---|---|
-| Fieldwork | Make `mp4`/`webm` optional on `FieldworkAsset`; render WebP | Conditional player, offscreen pause and pause control |
-| Console cold start | `RunConsole` uses the CSS backdrop; no generated still under reduced motion | Transient non-looping player and cold-state cross-fade |
-| Hero | Local WebP cards replace Unsplash and keep parallax | Optional player on at most two cards plus pause control |
-| Report / ambient / empty states | Graded WebP in the media leaf with CSS fallback | Conditional player, pause control and state ownership below |
+| Fieldwork | **OUTSTANDING** — make `mp4`/`webm` optional on `FieldworkAsset`, fill `ASSETS`, render WebP | Conditional player, offscreen pause and pause control |
+| Console cold start | DONE — `RunConsole` keeps the CSS backdrop; no still exists | Transient non-looping player and cold-state cross-fade |
+| Hero | DONE — local WebP cards replace Unsplash and keep parallax | Optional player on at most two cards plus pause control |
+| Report / ambient / empty states | DONE — graded WebP mounted by `AppBackdrop` and the explorer | Conditional player, pause control and state ownership below |
 | Product captures | Existing code-drawn `Fragment` remains the fallback | Capture player only after its script and freeze gate |
 
 Every generated video still has a graded WebP poster for first paint and failure.
@@ -168,9 +156,14 @@ skeletons and all error boundaries.
 
 ## Before the first call
 
-**`public/media/` does not exist yet.** Create only the subdirectories the work
-needs: `capture/`, `roadmap/`, `validate/`, `hero/`, and — only below Gate B —
-`sources/` and `app/`.
+**`public/media/` exists and holds every integrated still**: `backdrop-field.webp`
+plus `app/`, `hero/`, `roadmap/`, `sources/` and `validate/`. As checked on
+2026-08-22, the six ambient/backdrop entries (`backdrop-field`,
+`validate/report-field`, `app/not-found`, `sources/zero-results`,
+`roadmap/backdrop`, and `sources/field`) have no `.mp4` or `.webm` files and
+are not mounted as video. Their WebP files are the complete shipped state;
+video remains optional image-to-video work. Only `capture/` is still missing,
+and only Batch C creates it.
 
 ### Spend and schema gate
 
@@ -318,21 +311,23 @@ costs the still *and* the clip. Reject hard at the still stage.
 
 ### 2. Composition sketches — worth making by hand, ~5 minutes each
 
-Six assets carry a compositional constraint that **decides accept/reject**, and
-prose is a poor way to enforce a spatial rule. If the connector accepts a
-composition, structure or layout reference, feed it a crude greyscale block
-sketch — black frame, a lighter blob where the subject belongs, flat black where
-it must stay empty. No detail, no rendering; the model reads the value
-distribution.
+Six assets carried a compositional constraint that **decided accept/reject**.
+**Five of the six are now settled** — their stills are accepted and integrated,
+so the sketch is only useful if that asset is ever regenerated. The table is kept
+as the acceptance record, and the one live row is marked.
+
+If a sketch is still needed, feed the connector a crude greyscale block sketch —
+black frame, a lighter blob where the subject belongs, flat black where it must
+stay empty. No detail, no rendering; the model reads the value distribution.
 
 | Asset | The sketch must show | Why it decides the asset |
 |---|---|---|
-| **3.3 `centre`** | Subject mass in the **outer 30% on each side**, central 40% flat black | The 104px headline sits in that central region. Filled = unusable. |
-| **2 console cold start** | Overlay the actual 320px query rail and findings column; no bright mass behind either | The console is dense even before its first finding and cannot tolerate a focal object behind either column. |
-| **4b report field** | Uniform near-black value across the whole frame | A directional gradient can erase figure axes and gridlines even when the subject prompt passes. |
-| **4c not-found** | Single light source **lower right**, left two-thirds flat black | Headline, both paragraphs and `RecentRunsList` occupy the left two-thirds. |
-| **5a `archive` / `drawer`** | Subject mass in the **right 40%**, left 60% flat black | The shipped typography occupies the left 560px of a ~1040px region and needs crop tolerance. |
-| **5c explorer field** | Left 260px and everything below the top 420px flat black | The facet rail is media-free and the field must end before the first run-section hairline. |
+| 3.3 `centre` — *settled* | Subject mass in the **outer 30% on each side**, central 40% flat black | The 104px headline sits in that central region. Filled = unusable. |
+| **2 console cold start — LIVE** | Overlay the actual 320px query rail and findings column; no bright mass behind either | The console is dense even before its first finding and cannot tolerate a focal object behind either column. **The only row that still applies** — see Batch 2. |
+| 4b report field — *settled* | Uniform near-black value across the whole frame | A directional gradient can erase figure axes and gridlines even when the subject prompt passes. |
+| 4c not-found — *settled* | Single light source **lower right**, left two-thirds flat black | Headline, both paragraphs and `RecentRunsList` occupy the left two-thirds. |
+| 5a `archive` — *settled* | Subject mass in the **right 40%**, left 60% flat black | The shipped typography occupies the left 560px of a ~1040px region and needs crop tolerance. |
+| 5c explorer field — *settled* | Left 260px and everything below the top 420px flat black | The facet rail is media-free and the field must end before the first run-section hairline. |
 
 Label every reference by role — composition, subject, identity or style — and
 record its crop, strength, source and checksum in the ledger. Start sketches at
@@ -342,10 +337,11 @@ enforced by CSS masks; the reference only keeps the source frame quiet.
 
 ### 3. Existing images are crop references, not conditioning inputs
 
-Batch 3's five Unsplash stills show the current crop and mass distribution, but
-do **not** feed them to a generator by default. They carry a photographer's
-content and style, can leak unwanted visual features into the result, and their
-licence may not grant model-conditioning rights. Use the live card geometry to
+Batch 3's five hero stills — now local WebPs in `public/media/hero/`, downloaded
+from their original Unsplash sources — show the current crop and mass
+distribution, but do **not** feed them to a generator. They carry a
+photographer's content and style, can leak unwanted visual features into the
+result, and their licence may not grant model-conditioning rights. Use the live card geometry to
 make a neutral greyscale block sketch instead. Only use a third-party image as a
 model input after verifying both its licence and the selected model's terms.
 
@@ -718,9 +714,12 @@ conference room, no laptop hero shot, no whiteboard, no sticky notes.** The
 whiteboard is the landing page's vocabulary (batch 3, `centre`) and reusing it
 here makes the two surfaces look like the same page.
 
-Generate one still per panel, then composite all three together. Authorize a
-second still only for a named defect. Do not authorize any video until the
-three-still band passes as one system.
+**This is the only place in the build where an approved asset is sitting unused.**
+All three stills exist at
+`public/media/roadmap/{conversation,expo,front-desk}.webp` and none of them is on
+screen, because `ASSETS` in `components/roadmap/fieldwork-band.tsx` is still `{}`.
+Do not regenerate them; wire them, then composite the band before authorizing any
+optional video.
 
 ### 1.1 `conversation` — caption `01 · 8–10 CONVERSATIONS`
 
@@ -809,25 +808,35 @@ spending.
 
 ---
 
-## Batch 2 — Run Console cold start, 1 clip `[HIGH · cheapest of the paid work]`
+## Batch 2 — Run Console cold start `[BLOCKED · decide before budgeting]`
 
-**Why:** the single highest-anxiety moment in the product. The user has just
-approved a brief, the page changed, and for ~6 seconds nothing lands. The shared
-plan calls this *"the one place this genuinely earns its keep."*
-
-Be clear-eyed about what it buys: **near-zero visual quality, real product feel,
-in one six-second window per run.** Its revised cap is five generations for a
-single deliverable; it is here because the cap is small, not because it
-changes how the site looks.
+**Why it was ranked high:** the single highest-anxiety moment in the product. The
+user has just approved a brief, the page changed, and for ~6 seconds nothing
+lands. The shared plan calls this *"the one place this genuinely earns its keep."*
 
 **What it has to say:** *machinery is already working.* Not "please wait", not
 decoration, not a mood. **It does the job a spinner does without being a
 spinner** — a spinner says "we are busy"; this says "there is a machine, and it
 is big." Depth, scale, one working light, dust in the air.
 
-**Generate one `aisle` still first.** Only spend on `reader` if `aisle` fails a
-named criterion that the alternate can solve. Animate only the accepted winner
-and deliver one file.
+**Why it is blocked, stated plainly.** This is the one batch where the
+"stills are complete" rule does not hold. **No `aisle` or `reader` still was ever
+generated, and nothing exists at `public/media/validate/console-coldstart.*`.**
+Every other batch can go straight to image-to-video because it has an approved
+local source frame; this one cannot. Image-to-video needs a first frame, and a
+`<video>` needs a poster, so the batch has two unmet prerequisites, not one.
+
+**Two honest options — pick one before spending anything:**
+
+1. **Drop the batch.** `RunConsole` keeps the CSS backdrop, which is the current
+   shipped state and is finished. This is the default.
+2. **Reopen still generation for exactly one subject.** Generate `aisle` only,
+   accept it as both the poster and the i2v source frame, and update the "stills
+   are complete" line at the top of this file. `reader` stays unbriefed unless
+   `aisle` fails a named criterion.
+
+The candidate prompts below are retained for option 2 and are **not** authorized
+by the current queue state.
 
 ### `aisle` — primary
 
@@ -866,7 +875,9 @@ The old 20s rationale was false — a 20s file still restarts twice during a 45s
 run. The shorter clip covers the cold state and is then unmounted; it does not
 need to loop. Ship no larger than 1920×1080.
 
-**Deliver to:** `public/media/validate/console-coldstart.{mp4,webm,webp}`
+**Deliver to:** `public/media/validate/console-coldstart.{mp4,webm,webp}` — the
+`webp` is the poster and is mandatory, which is precisely why option 1 above
+cannot be reached by an i2v call alone.
 
 **Shipping behavior:** `0.34` only while zero findings have landed, for a
 maximum of five seconds. Test the composite there. At the first finding or the
@@ -886,26 +897,11 @@ the console uses only the CSS backdrop.
 
 ---
 
-## Batch 3 — Hero collage, 5 stills + up to 2 clips `[HIGH · motion optional]`
+## Batch 3 — Hero collage, local stills + up to 2 clips `[HIGH · motion optional]`
 
-**Why third, not first.** The landing hero currently renders **five hotlinked
-Unsplash stills** via the `UNSPLASH()` helper at `lib/content/landing.ts:59`,
-consumed by the five `COLLAGE` entries beneath it. The plan's own verdict:
-*"generic 'people working' stock and they are the weakest thing on the page."*
-It is the only place the current state is **actively wrong** rather than merely
-plainer.
-
-**But it is already 62% laundered.** Each card renders under a `--ob-void` scrim
-at `opacity: 0.62` plus a radial veil, so heavily-darkened stock mostly reads as
-dark texture. You are replacing barely-visible stock with barely-visible better,
-and that is why its legacy ~18-generation scope sits behind three fieldwork clips
-and ~13. The revised hero cap spends less; the five local stills deliver the
-reliability fix by themselves.
-
-**The argument that actually justifies it is robustness.** Those five photo IDs
-are hotlinked to a third-party CDN. If they rot or get rate-limited, the hero
-breaks in production. This batch removes a runtime dependency on someone else's
-infrastructure — a reliability fix wearing a design upgrade's clothes.
+The five approved local hero WebP stills are already used by the collage. No still
+generation or remote fetch is owed. The only remaining work in this batch is
+optional image-to-video on at most two cards.
 
 **What the collage has to say:** *early-stage work being figured out.* Not
 polished startup-office stock. Notebooks, whiteboards, screens mid-thought,
@@ -969,33 +965,37 @@ this criterion before judging anything else.
 > glyph, word, number, app chrome, logo, watermark, saturated colour or lens
 > flare.
 
-**Source format:** five highest-verified-native 16:9 accepted still masters.
-Ship all five as WebP first. If the still contact sheet passes and motion still
-adds something, authorize one 10–12s clip on the card whose safe zone is least
-affected; add at most one more after measuring decode and visual cost. Do not
+**Source format:** the five approved local hero stills already ship as WebP.
+If motion still adds something, authorize one 10–12s clip on the card whose safe
+zone is least affected; add at most one more after measuring decode and visual
+cost. Do not
 default to the centre merely because it is largest — its headline safe zone is
 the most fragile. Generated motion and wrapper parallax must be reviewed
 together; if they read as two camera moves, keep the still.
 
 **Deliver to:** `public/media/hero/{far-left,left,centre,right,far-right}.{mp4,webm,webp}`
 
-**Swap-in:** make `CollageCard` accept a local `poster` plus optional `mp4` /
-`webm`. Render the WebP `<img>` when video paths are absent or motion is reduced;
-render `<video autoPlay muted loop playsInline>` only for approved motion cards.
-Drop the `UNSPLASH()` helper once all five local stills have landed. The parallax
-writer, scrim, veil and entrance stagger operate on the wrapper and stay exactly
-as they are.
+**Swap-in:** already complete. `CollageCard` renders the local WebP `<img>`.
+Optional video may be added only to approved cards; the parallax writer, scrim,
+veil and entrance stagger stay exactly as they are.
 
 ---
 
 # GATE B — before Batches 4–5
 
-**Batches 0–3 buy essentially all of the available gain: below ~25 calls for the
-nine stills and at most 33 if every justified clip is also made.**
-Everything below is optional: **4b has implementation downside; 5a remains on a
-one-week hold; 5b and 5c are default no.** Do not start Batch 4 until 0–3 have
-landed and been inspected at 1440px and 1280px. If Gate A did not pass, nothing
-below this line is authorized.
+**Queue update — 2026-08-21:** standalone stills for 4a–4c and 5a–5c have
+already been generated outside Higgsfield and are removed from the active
+index and call budgets. The detailed briefs below remain only as reference for
+optional Higgsfield image-to-video work; do not regenerate their stills.
+
+**Every below-the-line still is already integrated.** Any remaining spend is
+optional image-to-video work using those approved local source frames.
+Everything below is optional: **4b has implementation downside; 5a is a
+judgement call; 5b and 5c are default no.**
+
+**Two things above this line are still open and neither is a still:** Batch 0
+(the favicon is still the Next.js default) and Batch 1's `ASSETS` wiring. Neither
+blocks Batch 4, but both are cheaper and worth more than anything below it.
 
 ---
 
@@ -1014,43 +1014,34 @@ Do not paste the batch-1/3 treatment over the haze or report field.
 
 ### 4a. Hero ambient field
 
-Replaces `.ob-backdrop`'s two drifting radial gradients on `/`.
+The approved still is already integrated at
+`public/media/backdrop-field.webp`. If motion is approved, use that still as the
+source frame; do not generate another image.
 
-> A full-bleed field of volumetric haze in near-black, with one faint neutral
-> luminance bloom suspended within it. A long-exposure of dust in a
-> projector beam, not a nebula. No object, no horizon, nothing the eye can land
-> on. The haze fills the entire frame edge to edge and falls away to black at
-> every edge, with no visible border. Shot on 35mm. Neutral monochrome grade.
-> Cinematic, restrained, documentary — not stock
-> photography. No text, no logos, no legible screens, no watermarks. No people.
-> No bright saturated colour. No lens flare.
-
-It must pass the final-composite text and line baseline tests above; subjective
-"dark enough" is not an acceptance criterion.
-
-**Source format:** highest verified native 16:9 output and shortest native
-duration; 12–20s is only a presentation target. Ship no larger than 1920×1080.
-**Deliver to:** `public/media/backdrop-field.{mp4,webm,webp}`
+**Video deliverables:** `public/media/backdrop-field.{mp4,webm}`.
 **Swap-in:** mount the shared client media leaf inside the `.ob-backdrop` wrapper
-in `app/page.tsx`; keep the page server-first, the CSS gradients underneath as
-the fallback and the CSS accent wash as the only source of blue. Never grade the
-generated neutral bloom toward the accent.
+in `app/page.tsx`; keep the page server-first and the CSS accent wash as the only
+source of blue. Never grade the generated neutral bloom toward the accent.
+
+**The documented fallback is real again, and the mechanism matters.** The plans
+say "keep the CSS gradients underneath as the fallback", and they now do exactly
+that: the blooms stay live and animated on every surface, and the still sits over
+them in `.ob-backdrop-plate`. If a plate is absent (`define`), slow, or 404s, the
+blooms are what the surface shows.
+
+**The strength lives on the plate's scrim, never on the image.** An earlier pass
+put it on the image as `opacity`, which forced a choice between a translucent
+plate with two stacked atmospheres or killing the blooms outright. Keeping the
+raster fully opaque and scrimming it in `--ob-canvas` at `1 − strength` gives the
+same rendered result with one visible field and a working fallback. **Do not
+reintroduce `opacity` on `.ob-backdrop-media`** — that is what breaks it.
 
 ### 4b. Report ambient field `[highest downside risk in the file]`
 
 **The most constrained asset here.** It sits behind the densest surface in the
-product, and every figure draws its axes and gridlines at
-`rgba(244,244,245,0.06)`.
-
-> A uniformly lit, near-black macro field of matte paper fibre, viewed nearly
-> straight on and filling the frame edge to edge. The texture is just barely
-> visible, with no directional light gradient, bright edge, vignette, bounded
-> sheet, object or horizon anywhere in frame. Neutral monochrome grade.
-> Cinematic and restrained. No text, logos, screens, watermarks, people,
-> saturated colour or lens flare.
-
-A *ground*, not a scene. This queue approves the paper-fibre subject only;
-alternate materials require their own prompt and acceptance pass.
+product, and every figure draws axes and gridlines. The approved still is already
+integrated at `public/media/validate/report-field.webp`; use it as the video
+source frame if motion survives the separate gate.
 
 **Any region that reduces the gridline's local contrast enough deletes the
 gridline under it.** Alpha is not brightness, so judge the final composite, not
@@ -1064,14 +1055,11 @@ specifically to prevent that edge.
 Ships at `opacity: 0.10`. **Do not exceed it "to make it visible" — if it is
 visible, it is wrong.**
 
-Generate and composite **one still first**. Motion contributes nothing to this
-surface; stop at the still unless a blinded A/B comparison shows a measurable
-gain without reducing any figure-line contrast.
+Motion contributes nothing by default, so stop at the still unless a blinded
+A/B comparison shows a measurable gain without reducing any figure-line
+contrast.
 
-**Source format:** highest verified native 16:9 output. If video survives the
-separate gate, use the shortest native duration; 12–20s is only a presentation
-target. Ship no larger than 1920×1080.
-**Deliver to:** `public/media/validate/report-field.{mp4,webm,webp}`
+**Video deliverables:** `public/media/validate/report-field.{mp4,webm}`.
 **Verify:** use the rendered-pixel baseline test above on every figure gridline;
 reading computed CSS colour alone cannot see the media underneath.
 
@@ -1091,45 +1079,33 @@ hairlines remain unchanged above it.
 
 The blankest screen in the product and the only one with no dense type on it —
 which makes it the **best** of the three below-the-line backdrops, because
-atmosphere has nothing to compete with. Currently the CSS `Orb`, breathing at 38s.
+atmosphere has nothing to compete with. **Shipped:** the still replaced the CSS
+`Orb` on both branches.
 
 **What it has to say:** *the link was cut, not the run.* Absence, not error.
 There is no red in this system and no apology in this copy.
 
-This one **is** a subject in a room, so it keeps the batch-1/3 treatment.
-
-> An empty desk in a dark unlit room, the chair pushed back and turned slightly
-> away, one small lamp lit at the far right edge of the frame. Nobody present.
-> Photographed from a few metres back at seated height, the left two thirds of
-> the frame uncluttered and unlit. The small practical lamp is the only light
-> source and its pool dies before the middle of the frame. Shot on 35mm, shallow
-> depth of field, deep shadow everywhere else. Near-monochrome, desaturated, cool
-> grade. Matte black background. Cinematic, restrained, documentary — not stock
-> photography. No text, no logos, no legible screens, no watermarks. No bright
-> saturated colour. No lens flare.
-
-The composition **must** be weighted to the lower right — the headline, the two
-paragraphs and `RecentRunsList` all sit in the left two thirds.
+The approved still is already integrated at
+`public/media/app/not-found.webp`. Use it as the video source frame; its
+lower-right subject and left-side safe zone must remain unchanged.
 
 Ships at `opacity: 0.24`, higher than the shared ambient baseline (`0.16`) but
 lower than the console cold-start treatment (`0.34`).
 
-**Source format:** highest verified native 16:9 output and shortest native
-duration; 12–20s is only a presentation target. Ship no larger than 1920×1080.
-**Deliver to:** `public/media/app/not-found.{mp4,webm,webp}`
+**Video deliverables:** `public/media/app/not-found.{mp4,webm}`.
 
-**Required code change:** `app/not-found.tsx` is already client-side, so it
-conditionally mounts this media for both root and run-link branches and renders
-the existing standalone `AppBackdrop` as the fallback underneath. Do not invent
-an unsupported `src` prop on `AppBackdrop`. Then remove `<Orb dimmed />` from
-`components/layout/run-not-found.tsx:49`. There is no
-`app/r/[slug]/not-found.tsx`, and `app/not-found.tsx` itself does not render the
-Orb.
+**Code change — already done.** `app/not-found.tsx` mounts
+`.ob-not-found-backdrop` for both the root and run-link branches at
+`opacity: 0.24`, and `<Orb dimmed />` is gone from
+`components/layout/run-not-found.tsx`. If video is ever added, extend that same
+leaf and keep the WebP as the reduced-motion and failure fallback.
 
-This clip replaces the Orb; it does not join it. Until both branches use the
-asset, do not delete `Orb`. Measure `.ob-recovery` and the entire
-`.ob-standalone-body` before and after: identical, or the asset is pushing the
-recovery path down the page.
+**Loose end this created:** `Orb` now has **zero call sites**.
+`components/ui/orb.tsx` and the `.ob-orb` / `.ob-orb-dimmed` rules in
+`styles/obsidian-app.css` are dead code and can be deleted in a separate
+housekeeping pass. Measure `.ob-recovery` and `.ob-standalone-body` before and
+after any such change: identical, or something is pushing the recovery path down
+the page.
 
 **Two-layout acceptance:** test root 404 and run-link not-found independently at
 1280px and 1440px. On the run branch, test `RecentRunsList` both empty and
@@ -1152,85 +1128,37 @@ not because they should be made.
 facet combination yields zero rows. Cross `PRACTICAL` × `contests` × `cited in
 report` to reach it.
 
-**The typographic content shipped, but its reserved-height contract did not.**
-`.ob-src-empty` at `styles/obsidian-app.css:4716` has the headline, live facet
-echo and ghost `Clear` button, but currently lacks the plan's required
-`min-height: 620px`. Add and measure that prerequisite before judging the empty
-state or generating media; otherwise facet toggles collapse and re-expand the
-page, and media is being asked to disguise a layout bug.
+**The typographic content and its reserved-height contract both shipped.**
+`.ob-src-empty` now carries `min-height: 620px` alongside the headline, live
+facet echo and ghost `Clear` button, so facet toggles no longer collapse and
+re-expand the page.
 
-Once that is fixed, the typographic state is a defensible permanent answer.
-**`_sources.md`'s instruction is to live with it for a week and only then
-decide.** If the region still reads as a hole after that, *the copy is wrong, not
-the media* — fix the copy before spending a credit.
+The typographic state is a defensible permanent answer. **`_sources.md`'s
+instruction is to live with it and only then decide.** If the region still reads
+as a hole, *the copy is wrong, not the media* — fix the copy before spending a
+credit.
 
-**What the clip has to say:** *we looked, and the shelf ends here.*
+The approved `archive` still is already integrated at
+`public/media/sources/zero-results.webp`. Use it as the video source frame if
+Option B remains approved; do not generate the `drawer` alternate.
 
-Generate `archive` first. Only brief `drawer` if `archive` reads as a stock
-photograph of a warehouse.
-
-**`archive` — primary**
-
-> A long row of unlabelled grey archive boxes on steel shelving receding into
-> darkness, lit hard from one side, the near boxes in focus and the far end
-> unresolvable. The left 60% of the frame is near-featureless, unlit and
-> empty; all subject mass stays in the right 40%. Shot on 35mm, shallow depth
-> of field, single hard key light from one side, deep shadow everywhere else.
-> Near-monochrome, desaturated, cool grade.
-> Matte black background. Cinematic, restrained, documentary — not stock
-> photography. No text, no logos, no legible screens, no watermarks. No
-> people. No bright saturated colour. No lens flare.
-
-**`drawer` — alternate**
-
-> A single hand pushing a deep unlabelled filing drawer closed in low light,
-> shot from the side, the drawer front filling the lower third. The left 60%
-> of the frame is near-featureless, unlit and empty; the hand and drawer action
-> stay in the right 40%. Shot on 35mm, shallow
-> depth of field, single hard key light from one side, deep shadow everywhere
-> else. Near-monochrome, desaturated, cool grade. Matte black background.
-> Cinematic, restrained, documentary — not stock photography. No text,
-> no logos, no legible screens, no watermarks. Nobody looking at the camera. No
-> bright saturated colour. No lens flare.
-
-**The featureless left 60% is the accept/reject criterion** — the shipped
-typography occupies the left 560px of a ~1040px region and still needs tolerance
-for the 1280px crop. The clip goes *behind* it, never instead of it.
-
-Generate at most one accepted subject. `archive` and `drawer` are candidates,
-not two deliverables.
-
-**Source format:** highest verified native 16:9 still/video master, 10–12s.
-**Deliver to:** `public/media/sources/zero-results.{mp4,webm,webp}`
+**Video deliverables:** `public/media/sources/zero-results.{mp4,webm}`.
 **Shipping treatment:** a `--ob-void` scrim at `opacity: 0.62` plus
 `grayscale(.35) contrast(1.05)`. Re-measure the region height before and after —
 **unchanged**, or the page will collapse and re-expand as facets toggle.
 
 ### 5b. Roadmap ambient field `[default answer no]`
 
-**Where:** `/r/[slug]/roadmap`, the `.ob-backdrop` variant. Differs from the
-other routes only in bloom position — low and right, behind the week axis rather
-than behind the headline.
-
-> A full-bleed field of volumetric haze in near-black with a single faint
-> neutral luminance bloom concentrated in the lower right. A long exposure
-> of dust in a projector beam, not a nebula. No object, no horizon, nothing the
-> eye can land on. The haze fills the entire frame edge to edge and falls away
-> to black at every edge, with no visible border. Shot on 35mm. Neutral
-> monochrome grade. Cinematic, restrained, documentary — not stock
-> photography. No text, no logos, no legible screens, no watermarks. No people.
-> No bright saturated colour. No lens flare.
+**Where:** `/r/[slug]/roadmap`, the `.ob-backdrop` variant. The approved still is
+already integrated at `public/media/roadmap/backdrop.webp`; use it as the video
+source frame if this optional upgrade survives review.
 
 It must pass the final-composite baseline for `--ob-dim` mono at **12px** — a
 harder bar than the landing page's, where the backdrop only ever sits behind
 104px display type.
 
-**Source format:** highest verified native 16:9 output and shortest native
-duration; 12–20s is only a presentation target. Ship no larger than 1920×1080.
-**Deliver to:** `public/media/roadmap/backdrop.{mp4,webm,webp}`
-
-Generate one neutral still and composite it before considering motion. The CSS
-accent wash supplies any blue; the generated file remains neutral.
+**Video deliverables:** `public/media/roadmap/backdrop.{mp4,webm}`. The CSS
+accent wash supplies any blue; the generated file stays neutral.
 
 **Required code change if video survives:** mount the one shared client media
 leaf beside the existing page-owned `<AppBackdrop variant="roadmap" />`; keep
@@ -1243,24 +1171,10 @@ active. Do not move backdrop ownership into `RunShell`.
 
 ### 5c. Explorer ambient field `[default answer no · ranked last for a reason]`
 
-**Where:** `/r/[slug]/sources`, the top 420px band only. Must resolve to flat
-`--ob-canvas` before the `01 THE RUN` hairline — the 65 rows never enter it, and
-the 260px facet rail is a **media-free zone** because a live count over a moving
-bloom stops reading as a number.
-
-> Volumetric haze in a near-black room, a single faint neutral luminance bloom
-> positioned on the left, photographed as a long exposure of
-> dust in a projector beam — the upper third of the frame open and almost
-> featureless. No object, no horizon, nothing the eye can land on. The haze fills
-> the entire frame edge to edge and falls away to black at every edge, with no
-> visible border. Shot on 35mm. Neutral monochrome grade.
-> Cinematic, restrained, documentary — not stock photography. No text, no logos,
-> no legible screens, no watermarks. No people. No bright saturated colour. No
-> lens flare.
-
-**Source format:** highest verified native 16:9 output and shortest native
-duration; 12–20s is only a presentation target. Ship no larger than 1920×1080.
-**Deliver to:** `public/media/sources/field.{mp4,webm,webp}`
+**Where:** `/r/[slug]/sources`, the top 420px band only. The approved still is
+already integrated at `public/media/sources/field.webp`; use it as the video
+source frame if this optional upgrade survives review.
+**Video deliverables:** `public/media/sources/field.{mp4,webm}`.
 
 The top-420px fade and left-260px rail exclusion are CSS masks, not prompt
 effects. The generated field stays neutral; CSS supplies any controlled accent.

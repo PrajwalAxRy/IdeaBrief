@@ -39,8 +39,8 @@ image (§6) both need regenerating.
 
 **Lives in:** `lib/content/landing.ts` → `COLLAGE`, rendered by
 `components/landing/hero-collage.tsx`.
-**Currently:** five hotlinked Unsplash stills, each verified reachable. They are
-generic "people working" stock and they are the weakest thing on the page.
+**Currently:** five local WebP stills retained from the verified Unsplash
+sources. They are the approved static treatment; no still generation is owed.
 
 **What the collage has to say:** *early-stage work being figured out.* Not
 polished startup-office stock. Notebooks, whiteboards, screens mid-thought,
@@ -89,8 +89,11 @@ stay exactly as they are; they operate on the wrapper, not the media.
 
 **Lives in:** `.ob-backdrop` in `styles/obsidian.css` (two drifting radial
 gradients on 34s and 52s loops).
-**Currently:** pure CSS. It genuinely works — this is an optional upgrade, not a
-gap.
+**Currently:** the approved neutral still is shipped at
+`public/media/backdrop-field.webp` above the CSS fallback. Still generation is
+complete; only optional image-to-video work remains, using that local still as
+the source frame. No `backdrop-field.mp4` or `.webm` currently exists, so the
+WebP is the shipped runtime asset.
 
 **If replaced:** a full-bleed 20s loop of very slow-moving volumetric haze in
 near-black, with one faint cool-blue bloom drifting through it. Think a
@@ -98,7 +101,8 @@ long-exposure of dust in a projector beam, not a nebula. It must be dark enough
 that white text at 60% opacity is still legible over it.
 
 **Format:** 16:9, 2560×1440, 20s, MP4 + WebM, no audio, seamless loop.
-**Deliver to:** `public/media/backdrop-field.{mp4,webm}`
+**Deliver to:** `public/media/backdrop-field.{mp4,webm}`. The existing WebP
+remains the poster and reduced-motion fallback.
 **Code change:** add a `<video>` inside the `.ob-backdrop` div in
 `app/page.tsx`, keep the CSS gradients underneath as the poster/fallback.
 

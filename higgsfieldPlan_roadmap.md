@@ -69,10 +69,12 @@ either a diagram, an optional backdrop, or a static card.
 `styles/obsidian-app.css`. **`FieldworkBand` and `FieldworkMedia` enter the
 plan's naming contract when A11 builds them; do not rename either.**
 
-**Currently:** three `MediaSlot`s — correctly sized, hairline-framed, visibly
-labelled, each carrying its own art-direction brief on screen. That is the
-correct shipped state, not a gap. Standing rule 14: a slot is the spec for an
-asset someone still owes. **Do not delete these as cleanup.**
+**Currently:** the approved standalone stills are retained locally at
+`public/media/roadmap/{conversation,expo,front-desk}.webp`. The three
+`MediaSlot`s remain until their static swap is wired; no still generation is
+owed. `ASSETS` is still empty, so no video is mounted either. Any remaining
+HiggsField work is optional image-to-video using these local stills as source
+frames.
 
 **Where it sits, and why.** Between `01 OPEN QUESTIONS` and `02 BUILD ROADMAP`,
 as the page's hinge, full `--ob-container` width (1200px) with a 1px
@@ -183,14 +185,18 @@ enjoying this — not a different treatment.
 
 ## 2. Roadmap ambient backdrop `[LOW]`
 
-**Lives in:** `.ob-backdrop` (the landing recipe in `styles/obsidian.css` §1, with its per-route `[data-variant]` offset in `styles/obsidian-app.css` §5), mounted by
-`RunShell` and varied per route. The roadmap variant differs from the other
+**Lives in:** the page-owned `<AppBackdrop variant="roadmap" />`, using the
+`.ob-backdrop` recipe in `styles/obsidian.css` with its per-route
+`[data-variant]` offset in `styles/obsidian-app.css` §5. It is varied per route.
+The roadmap variant differs from the other
 three only in bloom position — low and right, sitting behind the week axis
 rather than behind the headline.
 
-**Currently:** pure CSS — a drifting radial bloom on a transformed
-pseudo-element, ambient timing (20–50s infinite), so subtle a screenshot cannot
-tell it is moving. It works. This is an optional upgrade and not a gap.
+**Currently:** the approved neutral still is shipped at
+`public/media/roadmap/backdrop.webp` above the CSS fallback. Still generation is
+complete; only optional image-to-video work remains. No
+`backdrop.mp4` or `.webm` currently exists, so the WebP is the shipped runtime
+asset.
 
 **If replaced:** a full-bleed 20s loop of extremely slow volumetric haze in
 near-black with a single faint cool-blue bloom drifting across the lower right.
@@ -202,10 +208,11 @@ type at 104px.
 **Format:** 16:9, 2560×1440, 20s, MP4 (H.264) + WebM (VP9), no audio, plus a
 `.jpg` poster.
 **Deliver to:** `public/media/roadmap/backdrop.{mp4,webm}`
-**Code change:** add a `<video>` inside the `.ob-backdrop` element in
-`components/layout/run-shell.tsx`, gated on the route being `roadmap`, and keep
-the CSS gradients underneath as the poster and the reduced-motion fallback.
-Nothing else moves.
+**Code change if video is approved:** add the shared client media leaf beside
+the page-owned `<AppBackdrop variant="roadmap" />` in
+`app/r/[slug]/roadmap/page.tsx`, and keep the existing WebP/CSS backdrop as the
+poster and reduced-motion fallback. Do not move backdrop ownership into
+`RunShell`. Nothing else moves.
 
 **On a page whose job is to be worked from, an ambient video is the least
 defensible spend in this file.** It is heavier than the CSS it replaces, it

@@ -89,8 +89,11 @@ findings have landed and drops to `0.08` the moment the first one does — the
 atmosphere is spent on the empty state and then recedes for the next 40 seconds
 of real content.
 
-Generate **both** subjects below as stills, at two variants each. Pick one.
-Animate only the winner. Deliver one file.
+**Current status — BLOCKED:** neither subject has a generated still, and no
+console-coldstart media file exists. The shipped default is to keep the CSS
+backdrop and drop this batch. If the batch is explicitly reopened, generate
+`aisle` only and use its accepted still as both poster and image-to-video source;
+keep `reader` unbriefed unless `aisle` fails a named acceptance criterion.
 
 | Candidate | Subject line for the prompt | Why it might win |
 |---|---|---|
@@ -110,33 +113,36 @@ move — a 3–5% push-in or lateral drift across the whole clip. No cuts, no zo
 snap, no subject entering or leaving frame. The shot should end almost exactly
 where it started.*
 
-**Format:** 16:9, 2560×1440, 20s, MP4 (H.264) + WebM (VP9), no audio, plus a
-`.jpg` poster frame. 20s rather than 12s so the field is still drifting behind
-the stream at t=45s and never restarts visibly mid-run.
+**Format if reopened:** highest verified native 16:9 output, 10–12s target, MP4
+(H.264) + WebM (VP9), no audio, plus a `.webp` poster frame. This is transient
+cold-start media, not a looping background: it is visible for at most five
+seconds and is unmounted when the first finding lands or the limit expires.
 
 **Deliver to:** `public/media/validate/console-coldstart.{mp4,webm}` plus
-`public/media/validate/console-coldstart.jpg`.
+`public/media/validate/console-coldstart.webp`.
 
-**Code change to swap in:** in `run-console.tsx`, render the field as the first
-child of the console section, absolutely positioned, `inset: 0`,
-`z-index: 0`, with the console grid at `z-index: 1`:
+**Code change if the batch is approved:** `RunConsole` owns
+`stream.findings`, so it should conditionally mount a fixed, `aria-hidden`
+media leaf while `findings.length === 0`. Keep the existing page-owned
+`<AppBackdrop variant="validate" />` as the CSS fallback; cross-fade the cold
+media out when the first finding lands, then pause, detach sources and unmount
+it. Do not add a `data-cold` prop to `AppBackdrop`.
 
 ```tsx
 {reduced
-  ? <img src="/media/validate/console-coldstart.jpg" alt="" />
-  : <video autoPlay muted loop playsInline preload="auto"
-      poster="/media/validate/console-coldstart.jpg">
+  ? <img src="/media/validate/console-coldstart.webp" alt="" />
+  : <video autoPlay muted playsInline preload="metadata"
+      poster="/media/validate/console-coldstart.webp">
       <source src="/media/validate/console-coldstart.webm" type="video/webm" />
       <source src="/media/validate/console-coldstart.mp4" type="video/mp4" />
     </video>}
 ```
 
-carried by the existing `<AppBackdrop variant="validate" data-cold={findings.length === 0} />`.
 The recipe carries the opacity ramp and nothing else:
 
 ```css
-.ob-backdrop[data-variant='validate'] { opacity: .08; transition: opacity var(--ob-enter) var(--ob-ease); }
-.ob-backdrop[data-variant='validate'][data-cold='true'] { opacity: .34; }
+.ob-console-cold { opacity: .34; transition: opacity var(--ob-enter) var(--ob-ease); }
+.ob-console-cold[data-state='fading'] { opacity: 0; }
 ```
 
 `reduced` comes from the existing reduced-motion hook read in an effect, never
@@ -191,22 +197,17 @@ HiggsField is the wrong tool for all three; the right tool is the browser.
 
 ## 3. Report ambient backdrop `[MEDIUM]`
 
-**Lives in:** the report's outermost wrapper in
-`components/validate/report/report.tsx`, as a fixed-position
-the same `.ob-backdrop[data-variant='validate']` element sitting behind the
-`--ob-container-report` grid. Recipe in the Report section of
-`styles/obsidian-app.css`.
+**Lives in:** `app/r/[slug]/validate/page.tsx`, which mounts the page-owned
+`<AppBackdrop variant="validate" />` behind the report's
+`--ob-container-report` grid. The report component remains focused on report
+content. Recipe in the Report section of `styles/obsidian-app.css`.
 
-**Currently:** flat `--ob-canvas`. It is fine. **This is an optional upgrade,
-not a gap** — the report's visual interest comes from the hairline figure layer,
-not from anything behind it.
-
-**If replaced:** an unbroken sheet of dark matte material — heavy paper, slate,
-or raw concrete — photographed at a raking angle with one hard light entering
-from a single edge, so the fibre or grain is just barely legible and everything
-else falls to black. A *ground*, not a scene. No horizon, no object, no
-recognisable subject, nothing the eye can land on. The whole point is that at
-`opacity: 0.10` it registers as texture and depth and nothing more.
+**Currently:** the approved static paper-fibre WebP is shipped at
+`public/media/validate/report-field.webp` at the constrained opacity above, with
+the CSS field retained underneath. **Still generation is complete;** only
+optional image-to-video work remains — do not regenerate the still. No
+`report-field.mp4` or `.webm` currently exists, so the WebP is the shipped
+runtime asset.
 
 **The hard warning, and it is the reason this entry is `[MEDIUM]` and not
 higher:** this backdrop sits behind the densest surface in the product — a
@@ -219,26 +220,17 @@ quietly degrades from "measurement" to "infographic". If the delivered asset has
 a bright edge, crop it out rather than dimming the whole frame — a uniform dim
 keeps the bright region relatively bright.
 
-**Prompt:**
-
-> An unbroken sheet of dark matte paper photographed at a raking angle, the
-> fibre texture just barely visible, no object and no horizon in frame. Shot on
-> 35mm, shallow depth of field, single hard key light from one side, deep shadow
-> everywhere else. Near-monochrome, desaturated, cool grade. Matte black
-> background. Cinematic, restrained, documentary — not stock photography. No
-> text, no logos, no legible screens, no watermarks. Nobody looking at the
-> camera. No bright saturated colour. No lens flare.
-
 **Motion prompt (image-to-video):** *Extremely slow, single continuous camera
 move — a 3–5% lateral drift across the whole clip. No cuts, no zoom snap, no
 subject entering or leaving frame. The shot should end almost exactly where it
 started.*
 
 **Format:** 16:9, 2560×1440, 20s, MP4 (H.264) + WebM (VP9), no audio, plus a
-`.jpg` poster frame.
+`report-field.webp` poster frame.
 
-**Deliver to:** `public/media/validate/report-field.{mp4,webm}` plus
-`public/media/validate/report-field.jpg`.
+**Deliver to:** `public/media/validate/report-field.{mp4,webm}`. The approved
+still at `public/media/validate/report-field.webp` remains the reduced-motion
+and failure fallback.
 
 **Code change to swap in:** add the `<video>` inside `.ob-backdrop` in
 `report.tsx`, `preload="metadata"` (it is below the fold on first paint and must

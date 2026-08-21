@@ -99,10 +99,10 @@ rendering and must not sniff the pathname to find out. **The recipe is
 the per-route `[data-variant]` offsets are added in `styles/obsidian-app.css`
 **§5 `RUN CHROME`** (A4). There is no `.ob-app-backdrop`.
 
-**Currently:** nothing. The run pages have no atmosphere at all; they are Deep
-Canopy flat surfaces. A4 builds the mount point as part of the run chrome. If
-`AppBackdrop` doesn't exist when you come to swap this in, build it then — it is
-a server component, three props, four lines of JSX.
+**Currently:** the approved WebP plates are integrated on the eligible run
+surfaces, with the CSS blooms retained underneath as fallback. `AppBackdrop`
+already owns the page-level mount point. No ambient/backdrop video has been
+generated or wired; any clip remains an optional later upgrade.
 
 **This entry owns the system, not the clip.** The mount point, the routing
 table, the treatment rules, the opacity and the swap-in diff are settled here
@@ -113,12 +113,11 @@ resolved on Roadmap"* — so each page file owns its own subject, its own path,
 and its own argument for whether the route deserves one at all.
 
 **What that means in practice:** the four page files were written to that brief
-and, having each argued it out, landed on **three clips, not four** —
-`higgsfieldPlan_validate.md` briefs two (the console cold start and a quieter
-report field), `_roadmap.md` one, `_sources.md` one, and `_define.md` decides
-against a backdrop entirely and records the brief it would have needed so a
-future pass fails against a written spec rather than inventing its own. Read
-each page file for the subject; read this section for everything else.
+and, having each argued it out, landed on **four optional clip entries across
+three eligible routes** — `higgsfieldPlan_validate.md` briefs two (the console
+cold start and a quieter report field), `_roadmap.md` one, `_sources.md` one,
+and `_define.md` decides against a backdrop entirely. Read each page file for
+the subject; read this section for everything else.
 
 **What must not drift between them.** One `AppBackdrop` component, one recipe,
 one opacity (`0.16`), one veil, one reduced-motion rule, and the treatment and
@@ -147,6 +146,17 @@ the right-hand column is what it becomes if and when its asset lands.
 | `/r/[slug]` not-found | `'ambient'` | `'clip'` — §2 below | Its own asset, not a page file's. See §2 — this is the one that gets *worse* on a known date. |
 | Error boundaries | `'none'` | **stays `'none'`** | See §3. Atmosphere behind a stack-trace digest reads as indifference. |
 
+**Still status — 2026-08-21:** the approved standalone plates for the landing
+hero, validate report, roadmap, sources explorer, invalid-run surface, and
+zero-results state have been generated outside HiggsField. Do not regenerate
+their stills. Any future HiggsField work for these entries is image-to-video
+only and must use the local still as its source frame.
+
+**Video status — 2026-08-22:** none of those six ambient/backdrop entries has an
+MP4 or WebM yet, and the current app mounts each approved WebP as an image.
+The still-only treatment is therefore the shipped state; video is an optional
+future upgrade, not an existing delivery.
+
 **What every backdrop has to say, whatever its subject:** *nothing.* This is the
 entry most likely to be over-delivered. It is not a subject, it is a
 temperature — a room with the lights off and one cold source somewhere
@@ -172,8 +182,9 @@ single continuous camera move — a 3–5% push-in or lateral drift across the w
 clip. No cuts, no zoom snap, no subject entering or leaving frame. The shot
 should end almost exactly where it started.*
 
-**Format, identical on all four:** 16:9, 2560×1440, 20s, MP4 (H.264) + WebM
-(VP9), no audio, plus a `.jpg` poster frame.
+**Format, identical on all four if a clip is approved:** 16:9, highest verified
+native resolution, 10–12s target, MP4 (H.264) + WebM (VP9), no audio, plus the
+approved WebP still as poster frame.
 **Deliver to:** each page file names its own path under
 `public/media/<route>/`. **This entry delivers no asset of its own** — there is
 no shared base clip, and a path like `public/media/app/backdrop-base.*` should
@@ -202,22 +213,11 @@ landing version is deliberately almost invisible; this one is quieter still.
 
 ## 2. Invalid run / truncated link `[MEDIUM — upgrade, not a gap]`
 
-**Lives in:** `app/r/[slug]/not-found.tsx` (the run-specific surface, deliberately
-*not* wrapped in `RunShell` — that layout is what threw) and `app/not-found.tsx`
-(the plain 404 with no run context). Both render `<Orb dimmed />` from
-`components/ui/orb.tsx` (A2 moves it there from `components/entry/`).
-
-**Currently:** a pure-CSS breathing ellipse whose entire appearance lives in
-`.orb` / `.orb--dimmed` in `styles/components.css`. **D1 deletes
-`styles/components.css` at the end of the build.** When A15 lands, this surface
-would lose its only visual element. **That is no longer true and the entry is
-ranked accordingly:** A2 ports `Orb` to `components/ui/orb.tsx` on a new
-`.ob-orb` recipe in `obsidian-app.css` §2, so it survives the deletion intact and
-this surface ships finished with or without a clip. **This is an upgrade, not a
-gap.** It is still the strongest *upgrade* case on the app side — it is the
-blankest screen in the product and the only one with no dense type on it — but it
-does not outrank the remaining genuine absence (§4's OG block), and the priority
-order below reflects that.
+**Lives in:** `app/not-found.tsx`, which branches between the root 404 and the
+invalid-run surface using `usePathname()`. The approved static still is
+integrated at `public/media/app/not-found.webp`; still generation is complete.
+No `app/not-found.mp4` or `.webm` exists. Any future HiggsField work is optional
+image-to-video using that local still as the source frame.
 
 **What the invalid-run surface has to say:** *the link was cut, not the run.* The
 URL is the entire access model — no login, no account, no recovery email. A
@@ -226,54 +226,23 @@ the page's job is to hand the visitor `RecentRunsList` and get out of the way.
 The atmosphere must read as **absence, not error.** There is no red in this
 system and there is no apology in this copy. Something is not here; that is all.
 
-**Subject:** an empty desk in an unlit room, chair pushed back and turned
-slightly away, a single lamp lit at the far edge of frame. Nobody in it. The
-composition should be weighted to the lower right so the left two thirds — where
-the headline, the two paragraphs and the recovery list sit — stay near-featureless.
-
-**Prompt template:**
-
-> An empty desk in a dark unlit room, the chair pushed back and turned slightly
-> away, one small lamp lit at the far right edge of the frame. Nobody present.
-> Photographed from a few metres back at seated height, the left two thirds of
-> the frame uncluttered and unlit.
->
-> Shot on 35mm, shallow depth of field, single hard key light from one side, deep
-> shadow everywhere else. Near-monochrome, desaturated, cool grade. Matte black
-> background. Cinematic, restrained, documentary — not stock photography.
->
-> No text, no logos, no legible screens, no watermarks. Nobody looking at the
-> camera. No bright saturated colour. No lens flare.
-
 **Motion prompt (image-to-video):** *Extremely slow, single continuous camera
 move — a 3–5% push-in or lateral drift across the whole clip. No cuts, no zoom
 snap, no subject entering or leaving frame. The shot should end almost exactly
 where it started.*
 
-**Format:** 16:9, 2560×1440, 20s, MP4 (H.264) + WebM (VP9), no audio, plus a
-`.jpg` poster frame.
-**Deliver to:** `public/media/app/not-found.{mp4,webm}` and
-`public/media/app/not-found.jpg`
+**Format:** 16:9, MP4 (H.264) + WebM (VP9), no audio. Use
+`public/media/app/not-found.webp` as the poster and source frame.
+**Video deliverables:** `public/media/app/not-found.{mp4,webm}`.
 
-**Code change to swap in:** in **both** `app/r/[slug]/not-found.tsx` and
-`app/not-found.tsx`, replace `<Orb dimmed />` with
-`<AppBackdrop variant="standalone" src="/media/app/not-found" />` and delete the `Orb`
-import. This surface may run the clip at `opacity: 0.24` rather than §1's `0.16`
-— it is the blankest screen in the product and the only one with no dense type on
-it — set via `[data-variant='standalone']` on `.ob-backdrop`, not an
-inline style. Under `prefers-reduced-motion` render the poster `<img>`. The
-`DisplayHeadline`, the two paragraphs, the "Start a new idea" CTA and
-**`RecentRunsList` — which is the actual recovery path and the reason the page
-exists — all stay exactly where they are.** Measure
-`document.querySelector('.recent-runs')?.getBoundingClientRect()` before and
-after the swap: identical, or the asset is pushing the recovery path down the
-page.
+**Code change if video is approved:** extend the existing not-found media leaf
+inside `app/not-found.tsx`; keep the static WebP as the reduced-motion and
+failure fallback. The headline, paragraphs, CTA and `RecentRunsList` remain
+unchanged, and the asset must not change `.ob-recovery` or
+`.ob-standalone-body` geometry.
 
-Note the ordering. Per **C13**, A8 removes the `Orb` from the Run Console (the
-backdrop replaces it there) and A14 keeps it on the invalid-run page — so by the
-end of the build this surface is `Orb`'s **only** caller. Filling this slot is
-therefore what finally retires the component; until it lands, **do not delete
-`Orb`**, or the invalid-run page ships as a blank field.
+The static image now replaces the former `Orb` on both branches. Do not mount a
+second ambient field underneath it.
 
 ---
 

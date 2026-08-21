@@ -60,13 +60,16 @@ server render, and the URL being the whole access model is the point.
 
 ## 1. Explorer ambient backdrop `[LOW]`
 
-**Lives in:** the shared app backdrop — `.ob-app-field` in
-`styles/obsidian-app.css` §1, specified in `higgsfieldPlan_shared.md` §1 —
-scoped to this route by `app/r/[slug]/sources/page.tsx`.
-**Currently:** pure CSS. Two radial washes at `--ob-accent-wash` drifting on 38s
-and 54s, confined to the top band beneath the header and faded out before the
-`01 THE RUN` hairline. It works. On this page it is also doing less work than on
-any other route in the app.
+**Lives in:** the page-owned `<AppBackdrop variant="sources" />`, using the
+shared `.ob-backdrop` recipe in `styles/obsidian.css` and the route-specific
+offset in `styles/obsidian-app.css`. It is mounted by
+`app/r/[slug]/sources/page.tsx`.
+**Currently:** the approved neutral still is shipped at
+`public/media/sources/field.webp` above the CSS fallback, confined to the top
+band beneath the header and faded out before the `01 THE RUN` hairline. Still
+generation is complete; only optional image-to-video work remains. No
+`field.mp4` or `.webm` currently exists, so the WebP is the shipped runtime
+asset.
 
 **What the backdrop has to say:** *nothing.* That is not a shortfall in the brief,
 it is the brief. Define has an empty transcript to fill, the console has 6s of
@@ -82,19 +85,6 @@ dark and still enough that a 12px mono domain string at `--ob-dim` set over the
 band stays readable without a second scrim. It renders in the top 420px only and
 must resolve to flat `--ob-canvas` before the `01 THE RUN` rule.
 
-**Prompt template:**
-
-> `<subject>`. Shot on 35mm, shallow depth of field, single hard key light from
-> one side, deep shadow everywhere else. Near-monochrome, desaturated, cool
-> grade. Matte black background. Cinematic, restrained, documentary — not stock
-> photography. No text, no logos, no legible screens, no watermarks. Nobody
-> looking at the camera. No bright saturated colour. No lens flare.
-
-`<subject>` = *Very slow-moving volumetric haze in a near-black room, a single
-faint cool-blue bloom drifting through it from the left, photographed as a long
-exposure of dust in a projector beam — the upper third of the frame open and
-almost featureless.*
-
 **Motion prompt (image-to-video):** *Extremely slow, single continuous camera
 move — a 3–5% push-in or lateral drift across the whole clip. No cuts, no zoom
 snap, no subject entering or leaving frame. The shot should end almost exactly
@@ -104,10 +94,9 @@ where it started.*
 **Deliver to:** `public/media/sources/field.{mp4,webm}` plus `field.jpg` as the
 poster frame.
 
-**Code change to swap in:** in `app/r/[slug]/sources/page.tsx`, add a `<video
-autoPlay muted loop playsInline preload="metadata" poster="/media/sources/field.jpg">`
-as the first child of the `.ob-app-field` div, WebM source before MP4. Keep the
-CSS gradients underneath as the fallback — do not delete them. Gate on
+**Code change if video is approved:** add a shared client media leaf beside the
+page-owned `<AppBackdrop variant="sources" />`; keep the CSS gradients underneath
+as the fallback — do not delete them. Gate on
 `prefers-reduced-motion` read in an effect, never during render; under reduce,
 render the poster `<img>` and nothing else. **The backdrop div must not gain
 `position: relative`, `overflow`, `contain`, or `filter`** — `FacetRail` sits in
@@ -171,10 +160,10 @@ the wrong tool for this one; noted here so it isn't mistaken for a gap.**
 
 ## 4. `02 EVERYTHING WE CHECKED` — rail, rows, discards, drawer `[LOW — do not replace]`
 
-**Lives in:** `components/validate/sources/evidence-explorer.tsx` →
-`EvidenceExplorer`; `components/validate/sources/facet-rail.tsx` → `FacetRail`;
+**Lives in:** `components/validate/explorer/evidence-explorer.tsx` →
+`EvidenceExplorer`; `components/validate/explorer/facet-rail.tsx` → `FacetRail`;
 `components/validate/evidence/finding-card.tsx` at `variant="row"`;
-`components/validate/sources/discard-row.tsx` → `DiscardRow`;
+`components/validate/explorer/discard-row.tsx` → `DiscardRow`;
 `components/validate/evidence/evidence-drawer.tsx` → `EvidenceDrawer`.
 **Currently:** a `260px minmax(0,1fr)` grid at `gap: 64px` inside
 `--ob-container-app`. Facet groups for dimension · stance · cited · domain ·
@@ -209,13 +198,15 @@ it by mistake.
 
 ## 5. The zero-results moment `[MEDIUM]`
 
-**Lives in:** `components/validate/sources/evidence-explorer.tsx` — the branch
+**Lives in:** `components/validate/explorer/evidence-explorer.tsx` — the branch
 taken when the active facet combination yields zero rows. The region is the
 `minmax(0,1fr)` right column of the explorer grid: roughly **1040 × 620px** in the
 middle of the densest page in the app.
-**Currently:** nothing, and worse, today's equivalent branch in
-`components/validate/sources-list.tsx` is *unreachable* — every dimension has at
-least two findings, so the empty state has never rendered once (r07 §6d).
+**Currently:** the approved `archive` still is integrated at
+`public/media/sources/zero-results.webp` behind the typographic state. Still
+generation is complete; any future HiggsField work is optional image-to-video
+using that local still as the source frame. No `zero-results.mp4` or `.webm`
+currently exists, so the WebP is the shipped runtime asset.
 **A13 makes it reachable for the first time.** Cross three facets — `PRACTICAL`
 (2 findings) × `contests` (neither of the 2 contests anything) × `cited in
 report` — and the list empties. That is standing rule 14's blank div, arriving
@@ -274,20 +265,13 @@ because the subject is genuinely physical, not because the area needs filling.
 | `archive` | A long row of grey archive boxes on steel shelving receding into darkness, lit hard from one side, the near boxes in focus and the far end unresolvable. | Reads as "we went down the row and it stopped." The receding perspective gives a natural quiet zone on the left where the type sits. |
 | `drawer` | A single hand pushing a deep filing drawer closed in low light, shot from the side, the drawer front filling the lower third. | More human, more finite. Riskier — a hand implies an actor, and this page's voice is deliberately impersonal. |
 
-Generate `archive` first. Only brief `drawer` if `archive` reads as a stock
-photograph of a warehouse.
+The existing `archive` still is the only accepted candidate. Do not generate
+`drawer` unless a later review explicitly rejects this still for a named
+criterion.
 
 **Both variants must be near-featureless across the left 560px of the frame**,
 because that is exactly where Option A's typography sits and Option B does not
 replace it — it goes *behind* it.
-
-**Prompt template** (swap the subject line per variant):
-
-> `<subject>`. Shot on 35mm, shallow depth of field, single hard key light from
-> one side, deep shadow everywhere else. Near-monochrome, desaturated, cool
-> grade. Matte black background. Cinematic, restrained, documentary — not stock
-> photography. No text, no logos, no legible screens, no watermarks. Nobody
-> looking at the camera. No bright saturated colour. No lens flare.
 
 **Motion prompt (image-to-video):** *Extremely slow, single continuous camera
 move — a 3–5% push-in or lateral drift across the whole clip. No cuts, no zoom
@@ -295,32 +279,13 @@ snap, no subject entering or leaving frame. The shot should end almost exactly
 where it started.*
 
 **Format:** 16:9, 1920×1080, 12s, MP4 (H.264) + WebM (VP9), no audio.
-**Deliver to:** `public/media/sources/zero-{archive,drawer}.{mp4,webm}` plus a
-`.jpg` poster frame each.
+**Deliver to:** `public/media/sources/zero-results.{mp4,webm}` with the
+existing `zero-results.webp` as poster and reduced-motion fallback.
 
-**Code change to swap in:** in `evidence-explorer.tsx`, the zero branch already
-renders `<div className="ob-src-empty">`. Add a sibling first child
-`<div className="ob-src-empty-media">` holding the `<video autoPlay muted loop
-playsInline preload="metadata" poster=…>`, WebM source before MP4. In
-`styles/obsidian-app.css` §14: `.ob-src-empty { position: relative; isolation: isolate }`,
-`.ob-src-empty-media { position: absolute; inset: 0; z-index: 0; overflow: hidden;
-border-radius: var(--ob-r-lg) }`, `.ob-src-empty-media::after { content: ''; position:
-absolute; inset: 0; background: var(--ob-void); opacity: .62 }`, `.ob-src-empty > :not(.ob-src-empty-media)
-{ position: relative; z-index: 1 }`, and `filter: grayscale(.35) contrast(1.05)`
-on the `<video>` itself. Reduced motion renders the poster `<img>` in place of the
-`<video>`, branched in an effect. **Every element of Option A stays exactly as it
-is** — the rule, the mono facet echo, the h2, the body copy, the ghost button.
-The clip is atmosphere behind type, never content. Re-measure the region height
-before and after: **620px, unchanged.**
+The static image is already wired behind the live Option A content. If video is
+approved later, keep the region at 620px and mount the player behind the same
+copy without changing the facet rail or drawer behavior.
 
-**If Option B is chosen but not yet generated, the region carries a `MediaSlot`
-at `ratio="16/9"`, `kind="video"`, `label="SOURCES / ZERO RESULTS"`, with this
-brief and this delivery path written into it** — not a blank div, and not a
-deleted requirement (standing rule 14).
-
-**Ship Option A first and live with it for a week.** If the region still reads as
-a hole after that, the copy is wrong, not the media. Fix the copy before spending
-a credit.
 
 ---
 
