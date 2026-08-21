@@ -1,8 +1,9 @@
-import { SectionLabel } from '@/components/ui/section-label';
+import { APP_CONSOLE } from '@/lib/content/app';
 import type { QueryRow } from '@/lib/run-stream-reducer';
-import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 
-const VISIBLE_COUNT = 5;
+/** Rows visible in the collapsed window. 6 × 34px = 204px. */
+const WINDOW_ROWS = 6;
 
 const GLYPH: Record<QueryRow['state'], string> = {
   queued: '○',
@@ -11,9 +12,21 @@ const GLYPH: Record<QueryRow['state'], string> = {
 };
 
 /**
- * The actual generated search queries, as they run — no `'use client'` of
- * its own; it's only ever rendered inside `RunConsole`'s already-client
- * subtree, so `onToggleExpand` (owned by the parent) attaches safely here.
+ * Trust device 1 — the actual generated search queries, as they run, and it
+ * must actually tick.
+ *
+ * It used to render `queries.slice(0, 5)`: all five read `✓` within the first
+ * two seconds and never changed again, while queries 6–19 ran invisibly behind
+ * a one-way `… 14 more`. **The track now holds all nineteen rows** and rolls
+ * under a clipped, edge-masked window that follows the frontier.
+ *
+ * **The roll is a compositor transform and React writes only the variable** —
+ * CSS reads `--ob-ticker-offset` and owns the `transform` outright, so there is
+ * exactly one owner of that property (pitfalls §4) and nothing animates a
+ * height, a top or a margin (motion.md §7).
+ *
+ * No `'use client'` of its own: it is only ever rendered inside `RunConsole`'s
+ * client subtree, so the parent's `onToggleExpand` attaches safely here.
  */
 export function QueryTicker({
   queries,
@@ -24,42 +37,44 @@ export function QueryTicker({
   expanded: boolean;
   onToggleExpand: () => void;
 }) {
-  const [announcement, setAnnouncement] = useState('');
-  const doneCountRef = useRef(0);
-
-  useEffect(() => {
-    const done = queries.filter((row) => row.state === 'done');
-    if (done.length > doneCountRef.current) {
-      const justDone = done.at(-1);
-      if (justDone) setAnnouncement(`Searched: ${justDone.query}`);
-    }
-    doneCountRef.current = done.length;
-  }, [queries]);
-
-  const visible = expanded ? queries : queries.slice(0, VISIBLE_COUNT);
-  const remaining = queries.length - VISIBLE_COUNT;
+  /* The highest index that is no longer queued — the live edge of the run. The
+     window sits three rows behind it so an arriving row is never at the very
+     bottom of the clip when it starts running. */
+  let frontier = -1;
+  for (const row of queries) if (row.state !== 'queued') frontier = row.index;
+  const maxStart = Math.max(0, queries.length - WINDOW_ROWS);
+  const windowStart = expanded ? 0 : Math.min(Math.max(frontier - 3, 0), maxStart);
 
   return (
-    <div className="flex flex-col gap-3">
-      <SectionLabel>Queries</SectionLabel>
-      <div aria-live="polite" className="sr-only">
-        {announcement}
+    <div className="ob-ticker" data-expanded={expanded}>
+      <p className="ob-meta">{APP_CONSOLE.queriesLabel}</p>
+
+      <div
+        className="ob-ticker-view"
+        style={{ ['--ob-ticker-offset' as string]: String(windowStart) } as CSSProperties}
+      >
+        <ul className="ob-ticker-track">
+          {queries.map((row) => (
+            <li key={row.index} className="ob-qrow" data-state={row.state}>
+              <span className="ob-qglyph" data-state={row.state} aria-hidden="true">
+                {GLYPH[row.state]}
+              </span>
+              {/* Ellipsised by design — the longest query overflows a 284px
+                  text column. The full string stays in `title` and in the
+                  aria-live summary, so nothing is lost. */}
+              <span className="ob-qrow-text" title={row.query}>
+                {row.query}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="flex flex-col gap-2">
-        {visible.map((row) => (
-          <li key={row.index} className="query-ticker-row">
-            <span className={`query-glyph query-glyph--${row.state}`} aria-hidden="true">
-              {GLYPH[row.state]}
-            </span>
-            <span className="query-text">{row.query}</span>
-          </li>
-        ))}
-      </ul>
-      {!expanded && remaining > 0 && (
-        <button type="button" className="text-action" onClick={onToggleExpand}>
-          … {remaining} more
-        </button>
-      )}
+
+      {/* Two-way. The one-way `… 14 more` was the tell that the rest of the
+          list was never meant to be read. */}
+      <button type="button" className="ob-btn-bare self-start" onClick={onToggleExpand}>
+        {expanded ? APP_CONSOLE.queriesCollapse : APP_CONSOLE.queriesExpand(queries.length)}
+      </button>
     </div>
   );
 }

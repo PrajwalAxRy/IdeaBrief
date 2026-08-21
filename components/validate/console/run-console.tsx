@@ -1,102 +1,129 @@
 'use client';
 
-import { Orb } from '@/components/entry/orb';
-import { PageContainer } from '@/components/layout/page-container';
-import { CoverageBar } from '@/components/status/coverage-bar';
 import { PhaseStrip } from '@/components/status/phase-strip';
-import { DisplayHeadline } from '@/components/ui/display-headline';
-import { Divider } from '@/components/ui/divider';
-import { SectionLabel } from '@/components/ui/section-label';
+import { APP_CONSOLE } from '@/lib/content/app';
+import { formatElapsed } from '@/lib/format';
 import { useRunStream } from '@/lib/hooks/use-run-stream';
-import { DIMENSIONS, type Dimension } from '@/lib/schemas/evidence';
 import type { RunPhaseName } from '@/lib/schemas/run';
 import { useEffect, useRef, useState } from 'react';
+import { ConsoleRail } from './console-rail';
 import { FindingStream } from './finding-stream';
-import { QueryTicker } from './query-ticker';
+
+/** One write per 3s. 84 per-item announcements in 45 seconds is a firehose. */
+const ANNOUNCE_EVERY_MS = 3_000;
 
 interface RunConsoleProps {
   slug: string;
   oneLiner: string;
-  dimensionLabels: Record<Dimension, string>;
+  /** `?stall=1` — the QA affordance for the stalled state. */
+  stall?: boolean;
   onComplete: () => void;
 }
 
 /**
- * Mode A — hold the user's attention for three to five minutes by showing
- * real machinery doing real work. One of the thirteen allowed `'use client'`
- * components: it owns the whole `useRunStream` subscription plus the query
- * ticker's expand toggle.
+ * Mode A — hold the user's attention by showing real machinery doing real
+ * work. It owns the `useRunStream` subscription and the ticker's expand
+ * toggle; everything else is composed.
+ *
+ * `Orb` is gone. It was `position: absolute; bottom: -240px; z-index: -1`
+ * inside a column that grew to ~5,000px, so it parked below the fold on every
+ * run — the positioning bug was a symptom of it never having had a job here.
+ * Obsidian's ambient field is `.ob-backdrop`, which is `position: fixed` and
+ * cannot fall below a growing column, and **the page mounts it, not this
+ * component** (C13): the page cannot know the client-side mode, and two
+ * ambient fields on one page is one too many under D17.
  */
-export function RunConsole({ slug, oneLiner, dimensionLabels, onComplete }: RunConsoleProps) {
-  const stream = useRunStream(slug);
+export function RunConsole({ slug, oneLiner, stall = false, onComplete }: RunConsoleProps) {
+  const stream = useRunStream(slug, { stall });
   const [queriesExpanded, setQueriesExpanded] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
   const everRunningRef = useRef(false);
+  const announcedAtRef = useRef(0);
 
   useEffect(() => {
     if (stream.status !== 'complete') everRunningRef.current = true;
     if (stream.status === 'complete' && everRunningRef.current) onComplete();
   }, [stream.status, onComplete]);
 
-  const max = Math.max(1, ...DIMENSIONS.map((dimension) => stream.counts[dimension]));
+  const searched = stream.queries.filter((row) => row.state === 'done').length;
+  const verified = stream.findings.length;
+
+  useEffect(() => {
+    const now = Date.now();
+    if (now - announcedAtRef.current < ANNOUNCE_EVERY_MS) return;
+    announcedAtRef.current = now;
+    setAnnouncement(APP_CONSOLE.liveSummary(searched, 19, verified));
+  }, [searched, verified]);
+
+  const connecting = stream.status === 'connecting';
+  const complete = stream.status === 'complete';
   const displayPhase: RunPhaseName = stream.phase === 'starting' ? 'searching' : stream.phase;
 
-  return (
-    <PageContainer variant="app" className="flex flex-col gap-8 py-12">
-      <div className="flex flex-col gap-4">
-        <DisplayHeadline as="h1" muted="Reading the web" bright="about your idea." />
-        <p className="meta-line">{oneLiner}</p>
+  const note = complete
+    ? `${formatElapsed(stream.elapsedMs)} · ${APP_CONSOLE.complete}`
+    : stream.status === 'stalled'
+      ? stream.stalledLong
+        ? APP_CONSOLE.stalledLong
+        : APP_CONSOLE.stalled
+      : undefined;
 
-        {stream.status === 'connecting' ? (
-          <p className="meta-line">starting…</p>
+  return (
+    <div className="ob-console ob-container-app">
+      <div className="ob-console-head">
+        <h1 className="ob-h1">{APP_CONSOLE.h1}</h1>
+        <p className="ob-lead">{oneLiner}</p>
+
+        {connecting ? (
+          <p className="ob-meta">{APP_CONSOLE.connecting}</p>
         ) : (
-          <PhaseStrip phase={displayPhase} elapsedMs={stream.elapsedMs} />
+          <PhaseStrip
+            phase={displayPhase}
+            elapsedMs={stream.elapsedMs}
+            state={stream.status}
+            note={note}
+          />
+        )}
+
+        {stream.stalledLong && (
+          <button
+            type="button"
+            className="ob-btn ob-btn-ghost self-start"
+            onClick={() => window.location.reload()}
+          >
+            {APP_CONSOLE.refresh}
+          </button>
         )}
       </div>
 
-      <div className="grid gap-12" style={{ gridTemplateColumns: '320px 1fr' }}>
-        <div className="flex flex-col gap-8" style={{ position: 'sticky', top: 96 }}>
-          <QueryTicker
-            queries={stream.queries}
-            expanded={queriesExpanded}
-            onToggleExpand={() => setQueriesExpanded(true)}
-          />
+      <div className="ob-console-grid">
+        <ConsoleRail
+          slug={slug}
+          queries={stream.queries}
+          expanded={queriesExpanded}
+          onToggleExpand={() => setQueriesExpanded((value) => !value)}
+          counts={stream.counts}
+          running={!complete}
+          elapsedMs={stream.elapsedMs}
+          discardedCount={stream.discarded}
+          lastDiscard={stream.lastDiscard}
+        />
 
-          <Divider />
-
-          <div className="flex flex-col gap-3">
-            <SectionLabel>Coverage</SectionLabel>
-            {DIMENSIONS.map((dimension) => (
-              <CoverageBar
-                key={dimension}
-                label={dimensionLabels[dimension]}
-                count={stream.counts[dimension]}
-                max={max}
-              />
-            ))}
-          </div>
-
-          <Divider />
-
-          <p className="meta-line">
-            {stream.discarded} excerpts discarded
-            <br />
-            (didn&rsquo;t match the page)
-          </p>
-        </div>
-
-        <div className="relative flex flex-col gap-4">
-          <FindingStream
-            findings={stream.findings}
-            newestFindingId={stream.newestFindingId}
-            running={stream.status !== 'complete'}
-          />
-          <Orb dimmed />
-        </div>
+        <FindingStream
+          findings={stream.findings}
+          newestFindingId={stream.newestFindingId}
+          running={!complete}
+          connecting={connecting}
+        />
       </div>
 
-      <p className="meta-line">
-        You can close this tab — the run keeps going. Come back to this link.
-      </p>
-    </PageContainer>
+      <p className="ob-console-foot ob-body">{APP_CONSOLE.foot}</p>
+
+      {/* One region, debounced. The newest finding and the newest query stay
+          reachable in the DOM and in `title`; nothing is hidden, only
+          un-shouted. */}
+      <div aria-live="polite" className="sr-only">
+        {announcement}
+      </div>
+    </div>
   );
 }
