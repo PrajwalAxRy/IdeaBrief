@@ -1,43 +1,63 @@
-import { CopyLinkButton } from '@/components/ui/copy-link-button';
-import { MetaLine } from '@/components/ui/meta-line';
-import type { StageStates } from '@/lib/run-stage';
+import { SkipLink } from '@/components/ui/skip-link';
+import type { RunSegment } from '@/lib/run-stage';
+import type { RunStatus } from '@/lib/schemas/run';
 import type { ReactNode } from 'react';
-import { PageContainer } from './page-container';
+import { EvidenceOverlay } from './evidence-overlay';
 import { RunFooterBar } from './run-footer-bar';
-import { StageRail } from './stage-rail';
-import { Wordmark } from './wordmark';
+import { RunHeader } from './run-header';
+import { RunMain } from './run-main';
 
 interface RunShellProps {
   slug: string;
-  stageStates: StageStates;
-  metaParts: string[];
+  status: RunStatus;
+  oneLiner: string;
+  metaBySegment: Record<RunSegment, string[]>;
+  copyLink: ReactNode;
+  verifiedCount: number;
+  discardedCount: number;
+  /** For the overlay's `EvidenceExplorer` — the `IN THE REPORT` facet (C16). */
+  citedIds: string[];
   children: ReactNode;
 }
 
 /**
- * The persistent chrome on every `/r/[slug]/*` page: header bar, wordmark,
- * StageRail, MetaLine, CopyLinkButton, and the thin footer. Holds no state
- * beyond what's passed in — every run page is `<RunShell>{children}</RunShell>`.
+ * The persistent chrome on every `/r/[slug]/*` page. **A server component**:
+ * the page bodies arrive as `children` and pass straight through, so the
+ * client boundary is `RunHeader` and `RunMain`, not the page.
+ *
+ * `RunFooterBar` must stay the element immediately after `<main>` — §5
+ * suppresses it on Define with `main[data-chrome='surface'] ~ .ob-run-footer`,
+ * which is how the footer is hidden without a second segment read.
+ *
+ * The skip link is the first child (R19): `<main id="main">` has existed since
+ * P3 with nothing pointing at it.
  */
-export function RunShell({ slug, stageStates, metaParts, children }: RunShellProps) {
+export function RunShell({
+  slug,
+  status,
+  oneLiner,
+  metaBySegment,
+  copyLink,
+  verifiedCount,
+  discardedCount,
+  citedIds,
+  children,
+}: RunShellProps) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="run-shell-header">
-        <PageContainer variant="app">
-          <div className="flex items-center justify-between gap-8 py-4">
-            <div className="flex items-center gap-8">
-              <Wordmark />
-              <StageRail slug={slug} stageStates={stageStates} />
-            </div>
-            <CopyLinkButton slug={slug} />
-          </div>
-          <MetaLine parts={metaParts} className="pb-3" />
-        </PageContainer>
-      </header>
-      <main id="main" className="flex-1">
-        {children}
-      </main>
-      <RunFooterBar slug={slug} />
+    <div className="ob-app">
+      <SkipLink />
+      <RunHeader
+        slug={slug}
+        status={status}
+        oneLiner={oneLiner}
+        metaBySegment={metaBySegment}
+        copyLink={copyLink}
+        verifiedCount={verifiedCount}
+        discardedCount={discardedCount}
+      />
+      <RunMain>{children}</RunMain>
+      <RunFooterBar slug={slug} copyLink={copyLink} />
+      <EvidenceOverlay slug={slug} citedIds={citedIds} />
     </div>
   );
 }

@@ -1,60 +1,74 @@
-import type { StageState, StageStates } from '@/lib/run-stage';
+'use client';
+
+import { APP_CHROME } from '@/lib/content/app';
+import { useRunProgress } from '@/lib/hooks/use-run-progress';
+import { type RunSegment, type StageKey, getStageStates } from '@/lib/run-stage';
+import type { RunStatus } from '@/lib/schemas/run';
 import Link from 'next/link';
 
-const STAGES: { key: keyof StageStates; label: string; href: string; lockedHint: string }[] = [
-  {
-    key: 'define',
-    label: 'Define',
-    href: 'define',
-    lockedHint: 'Start the conversation to unlock Define.',
-  },
-  {
-    key: 'validate',
-    label: 'Validate',
-    href: 'validate',
-    lockedHint: 'Approve the brief to unlock Validate.',
-  },
-  {
-    key: 'roadmap',
-    label: 'Roadmap',
-    href: 'roadmap',
-    lockedHint: 'Finish the research to unlock the roadmap.',
-  },
-];
+type LockedHintKey = keyof typeof APP_CHROME.lockedHints;
 
-function nodeGlyph(state: StageState): string {
-  if (state === 'done') return '✓';
-  if (state === 'active') return '●';
-  return '○';
+function lockedHint(key: StageKey): string | undefined {
+  return key in APP_CHROME.lockedHints ? APP_CHROME.lockedHints[key as LockedHintKey] : undefined;
 }
 
 /**
- * Primary navigation. Locked segments carry no affordance at all — dim
- * text, hollow node, no hover, no click, just a `title` explaining what
- * unlocks them. Never a disabled link.
+ * Primary navigation, and honest about where you are (D19).
+ *
+ * A client leaf because the reachability floor widens from `localStorage`
+ * after mount — `'use client'` costs nothing here, since `RunHeader` above it
+ * is already a client component and the four page bodies below the chrome stay
+ * server-rendered. That is standing rule 22 working as intended: the boundary
+ * sits at the leaf that actually needs storage.
+ *
+ * Locked segments carry **no affordance at all** — dim text, a hollow node, no
+ * hover rule, no `aria-disabled`, no pointer feedback. Only the `title`. Never
+ * a disabled link.
+ *
+ * On `/sources` no segment is active and nothing is `aria-current`: sources is
+ * the evidence layer, not a stage (D16).
  */
-export function StageRail({ slug, stageStates }: { slug: string; stageStates: StageStates }) {
-  return (
-    <ol className="stage-rail">
-      {STAGES.map((stage) => {
-        const state = stageStates[stage.key];
-        const content = (
-          <>
-            <span className="stage-node">{nodeGlyph(state)}</span>
-            <span className="stage-label">{stage.label}</span>
-          </>
-        );
+export function StageRail({
+  slug,
+  status,
+  segment,
+}: { slug: string; status: RunStatus; segment: RunSegment }) {
+  const progress = useRunProgress(slug);
+  const states = getStageStates(status, segment, progress);
 
-        return (
-          <li key={stage.key} className={`stage-segment stage-segment--${state}`}>
-            {state === 'locked' ? (
-              <span title={stage.lockedHint}>{content}</span>
-            ) : (
-              <Link href={`/r/${slug}/${stage.href}`}>{content}</Link>
-            )}
-          </li>
-        );
-      })}
-    </ol>
+  return (
+    <nav aria-label="Run stages">
+      <ol className="ob-stage-rail">
+        {APP_CHROME.stages.map((stage) => {
+          const key = stage.key as StageKey;
+          const state = states[key];
+          const content = (
+            <>
+              <span className="ob-stage-node" aria-hidden="true" />
+              <span className="ob-stage-label">{stage.label}</span>
+            </>
+          );
+
+          return (
+            <li key={key}>
+              {state === 'locked' ? (
+                <span className="ob-stage" data-state="locked" title={lockedHint(key)}>
+                  {content}
+                </span>
+              ) : (
+                <Link
+                  href={`/r/${slug}/${key}`}
+                  className="ob-stage"
+                  data-state={state}
+                  aria-current={state === 'active' ? 'page' : undefined}
+                >
+                  {content}
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
   );
 }

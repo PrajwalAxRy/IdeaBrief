@@ -1,6 +1,7 @@
 'use client';
 
-import { BRAND, HERO, NAV_LINKS } from '@/lib/content/landing';
+import { Wordmark } from '@/components/layout/wordmark';
+import { HERO, NAV_LINKS } from '@/lib/content/landing';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -41,10 +42,9 @@ export function SiteNav() {
   return (
     <header className="ob-nav" data-scrolled={scrolled} data-past-hero={pastHero}>
       <div className="ob-nav-inner">
-        <Link href="/" className="ob-wordmark" aria-label={`${BRAND.name} — home`}>
-          <Mark />
-          {BRAND.name}
-        </Link>
+        {/* One glyph definition in the repo. A2 re-authored `LogoMark` and
+            deliberately left this call site to A4 — this is that dedupe. */}
+        <Wordmark />
 
         <nav aria-label="Primary" className="flex items-center gap-8">
           {NAV_LINKS.map((link) => (
@@ -58,33 +58,19 @@ export function SiteNav() {
           <Link href={HERO.secondary.href} className="ob-btn ob-btn-bare">
             {HERO.secondary.label}
           </Link>
+          {/* **Ghost, not primary (A15).** Measured at 1440×900 and 1280×900,
+              this and the hero's `Start with an idea` were both in view at
+              once — two filled blue buttons saying the same thing, which is
+              rule 11's exact failure. The hero's is the page's one primary;
+              this is the persistent way back to it, so it takes the quieter
+              treatment and the eye keeps a single target. */}
           <span className="ob-nav-cta">
-            <a href="#start" className="ob-btn ob-btn-primary">
+            <a href="#start" className="ob-btn ob-btn-ghost">
               Start
             </a>
           </span>
         </div>
       </div>
     </header>
-  );
-}
-
-/**
- * The mark: a surveyed square with one corner stone set. Rotates 90° on hover
- * (see `.ob-wordmark:hover .ob-wordmark-glyph`).
- */
-function Mark() {
-  return (
-    <svg
-      className="ob-wordmark-glyph"
-      width="15"
-      height="15"
-      viewBox="0 0 15 15"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect x="0.5" y="0.5" width="14" height="14" stroke="currentColor" />
-      <rect x="1" y="9" width="5" height="5" fill="currentColor" />
-    </svg>
   );
 }
