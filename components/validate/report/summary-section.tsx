@@ -1,19 +1,27 @@
-import { SectionLabel } from '@/components/ui/section-label';
+import { CitationHint } from '@/components/validate/evidence/citation-hint';
 import { renderCitedText } from '@/components/validate/evidence/cited-text';
+import { assertEverySentenceCited } from '@/lib/citations';
 import type { CitedText } from '@/lib/schemas/report';
 
 /**
- * "What we found" — the whole report in 20 seconds. Every sentence carries
- * at least one citation, enforced at the schema layer (`CitedTextSchema`'s
- * `.refine()`), not re-checked here.
+ * §02 — the whole report in twenty seconds.
+ *
+ * **Every sentence carries at least one citation, and uncited prose here is a
+ * bug.** `CitedTextSchema.refine()` guarantees the bidirectional agreement
+ * between markers and the declared array, but not *per sentence*, so this calls
+ * `assertEverySentenceCited` — a fixture-authoring guard that throws in
+ * development and costs nothing in production.
  */
 export function SummarySection({ summary }: { summary: CitedText }) {
+  assertEverySentenceCited(summary.text);
+
   return (
-    <section id="what-we-found" className="report-section flex flex-col gap-4">
-      <SectionLabel>What we found</SectionLabel>
-      <p className="report-summary-text">
-        {renderCitedText(summary.text, { firstChipGetsHint: true })}
-      </p>
-    </section>
+    <>
+      {/* `.ob-lead` — 21px, muted. Borrowed from A2, not redeclared in §10. */}
+      <p className="ob-lead">{renderCitedText(summary.text)}</p>
+      {/* A normal-flow sibling *after* the paragraph, never absolutely
+          positioned under a chip mid-sentence (A5). */}
+      <CitationHint />
+    </>
   );
 }

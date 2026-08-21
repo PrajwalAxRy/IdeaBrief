@@ -1,46 +1,45 @@
-import { Card } from '@/components/ui/card';
-import { SectionLabel } from '@/components/ui/section-label';
+import { REPORT } from '@/lib/content/app';
+import type { UnansweredItem } from '@/lib/schemas/report';
 import Link from 'next/link';
 
 interface UnansweredSectionProps {
-  unanswered: string[];
+  unanswered: UnansweredItem[];
   slug: string;
-  /** Thin-variant treatment (07): expanded and given the visual weight normally spent on "What surprised us". */
+  /** Thin variant: this section takes the weight normally spent on surprises. */
   elevated?: boolean;
 }
 
 /**
- * "What we couldn't answer from the web" — the deliberate on-ramp into
- * Roadmap. Ends the page pointing forward with the report's one
- * `.btn-primary`.
+ * §06 — the deliberate on-ramp into the roadmap. **The report ends pointing
+ * forward; that is its job.**
+ *
+ * It owns **the page's only `.ob-btn-primary`, in both variants** —
+ * `ThinEvidenceNotice`'s CTA is ghost precisely so this one stays unique
+ * (rule 11).
+ *
+ * `why_unanswered` is rendered, not dropped: the difference between a gap and
+ * an omission is *why the web couldn't say*.
  */
 export function UnansweredSection({ unanswered, slug, elevated = false }: UnansweredSectionProps) {
-  const body = (
-    <>
-      <SectionLabel>What we couldn&rsquo;t answer from the web</SectionLabel>
-      <ul className="report-unanswered-list">
-        {unanswered.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-      <p style={{ color: 'var(--text-body)' }}>
-        These need real conversations. We&rsquo;ve written the scripts.
-      </p>
-      <Link href={`/r/${slug}/roadmap`} className="btn btn-primary self-start">
-        What to do next →
-      </Link>
-    </>
-  );
-
   return (
-    <div id="unanswered" className="report-section flex flex-col gap-4">
-      {elevated ? (
-        <Card featured padding="feature" className="flex flex-col gap-4">
-          {body}
-        </Card>
-      ) : (
-        body
-      )}
+    <div data-elevated={elevated || undefined}>
+      <p className="ob-lead">{REPORT.unanswered.lead(unanswered.length)}</p>
+
+      {unanswered.map((item, index) => (
+        <div key={item.question} className="ob-unans-row">
+          <span className="ob-unans-ord ob-meta">{String(index + 1).padStart(2, '0')}</span>
+          <div>
+            <p className={elevated ? 'ob-h3' : 'ob-body'}>{item.question}</p>
+            <p className="ob-unans-why">{item.why_unanswered}</p>
+          </div>
+        </div>
+      ))}
+
+      <p className="ob-body">{REPORT.unanswered.line}</p>
+
+      <Link href={`/r/${slug}/roadmap`} className="ob-btn ob-btn-primary">
+        {REPORT.unanswered.action}
+      </Link>
     </div>
   );
 }

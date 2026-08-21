@@ -1,18 +1,30 @@
-import { Card } from '@/components/ui/card';
+import { renderCitedText } from '@/components/validate/evidence/cited-text';
+import type { Surprise } from '@/lib/schemas/report';
 
 /**
- * The `featured` card holding two or three numbered surprises — deliberately
- * the most visually weighted block in the report (the screenshot moment).
+ * §05 — the screenshot moment.
+ *
+ * **The ordinal drops to `.ob-meta` and the surprise itself takes the type.**
+ * The largest thing on this page used to be three list ordinals at up to 68px,
+ * which is a page whose loudest element is a counter. Now the headline runs at
+ * `--ob-h1` down a hairline-ruled page.
+ *
+ * **No card, no featured ring.** Obsidian has no shadows and no featured card;
+ * the weight comes from scale and negative tracking. Heading *size* is a class,
+ * heading *level* is structure — these are `<h3>` at `--ob-h1`.
  */
-export function SurprisePanel({ surprises }: { surprises: string[] }) {
+export function SurprisePanel({ surprises }: { surprises: Surprise[] }) {
   return (
-    <Card featured padding="feature" className="flex flex-col gap-8">
+    <>
       {surprises.map((surprise, index) => (
-        <div key={surprise} className="flex gap-4">
-          <span className="surprise-number">{String(index + 1).padStart(2, '0')}</span>
-          <p className="surprise-text">{surprise}</p>
+        <div key={surprise.headline} className="ob-surprise-row">
+          <span className="ob-surprise-ord ob-meta">{String(index + 1).padStart(2, '0')}</span>
+          <div>
+            <h3 className="ob-h1">{surprise.headline}</h3>
+            <p className="ob-body">{renderCitedText(surprise.detail.text)}</p>
+          </div>
         </div>
       ))}
-    </Card>
+    </>
   );
 }

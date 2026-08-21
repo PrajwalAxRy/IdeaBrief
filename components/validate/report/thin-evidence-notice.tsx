@@ -1,24 +1,21 @@
-import { Card } from '@/components/ui/card';
+import { REPORT } from '@/lib/content/app';
 import Link from 'next/link';
 
 /**
  * The honest panel for low-yield runs. Diagnostic, never apologetic, never
- * encouraging — one acknowledgement, then get on with it (07).
+ * encouraging — **apologise exactly once**, then get on with it.
+ *
+ * **Its CTA is ghost, not primary.** `UnansweredSection` owns the page's only
+ * primary in both variants; two of them on one page is rule 11's exact failure.
  */
 export function ThinEvidenceNotice({ slug }: { slug: string }) {
   return (
-    <Card featured padding="feature" className="flex flex-col gap-4">
-      <p style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 'var(--text-h3)' }}>
-        We found very little about this online.
-      </p>
-      <p style={{ color: 'var(--text-body)' }}>
-        That is not evidence against your idea — it usually means the idea is new, very local, or
-        described in words the web doesn&rsquo;t use yet. The most useful part of this run is the
-        next section.
-      </p>
-      <Link href={`/r/${slug}/roadmap`} className="btn btn-primary self-start">
-        What to do next →
+    <div className="ob-report-full ob-thin-notice">
+      <p className="ob-h3">{REPORT.thin.title}</p>
+      <p className="ob-body">{REPORT.thin.body}</p>
+      <Link href={`/r/${slug}/roadmap`} className="ob-btn ob-btn-ghost">
+        {REPORT.thin.action}
       </Link>
-    </Card>
+    </div>
   );
 }

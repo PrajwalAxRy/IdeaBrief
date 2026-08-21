@@ -1,45 +1,54 @@
-import { Accordion } from '@/components/ui/accordion';
-import { Card } from '@/components/ui/card';
-import { Divider } from '@/components/ui/divider';
+import { REPORT } from '@/lib/content/app';
 import type { Competitor } from '@/lib/schemas/report';
 
-const NOT_ESTABLISHED = 'not established from available evidence';
-
-function CompetitorField({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="evidence-field-label">{label}</span>
-      <p style={{ color: value ? 'var(--text-body)' : 'var(--text-muted)' }}>
-        {value ?? NOT_ESTABLISHED}
-      </p>
-    </div>
-  );
-}
+const FIELDS = ['moat', 'take_from_them', 'ignore'] as const;
 
 /**
- * Field-rendered competitor profile — never prose, so the numbers can't
- * drift (07). Missing optional fields render `not established from
- * available evidence`, never omitted, never guessed.
+ * §04 — one full-measure row per competitor, separated by a hairline.
+ *
+ * **No 2-column grid, so no orphaned third card; no `.meta-line`, so no
+ * ellipsised price.** `price` is the single most decision-relevant field on
+ * this card and it used to be clipped by `white-space: nowrap` in a 600px
+ * column (R21). It is now a field, at reading size, wrapping freely.
+ *
+ * **No accordion.** Hiding four fields behind a per-card click is a barrier
+ * over content the reader came for.
+ *
+ * **Field-rendered, never prose.** A missing optional renders
+ * `not established from available evidence` — never omitted, never guessed.
+ * FrontDeskPro's `moat` and `ignore` are absent on purpose and both must be
+ * visible on screen.
  */
 export function CompetitorCard({ competitor }: { competitor: Competitor }) {
   return (
-    <Card padding="compact" className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 'var(--text-h3)' }}>
-          {competitor.name}
-        </span>
-        <span className="meta-line">{competitor.geography}</span>
-        <span className="meta-line">{competitor.price}</span>
-      </div>
-      <Divider />
-      <p style={{ color: 'var(--text-body)' }}>{competitor.difference_from_idea}</p>
-      <Accordion title="Moat · take · ignore">
-        <div className="flex flex-col gap-4">
-          <CompetitorField label="Moat" value={competitor.moat} />
-          <CompetitorField label="Take from them" value={competitor.take_from_them} />
-          <CompetitorField label="Ignore" value={competitor.ignore} />
+    <article className="ob-comp-row">
+      <div className="ob-comp-head">
+        <div>
+          {/* **`<h3>`, not `<h4>` (A15).** The competitors section's own heading
+              is the `<h2>`, and there is no intervening level between it and a
+              competitor name — so an `<h4>` here was a real 2→4 skip in the
+              document outline, at `ChairSync`. C17's table said h4 ×3 on the
+              assumption of a nesting this section does not have; the table is
+              amended in the same commit rather than the markup being bent to
+              fit it. Size is unchanged: `.ob-h3` is the class, and heading
+              *size* is a class while heading *level* is structure. */}
+          <h3 className="ob-h3">{competitor.name}</h3>
+          <p className="ob-meta">{competitor.geography}</p>
         </div>
-      </Accordion>
-    </Card>
+        <p className="ob-body">{competitor.difference_from_idea}</p>
+        <p className="ob-comp-price">{competitor.price}</p>
+      </div>
+
+      <div className="ob-comp-fields">
+        {FIELDS.map((field) => (
+          <div key={field} className="contents">
+            <p className="ob-comp-key ob-meta">{REPORT.competitor.keys[field]}</p>
+            <p className={competitor[field] ? 'ob-body' : 'ob-comp-missing'}>
+              {competitor[field] ?? REPORT.competitor.missing}
+            </p>
+          </div>
+        ))}
+      </div>
+    </article>
   );
 }
