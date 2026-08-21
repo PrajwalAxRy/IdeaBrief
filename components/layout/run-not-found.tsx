@@ -1,5 +1,4 @@
 import { PageContainer } from '@/components/layout/page-container';
-import { Orb } from '@/components/ui/orb';
 import { RecentRunsList } from '@/components/ui/recent-runs-list';
 import { SectionLabel } from '@/components/ui/section-label';
 import { SUPPORTING } from '@/lib/content/app';
@@ -14,9 +13,8 @@ import Link from 'next/link';
  * sentences that name the actual cause, and a recovery path — where the root
  * 404 gets `--ob-h2` and one sentence.
  *
- * It renders **no `AppBackdrop`**: one ambient field per surface, and the
- * `Orb` is this one's. That is also `Orb`'s only surviving call site in the
- * build — A8 removed the console's, where the per-page backdrop replaced it.
+ * It renders no additional backdrop: the shared not-found boundary owns the
+ * photographic field for both root and invalid-run surfaces.
  */
 export function RunNotFound() {
   const copy = SUPPORTING.notFoundRun;
@@ -46,7 +44,6 @@ export function RunNotFound() {
         </div>
       </PageContainer>
 
-      <Orb dimmed />
     </>
   );
 }

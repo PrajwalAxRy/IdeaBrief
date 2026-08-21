@@ -39,9 +39,9 @@ export default function NotFound() {
 
   return (
     <div className="ob-standalone">
-      {/* The invalid-run surface brings its own ambient field (the `Orb`), and
-          one per surface is the rule — so the backdrop is the root 404's only. */}
-      {isRunLink ? null : <AppBackdrop variant="standalone" />}
+      {/* One field for both branches. The plate is the empty-desk still; the CSS
+          blooms underneath are what shows if it never paints. */}
+      <AppBackdrop variant="standalone" />
 
       <header className="ob-standalone-head">
         <PageContainer variant="marketing">

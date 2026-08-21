@@ -174,11 +174,21 @@ export function EvidenceExplorer({
 
         {visible.length === 0 ? (
           <div className="ob-src-empty">
-            <p className="ob-h3">{SOURCES.empty.headline}</p>
-            {activeLabels ? <p className="ob-meta">{activeLabels}</p> : null}
-            <button type="button" className="ob-btn-ghost" onClick={onClear}>
-              {SOURCES.empty.clear}
-            </button>
+            <img
+              className="ob-src-empty-media"
+              src="/media/sources/zero-results.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="ob-src-empty-content">
+              <p className="ob-h3">{SOURCES.empty.headline}</p>
+              {activeLabels ? <p className="ob-meta">{activeLabels}</p> : null}
+              <button type="button" className="ob-btn-ghost" onClick={onClear}>
+                {SOURCES.empty.clear}
+              </button>
+            </div>
           </div>
         ) : (
           <ul className="ob-src-list" data-entrance={entrance ? 'on' : 'off'}>
