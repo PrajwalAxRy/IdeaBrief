@@ -1,25 +1,37 @@
-import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { BRIEF } from '@/lib/content/app';
 
 /**
- * `.btn-primary`, full-width in the panel — enabled the moment the AI has
- * proposed a brief, not when the conversation "finishes." Absent (not
- * disabled) before that point, since there's nothing to approve yet.
+ * The page's one `.ob-btn-primary`, full width of the aside foot.
+ *
+ * **Absent before `coreFilled`, never disabled** (D12) — the caller does not
+ * render it at all until the conversation has reached the five core fields.
+ * Talking past that point is optional, which is the whole reason it appears
+ * early.
+ *
+ * There is no confirmation `Modal`: approving is a direct action, and a dialog
+ * over a decision the product explicitly tells you it is fine to take early
+ * would contradict D12.
  */
 export function ApproveButton({ pending, onClick }: { pending: boolean; onClick: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <Button className="w-full justify-center" onClick={onClick} disabled={pending}>
+    <div className="ob-approve">
+      <button
+        type="button"
+        className="ob-btn ob-btn-primary w-full justify-center"
+        onClick={onClick}
+        disabled={pending}
+      >
         {pending ? (
           <>
-            <Spinner size={16} />
-            Starting research…
+            <Spinner size={14} />
+            {BRIEF.approving}
           </>
         ) : (
-          'Approve and research'
+          BRIEF.approve
         )}
-      </Button>
-      <span className="meta-line">Takes about 5 minutes.</span>
+      </button>
+      <p className="ob-approve-note">{BRIEF.approveNote}</p>
     </div>
   );
 }
