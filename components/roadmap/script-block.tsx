@@ -1,56 +1,67 @@
 'use client';
 
-import { Well } from '@/components/ui/well';
+import { ROADMAP } from '@/lib/content/app';
 import { useCopy } from '@/lib/hooks/use-copy';
 import { Copy } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 interface ScriptBlockProps {
-  lines: string[];
-  /** The exact plain text written to the clipboard — no markdown, no labels, no attribution footer. */
+  /** Rendered lines. Numbering is CSS; the data carries none. */
+  lines: ReactNode[];
+  /** The exact plain text written to the clipboard. */
   copyText: string;
   copyLabel?: string;
-  /** `.btn-primary` when this card is the expanded one, `.btn-secondary` otherwise (08). */
+  /** `.ob-btn-primary` only on the first expanded card (rule 11). */
   primary?: boolean;
 }
 
 /**
- * The copy-pasteable interview script — `Copy script` is the primary action
- * of the Open Question Card, the whole point of Pillar 3a. Reuses the
- * `useCopy` hook `CopyButton` is built on (extracted in P6 for exactly this)
- * rather than `CopyButton` itself, since `CopyButton` only ever renders the
- * secondary skin and this needs to switch to `.btn-primary` on the expanded
- * card. Logged 'use client' addition beyond the 13-name allowlist.
+ * The copy-pasteable interview script — the Open Question Card's primary
+ * action.
+ *
+ * **Numbering moved into CSS and out of the data.** The fixture used to store
+ * `"1. Walk me through…"`, which is presentation living in a field: it makes
+ * the number un-restylable, breaks if a line is inserted, and has to be
+ * stripped before any other use. `counter-increment` draws it now, and
+ * `buildScriptText` rebuilds it for the clipboard.
+ *
+ * **Lines are keyed by index, not by content** — two identical lines collided
+ * before.
+ *
+ * **Copy confirmation is the label swap and nothing else. There are no toasts
+ * in this product.**
  */
 export function ScriptBlock({
   lines,
   copyText,
-  copyLabel = 'Copy script',
+  copyLabel = ROADMAP.copyScript,
   primary = false,
 }: ScriptBlockProps) {
   const { state, copy } = useCopy();
 
   return (
     <div className="flex flex-col items-start gap-3">
-      <Well padding="none" className="p-5 w-full">
-        <div className="script-block-lines">
-          {lines.map((line) => (
-            <p key={line}>{line}</p>
-          ))}
-        </div>
-      </Well>
+      <ol className="ob-script">
+        {lines.map((line, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: two identical lines must not collide
+          <li key={index} className="ob-script-line">
+            {line}
+          </li>
+        ))}
+      </ol>
       <button
         type="button"
-        className={`btn ${primary ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+        className={`ob-btn ${primary ? 'ob-btn-primary' : 'ob-btn-ghost'}`}
         onClick={() => copy(copyText)}
       >
         {state === 'idle' && (
           <>
-            <Copy size={14} />
+            <Copy size={14} aria-hidden="true" />
             {copyLabel}
           </>
         )}
-        {state === 'copied' && '✓ Copied'}
-        {state === 'failed' && 'Press ⌘C'}
+        {state === 'copied' && ROADMAP.copied}
+        {state === 'failed' && ROADMAP.copyFailed}
       </button>
     </div>
   );

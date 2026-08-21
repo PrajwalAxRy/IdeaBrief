@@ -1,25 +1,35 @@
-import { BackLink } from '@/components/layout/back-link';
-import { PageContainer } from '@/components/layout/page-container';
+import { AppBackdrop } from '@/components/layout/app-backdrop';
 import { SegmentedControl } from '@/components/layout/segmented-control';
-import { OpenQuestionCard } from '@/components/roadmap/open-question-card';
-import { RoadmapProvider } from '@/components/roadmap/roadmap-context';
+import { FieldworkBand } from '@/components/roadmap/fieldwork-band';
+import { OpenQuestionsSection } from '@/components/roadmap/open-questions-section';
+import { RoadmapExit } from '@/components/roadmap/roadmap-exit';
 import { RoadmapTimeline } from '@/components/roadmap/roadmap-timeline';
-import { CopyButton } from '@/components/ui/copy-button';
-import { DisplayHeadline } from '@/components/ui/display-headline';
-import { Divider } from '@/components/ui/divider';
+import { TripwirePanel } from '@/components/roadmap/tripwire-panel';
+import { MetaLine } from '@/components/ui/meta-line';
 import { SectionLabel } from '@/components/ui/section-label';
-import { getBrief, getEvidence, getRoadmap } from '@/lib/db/queries';
-import type { OpenQuestion } from '@/lib/schemas/roadmap';
+import { ROADMAP, numberWord } from '@/lib/content/app';
+import { getBrief, getRoadmap } from '@/lib/db/queries';
+import { getEvidence } from '@/lib/db/queries';
+import { fanOut, isOnAxis, planHorizon, planSpans } from '@/lib/run-plan';
+import type { RoadmapStep } from '@/lib/schemas/roadmap';
 import { isThinEvidence } from '@/lib/thin-evidence';
 
-/** "Copy all scripts" — the whole interview guide in one paste, question headings only, still no markdown. */
-function buildAllScriptsText(questions: OpenQuestion[]): string {
-  return questions
-    .map(
-      (question) =>
-        `Q${question.number}. ${question.question}\n${question.script.lines.join('\n')}`,
-    )
-    .join('\n\n');
+/**
+ * The counts here are C5's and are **the same numbers the run header and the
+ * page meta line carry** — `4 BUILD STEPS · 1 TRIPWIRE`, never "five build
+ * steps". A15 asserts all three read the same.
+ */
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const [brief, roadmap] = await Promise.all([getBrief(slug), getRoadmap(slug)]);
+  const steps = roadmap.steps.filter(isOnAxis).length;
+  const description = `${numberWord(roadmap.open_questions.length)} open questions and a ${numberWord(steps).toLowerCase()}-step build plan.`;
+  const title = `What to do next — ${brief.one_liner.value}`;
+  return {
+    title,
+    description,
+    openGraph: { title, description, images: ['/og/roadmap.png'] },
+  };
 }
 
 export default async function RoadmapPage({
@@ -30,6 +40,7 @@ export default async function RoadmapPage({
   searchParams: Promise<{ thin?: string; broken?: string }>;
 }) {
   const { slug } = await params;
+
   const { thin: thinParam, broken } = await searchParams;
 
   // Prototype-only QA affordance for exercising this route's segment-scoped
@@ -37,76 +48,104 @@ export default async function RoadmapPage({
   if (broken === '1') {
     throw new Error('Prototype-only QA trigger for the roadmap error boundary (?broken=1).');
   }
+
   const [roadmap, brief, evidence] = await Promise.all([
     getRoadmap(slug),
     getBrief(slug),
     getEvidence(slug),
   ]);
 
-  // Same prototype-only QA affordance as /validate?thin=1 (see the P8 build log) — proves the
-  // thin-evidence variant without a second, hand-maintained fixture that could drift.
   const isThin = thinParam === '1' || isThinEvidence(evidence);
   const accentPhase = isThin ? 'WHAT_WOULD_CHANGE_THIS_PLAN' : 'FIRST_THING_TO_BUILD';
-  const firstQuestionId = roadmap.open_questions[0].id;
-  const allScriptsText = buildAllScriptsText(roadmap.open_questions);
+
+  /* The edges are `fanOut`'s, partitioned by `isOnAxis` — no component recounts
+     them, and there is no second name for the same arithmetic (C10). */
+  const edgeMap = fanOut(roadmap);
+  const edges = Object.fromEntries(
+    Object.entries(edgeMap).map(([id, steps]) => [
+      id,
+      {
+        governs: steps.filter(isOnAxis),
+        tripwire: steps.find((step) => !isOnAxis(step)) ?? null,
+      },
+    ]),
+  ) as Record<string, { governs: RoadmapStep[]; tripwire: RoadmapStep | null }>;
+
+  const fanOutMax = Math.max(...Object.values(edgeMap).map((steps) => steps.length));
+
+  /* Every count on this line is derived. `4 BUILD STEPS · 1 TRIPWIRE` is the
+     same count the run header and the OG description carry (C5), so there is no
+     second number to argue with. */
+  const spans = planSpans(roadmap);
+  const tripwires = roadmap.steps.filter((step) => !isOnAxis(step));
+  /* The schema guarantees exactly one; `?? null` is for the type, not for a
+     case the fixture can reach. */
+  const tripwire = tripwires[0] ?? null;
 
   return (
-    <PageContainer variant="app" className="py-16">
-      <div className="mx-auto flex w-full max-w-roadmap flex-col gap-10">
-        <BackLink href={`/r/${slug}/validate`}>Back to the report</BackLink>
+    <>
+      <AppBackdrop variant="roadmap" />
 
-        <header className="flex flex-col gap-3">
-          <DisplayHeadline as="h1" muted="What to do" bright="next." />
-          <p style={{ color: 'var(--text-body)' }}>{brief.one_liner.value}</p>
-        </header>
-
-        <RoadmapProvider defaultExpandedId={firstQuestionId}>
-          <SegmentedControl
-            items={[
-              { id: 'open-questions', label: 'Open questions' },
-              { id: 'build-roadmap', label: 'Build roadmap' },
+      <div className="ob-container ob-roadmap">
+        <header className="ob-roadmap-head">
+          <h1 className="ob-h1">{ROADMAP.h1}</h1>
+          <p className="ob-lead">{ROADMAP.lead}</p>
+          <MetaLine
+            parts={[
+              `${roadmap.open_questions.length} OPEN QUESTIONS`,
+              `${spans.length} BUILD STEPS`,
+              `${tripwires.length} TRIPWIRE${tripwires.length === 1 ? '' : 'S'}`,
+              `${planHorizon(roadmap)} WEEKS`,
             ]}
           />
+        </header>
 
-          <section id="open-questions" className="roadmap-section flex flex-col gap-6">
-            <SectionLabel>Open questions</SectionLabel>
-            <p style={{ color: 'var(--text-body)' }}>
-              {roadmap.open_questions.length < 4
-                ? `Only ${roadmap.open_questions.length} things were genuinely unresolved after the research.`
-                : `${roadmap.open_questions.length} things the web can't tell you. Ordered by how much the answer would change your plan.`}
-            </p>
-            {isThin && (
-              <p style={{ color: 'var(--text-body)' }}>
-                The web didn&rsquo;t have much on this, which makes these conversations the fastest
-                way to learn anything real.
-              </p>
-            )}
+        {/* A wrapper, not a primitive override: `.ob-segmented` is A2's and a
+            primitive that hardcodes `position: sticky` is a primitive that
+            cannot be used anywhere else. This is the half of R9 A4 did not own. */}
+        <div className="ob-roadmap-nav">
+          <SegmentedControl items={[...ROADMAP.nav]} />
+        </div>
 
-            <div className="flex flex-col gap-4">
-              {roadmap.open_questions.map((question) => (
-                <OpenQuestionCard key={question.id} question={question} roadmap={roadmap} />
-              ))}
-            </div>
+        <OpenQuestionsSection
+          questions={roadmap.open_questions}
+          edges={edges}
+          fanOutMax={fanOutMax}
+          brief={brief}
+          slug={slug}
+          fieldwork={<FieldworkBand />}
+        >
+          {/* §02, the time-scaled plan. On this route there is no separate
+              headline, so per C17 the `02 BUILD ROADMAP` eyebrow **is** the
+              section's `<h2>`; the four step names and the tripwire heading are
+              the last five of the route's eleven `<h3>`s. Heading size is a
+              class, heading level is structure. */}
+          <section
+            className="ob-roadmap-section"
+            id="build-roadmap"
+            aria-labelledby="build-roadmap-h"
+          >
+            <SectionLabel as="h2" id="build-roadmap-h" index="02">
+              Build roadmap
+            </SectionLabel>
 
-            <div className="flex justify-end">
-              <CopyButton variant="button" label="Copy all scripts" text={allScriptsText} />
-            </div>
+            {/* Under thin evidence the tripwire renders *above* the axis and no
+                lane takes the lead fill — `accentPhase` points off the axis, so
+                `lead` is false for all four bars without a second branch. */}
+            {isThin && tripwire ? <TripwirePanel step={tripwire} thin /> : null}
+
+            <RoadmapTimeline
+              spans={spans}
+              horizon={planHorizon(roadmap)}
+              accentPhase={accentPhase}
+            />
+
+            {!isThin && tripwire ? <TripwirePanel step={tripwire} /> : null}
+
+            <RoadmapExit slug={slug} />
           </section>
-
-          <Divider />
-
-          <section id="build-roadmap" className="roadmap-section flex flex-col gap-8">
-            <div className="flex flex-col gap-2">
-              <SectionLabel>Build roadmap</SectionLabel>
-              <p style={{ color: 'var(--text-body)' }}>
-                How to actually make this — specific to your idea, and honest about what to leave
-                out.
-              </p>
-            </div>
-            <RoadmapTimeline steps={roadmap.steps} accentPhase={accentPhase} />
-          </section>
-        </RoadmapProvider>
+        </OpenQuestionsSection>
       </div>
-    </PageContainer>
+    </>
   );
 }

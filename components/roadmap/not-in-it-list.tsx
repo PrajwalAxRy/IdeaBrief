@@ -1,19 +1,31 @@
-import { Well } from '@/components/ui/well';
+import { ROADMAP } from '@/lib/content/app';
 
 /**
- * The cut list, given full reading weight — not muted, not struck through
- * (08: "this list is content, not caveat"). Plain Server Component; nothing
- * here is interactive.
+ * The cut list — **inverted from what shipped before A12.**
+ *
+ * Items used to render `--text-muted` with `line-through`, which is exactly
+ * backwards: the most valuable thing this section can do is tell you what not
+ * to build yet, and a struck, dimmed line reads as a footnote. They now carry
+ * full reading weight at `--ob-body` / `--ob-text`, with no `text-decoration`
+ * and no opacity reduction.
+ *
+ * **Strike-through belongs to `--ob-discard` and to discarded evidence (C9),
+ * nowhere else.** A cut is a decision; a discard is a failure. Drawing them the
+ * same way says the wrong thing about both.
+ *
+ * Plain Server Component; nothing here is interactive.
  */
 export function NotInItList({ items }: { items: string[] }) {
   return (
-    <Well padding="none" className="p-5 flex flex-col gap-2">
-      <span className="evidence-field-label">Not in it</span>
-      <ul className="cut-list-items">
+    <div className="ob-notinit">
+      <p className="ob-meta">{ROADMAP.plan.notInIt}</p>
+      <ul>
         {items.map((item) => (
-          <li key={item}>{item}</li>
+          <li key={item} className="ob-notinit-item">
+            {item}
+          </li>
         ))}
       </ul>
-    </Well>
+    </div>
   );
 }
