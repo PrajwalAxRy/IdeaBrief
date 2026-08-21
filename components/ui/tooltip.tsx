@@ -18,7 +18,7 @@ export function Tooltip({ label, children, side = 'top' }: TooltipProps) {
       <TooltipPrimitive.Root>
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal>
-          <TooltipPrimitive.Content className="tooltip-content" side={side} sideOffset={6}>
+          <TooltipPrimitive.Content className="ob-tooltip" side={side} sideOffset={6}>
             {label}
           </TooltipPrimitive.Content>
         </TooltipPrimitive.Portal>

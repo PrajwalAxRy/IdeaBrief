@@ -1,13 +1,13 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
-/** Enforces the 68ch reading measure and vertical rhythm for long-form content — report, roadmap. */
+/** The report's reading measure — `--ob-report-prose` (580px), not 68ch. */
 export function ProseColumn({
   className = '',
   children,
   ...props
 }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
   return (
-    <div className={['mx-auto w-full max-w-prose', className].filter(Boolean).join(' ')} {...props}>
+    <div className={['ob-prose mx-auto w-full', className].filter(Boolean).join(' ')} {...props}>
       {children}
     </div>
   );

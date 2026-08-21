@@ -41,12 +41,12 @@ export function InlineEditableField({
 
   return (
     <div className={['flex flex-col gap-1', className].filter(Boolean).join(' ')}>
-      <span className="meta-line">{label}</span>
+      <span className="ob-meta">{label}</span>
       {isEditing ? (
         <input
           // biome-ignore lint/a11y/noAutofocus: opening the field is the user's own click action
           autoFocus
-          className="inline-editable"
+          className="ob-inline-input"
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
@@ -54,14 +54,9 @@ export function InlineEditableField({
           onKeyDown={handleKeyDown}
         />
       ) : (
-        <button
-          type="button"
-          className="inline-editable-display"
-          onClick={onStartEdit}
-          style={{ color: 'var(--text-primary)', textAlign: 'left' }}
-        >
+        <button type="button" className="ob-inline" onClick={onStartEdit}>
           <span>{value || placeholder}</span>
-          <Pencil size={14} className="edit-glyph" />
+          <Pencil size={14} className="ob-inline-glyph" />
         </button>
       )}
     </div>

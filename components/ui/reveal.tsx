@@ -1,50 +1,38 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useInView } from '@/lib/hooks/use-in-view';
+import type { CSSProperties, ReactNode } from 'react';
 
 interface RevealProps {
   children: ReactNode;
   className?: string;
-  /** Stagger offset for siblings — 02 §2.12: "90ms stagger between siblings." */
+  /** Stagger offset for siblings. */
   delayMs?: number;
 }
 
 /**
- * Scroll-triggered fade + rise (02 §2.12): `opacity 0->1`, `translateY(20px)->0`,
- * `--dur-enter` (600ms), `IntersectionObserver` at `threshold: 0.08`,
- * unobserved after firing once — never re-triggers on scroll-back. Landing
- * sections only (`WhatYouGet`, `TrustSection`); the Report deliberately does
- * NOT get this treatment — P8 built it to ship almost no JS, and wrapping
- * every section in a client `Reveal` would undo that. Logged 'use client'
- * addition beyond the 13-name allowlist — this exact motion work is P11's
- * own scope.
+ * Scroll-triggered entrance, re-authored over the `.ob-reveal` mechanism in
+ * styles/obsidian.css §15: the observer flips one data attribute and CSS does
+ * all the animating, so nothing runs per frame. Latches on first entry and
+ * never re-triggers on scroll-back.
+ *
+ * The old IntersectionObserver-plus-inline-`transitionDelay` implementation is
+ * deleted, not translated. `components/landing/scroll-reveal.tsx` is
+ * deliberately left alone — `/` is out of scope; A15 may dedupe.
+ *
+ * Reduced motion is handled by `.ob-reveal`'s own reduce block in
+ * obsidian.css §16, which resolves to the end state rather than merely
+ * stopping (rule 16).
  */
 export function Reveal({ children, className = '', delayMs = 0 }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.unobserve(el);
-        }
-      },
-      { threshold: 0.08 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { ref, inView } = useInView<HTMLDivElement>();
 
   return (
     <div
       ref={ref}
-      className={['reveal', visible ? 'reveal--visible' : '', className].filter(Boolean).join(' ')}
-      style={{ transitionDelay: visible ? `${delayMs}ms` : '0ms' }}
+      className={['ob-reveal', className].filter(Boolean).join(' ')}
+      data-shown={inView}
+      style={{ '--ob-reveal-delay': `${delayMs}ms` } as CSSProperties}
     >
       {children}
     </div>

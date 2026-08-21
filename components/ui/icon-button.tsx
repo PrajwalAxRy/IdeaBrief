@@ -6,14 +6,15 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   ref?: Ref<HTMLButtonElement>;
 }
 
-/** React 19 accepts `ref` as a plain prop — no forwardRef needed, e.g. when Radix's `asChild` wraps this in a Tooltip. */
+/** React 19 accepts `ref` as a plain prop — no forwardRef needed, e.g. when
+ *  Radix's `asChild` wraps this in a Tooltip. */
 export function IconButton({ label, className = '', children, ref, ...props }: IconButtonProps) {
   return (
     <button
       ref={ref}
       type="button"
       aria-label={label}
-      className={['icon-btn', className].filter(Boolean).join(' ')}
+      className={['ob-icon-btn', className].filter(Boolean).join(' ')}
       {...props}
     >
       {children}

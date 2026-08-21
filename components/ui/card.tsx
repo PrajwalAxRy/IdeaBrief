@@ -1,26 +1,37 @@
 import type { HTMLAttributes } from 'react';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  /** Adds the hover lift. Only for cards that are themselves clickable. */
+  /** The hover treatment. Only for cards that are themselves clickable. */
   interactive?: boolean;
-  /** Amber ring, no background change — Surprise Panel, approved brief, expanded question. */
-  featured?: boolean;
+  /**
+   * An accent hairline, and nothing else — no glow, no wash fill.
+   *
+   * **Legal only where the object genuinely passed verification**: a verified
+   * `FindingCard`, the approved brief, `EvidenceState`'s strong-on column. It
+   * is not an emphasis prop. Where the old `featured` meant "make this
+   * important", the house answer is a left hairline in the `.ob-proof` style.
+   */
+  verified?: boolean;
   padding?: 'compact' | 'feature' | 'none';
 }
 
-/** The base surface: no border, inset top highlight, outer shadow. Never nests — use Well instead. */
+/**
+ * The base surface: a hairline border and a surface lightness step. No shadow,
+ * no inset highlight, no gradient (standing rule 7) — elevation is a border and
+ * a surface step. Never nests; use `Well` instead.
+ */
 export function Card({
   interactive = false,
-  featured = false,
+  verified = false,
   padding = 'compact',
   className = '',
   ...props
 }: CardProps) {
   const paddingClass = padding === 'compact' ? 'p-6' : padding === 'feature' ? 'p-8' : '';
   const classes = [
-    'card',
-    interactive ? 'card--interactive' : '',
-    featured ? 'card--featured' : '',
+    'ob-card',
+    interactive ? 'ob-card-interactive' : '',
+    verified ? 'ob-card-verified' : '',
     paddingClass,
     className,
   ]

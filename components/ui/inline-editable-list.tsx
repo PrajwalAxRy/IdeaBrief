@@ -23,19 +23,19 @@ export function InlineEditableList({
 }: InlineEditableListProps) {
   return (
     <div className={['flex flex-col gap-2', className].filter(Boolean).join(' ')}>
-      <span className="meta-line">{label}</span>
+      <span className="ob-meta">{label}</span>
       {items.map((item, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: plain string[] has no stable id; index is the item's own identity here
         <div key={`${label}-${index}`} className="flex items-center gap-2">
           <input
-            className="inline-editable flex-1"
+            className="ob-inline-input flex-1"
             value={item}
             onChange={(event) => onChangeItem(index, event.target.value)}
           />
           <button
             type="button"
             aria-label={`Remove ${label} item ${index + 1}`}
-            className="icon-btn"
+            className="ob-icon-btn"
             onClick={() => onRemoveItem(index)}
           >
             <X size={14} />

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-/** `←`-prefixed text action. Used on Sources and the roadmap footer. */
+/** `←`-prefixed text action. */
 export function BackLink({
   href,
   children,
@@ -12,7 +12,7 @@ export function BackLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={['text-action', className].filter(Boolean).join(' ')}>
+    <Link href={href} className={['ob-text-action', className].filter(Boolean).join(' ')}>
       ← {children}
     </Link>
   );

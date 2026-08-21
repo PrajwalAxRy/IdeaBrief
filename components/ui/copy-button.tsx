@@ -58,7 +58,7 @@ export function CopyButton({
     timer.current = setTimeout(() => setState('idle'), 2000);
   }
 
-  const baseClass = variant === 'button' ? 'btn btn-secondary btn-sm' : 'text-action';
+  const baseClass = variant === 'button' ? 'ob-btn ob-btn-ghost ob-btn-sm' : 'ob-text-action';
 
   return (
     <button

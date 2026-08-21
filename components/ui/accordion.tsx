@@ -43,14 +43,14 @@ export function Accordion({
     <Collapsible.Root
       open={isOpen}
       onOpenChange={handleOpenChange}
-      className={['accordion-item', className].filter(Boolean).join(' ')}
+      className={['ob-acc', className].filter(Boolean).join(' ')}
     >
-      <Collapsible.Trigger className="accordion-trigger">
+      <Collapsible.Trigger className="ob-acc-trigger">
         {title}
-        <ChevronDown size={18} className="accordion-chevron" />
+        <ChevronDown size={18} className="ob-acc-chevron" />
       </Collapsible.Trigger>
-      <div className="accordion-content-wrapper" data-state={isOpen ? 'open' : 'closed'}>
-        <div className="accordion-content-inner" inert={!isOpen}>
+      <div className="ob-acc-wrap" data-state={isOpen ? 'open' : 'closed'}>
+        <div className="ob-acc-body" inert={!isOpen}>
           <Collapsible.Content forceMount className="pb-4">
             {children}
           </Collapsible.Content>

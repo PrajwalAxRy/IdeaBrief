@@ -28,7 +28,7 @@ interface DrawerProps {
 }
 
 /**
- * Right-side, 480px, focus-trapped, Esc to close — all handled by Radix
+ * Right-side, 520px, focus-trapped, Esc to close — all handled by Radix
  * Dialog. Enter/exit now driven by the `motion` package (P11 scope: "the
  * motion package used only for Drawer and Modal enter/exit") rather than the
  * CSS `[data-state]` keyframes P6 shipped with — `forceMount` on the Portal
@@ -54,28 +54,23 @@ export function Drawer({
           <Dialog.Portal forceMount>
             <Dialog.Overlay asChild forceMount>
               <motion.div
-                className="drawer-overlay"
+                className="ob-overlay"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: EASE_OUT }}
+                transition={{ duration: 0.18, ease: EASE_OUT }}
               />
             </Dialog.Overlay>
             <Dialog.Content asChild forceMount onCloseAutoFocus={onCloseAutoFocus}>
               <motion.div
-                className="drawer-content"
+                className="ob-drawer"
                 initial={{ x: '100%' }}
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
-                transition={{ duration: 0.26, ease: EASE_OUT }}
+                transition={{ duration: 0.32, ease: EASE_OUT }}
               >
-                <div
-                  className="flex items-center justify-between px-6 py-4"
-                  style={{ borderBottom: '1px solid var(--border-subtle)' }}
-                >
-                  <Dialog.Title style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                    {title}
-                  </Dialog.Title>
+                <div className="ob-drawer-head">
+                  <Dialog.Title className="ob-h3">{title}</Dialog.Title>
                   <Dialog.Description className="sr-only">{title}</Dialog.Description>
                   <Dialog.Close asChild>
                     <IconButton label="Close">
@@ -83,15 +78,8 @@ export function Drawer({
                     </IconButton>
                   </Dialog.Close>
                 </div>
-                <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
-                {footer && (
-                  <div
-                    className="px-6 py-4"
-                    style={{ borderTop: '1px solid var(--border-subtle)' }}
-                  >
-                    {footer}
-                  </div>
-                )}
+                <div className="ob-drawer-body">{children}</div>
+                {footer && <div className="ob-drawer-foot">{footer}</div>}
               </motion.div>
             </Dialog.Content>
           </Dialog.Portal>

@@ -15,7 +15,7 @@ interface MediaSlotProps {
 
 /**
  * A correctly-sized, visibly-labelled stand-in for an asset that does not exist
- * yet. Per deep-canopy-design: a section may implement its media in code, point
+ * yet. Per standing rule 14: a section may implement its media in code, point
  * at a real file in `public/`, or render one of these — a blank div is a bug.
  *
  * Renders in production too, deliberately. An unfilled slot should be visible
@@ -26,15 +26,15 @@ interface MediaSlotProps {
 export function MediaSlot({ ratio, kind, label, brief, source, className = '' }: MediaSlotProps) {
   return (
     <div
-      className={['media-slot', className].filter(Boolean).join(' ')}
+      className={['ob-slot', className].filter(Boolean).join(' ')}
       style={{ aspectRatio: ratio }}
       role="img"
       aria-label={`Placeholder for ${kind}: ${label}. ${brief}`}
     >
-      <span className="media-slot-kind">{kind}</span>
-      <span className="media-slot-label">{label}</span>
-      <p className="media-slot-brief">{brief}</p>
-      {source ? <span className="media-slot-source">{source}</span> : null}
+      <span className="ob-slot-kind ob-meta">{kind}</span>
+      <span className="ob-slot-label">{label}</span>
+      <p className="ob-slot-brief">{brief}</p>
+      {source ? <span className="ob-slot-source ob-meta">{source}</span> : null}
     </div>
   );
 }

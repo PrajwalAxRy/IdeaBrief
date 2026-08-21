@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-/** A single honest sentence plus at most one action. No illustrated empty state anywhere in this product. */
+/** A single honest sentence plus at most one action. No illustrated empty
+ *  state anywhere in this product. */
 export function EmptyNote({
   children,
   action,
@@ -12,7 +13,7 @@ export function EmptyNote({
 }) {
   return (
     <div className={['flex items-center gap-3', className].filter(Boolean).join(' ')}>
-      <p className="empty-note">{children}</p>
+      <p className="ob-empty">{children}</p>
       {action}
     </div>
   );

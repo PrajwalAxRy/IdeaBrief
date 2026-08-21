@@ -28,7 +28,7 @@ export function Modal({ open, onOpenChange, title, description, children }: Moda
           <Dialog.Portal forceMount>
             <Dialog.Overlay asChild forceMount>
               <motion.div
-                className="modal-overlay"
+                className="ob-overlay"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -37,28 +37,15 @@ export function Modal({ open, onOpenChange, title, description, children }: Moda
             </Dialog.Overlay>
             <Dialog.Content asChild forceMount>
               <motion.div
-                className="modal-content"
+                className="ob-modal"
                 initial={{ opacity: 0, x: '-50%', y: '-50%', scale: 0.97 }}
                 animate={{ opacity: 1, x: '-50%', y: '-50%', scale: 1 }}
                 exit={{ opacity: 0, x: '-50%', y: '-50%', scale: 0.97 }}
                 transition={{ duration: 0.2, ease: EASE_OUT }}
               >
-                <Dialog.Title
-                  style={{
-                    color: 'var(--text-primary)',
-                    fontSize: 'var(--text-h3)',
-                    fontWeight: 700,
-                    marginBottom: 'var(--sp-3)',
-                  }}
-                >
-                  {title}
-                </Dialog.Title>
+                <Dialog.Title className="ob-h3 mb-3">{title}</Dialog.Title>
                 {description ? (
-                  <Dialog.Description
-                    style={{ color: 'var(--text-body)', marginBottom: 'var(--sp-6)' }}
-                  >
-                    {description}
-                  </Dialog.Description>
+                  <Dialog.Description className="ob-body mb-6">{description}</Dialog.Description>
                 ) : (
                   <Dialog.Description className="sr-only">{title}</Dialog.Description>
                 )}

@@ -1,15 +1,20 @@
 import type { ButtonHTMLAttributes, Ref } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'ghost' | 'bare';
   size?: 'md' | 'sm';
   ref?: Ref<HTMLButtonElement>;
 }
 
 /**
- * Enforce one `variant="primary"` visible per viewport by convention, not by
- * code. Accepts `ref` as a plain React 19 prop so it can sit inside a Radix
- * `asChild` trigger (Dialog, Popover) without extra wrapping.
+ * Exactly one `variant="primary"` visible per viewport — enforced by review,
+ * not by code, and verifiable (references/verification.md §6).
+ *
+ * `.ob-btn:focus-visible` carries `transition: none` in obsidian.css §4. Do not
+ * remove it: a ring that fades over 320ms reads as lag.
+ *
+ * Accepts `ref` as a plain React 19 prop so it can sit inside a Radix `asChild`
+ * trigger (Dialog, Popover) without extra wrapping.
  */
 export function Button({
   variant = 'primary',
@@ -18,12 +23,7 @@ export function Button({
   ref,
   ...props
 }: ButtonProps) {
-  const classes = [
-    'btn',
-    variant === 'primary' ? 'btn-primary' : 'btn-secondary',
-    size === 'sm' ? 'btn-sm' : '',
-    className,
-  ]
+  const classes = ['ob-btn', `ob-btn-${variant}`, size === 'sm' ? 'ob-btn-sm' : '', className]
     .filter(Boolean)
     .join(' ');
 

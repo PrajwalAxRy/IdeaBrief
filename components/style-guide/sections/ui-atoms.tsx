@@ -1,5 +1,6 @@
 'use client';
 
+import { StatusBadge } from '@/components/status/status-badge';
 import { Accordion } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -30,12 +31,12 @@ function DrawerDemo() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
+      <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
         Open drawer
       </Button>
       <Drawer open={open} onOpenChange={setOpen} title="Evidence">
-        <p style={{ color: 'var(--text-body)' }}>
-          The 480px right-side drawer. Esc closes it; focus returns to the trigger on close.
+        <p className="ob-body">
+          The 520px right-side drawer. Esc closes it; focus returns to the trigger on close.
         </p>
       </Drawer>
     </>
@@ -46,7 +47,7 @@ function ModalDemo() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
+      <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
         Open modal
       </Button>
       <Modal
@@ -56,7 +57,7 @@ function ModalDemo() {
         description="This clears the conversation and the brief. Your original idea text is kept."
       >
         <div className="flex justify-end gap-3">
-          <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>
+          <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button variant="primary" size="sm" onClick={() => setOpen(false)}>
@@ -136,11 +137,11 @@ export function UiAtomsSection() {
     >
       <Row title="Button">
         <Button variant="primary">Start the run</Button>
-        <Button variant="secondary">Edit</Button>
+        <Button variant="ghost">Edit</Button>
         <Button variant="primary" size="sm">
           Approve
         </Button>
-        <Button variant="secondary" size="sm">
+        <Button variant="ghost" size="sm">
           Cancel
         </Button>
         <Button variant="primary" disabled>
@@ -160,10 +161,10 @@ export function UiAtomsSection() {
       </Row>
 
       <Row title="TextAction">
-        <button type="button" className="text-action">
+        <button type="button" className="ob-text-action">
           show excerpt
         </button>
-        <button type="button" className="text-action" disabled>
+        <button type="button" className="ob-text-action" disabled>
           collapse
         </button>
       </Row>
@@ -172,11 +173,15 @@ export function UiAtomsSection() {
         <CopyButtonDemo />
       </Row>
 
-      <Row title="TextArea">
-        <TextArea placeholder="Type your idea…" minRows={3} className="max-w-conversation" />
+      <Row title="TextArea — field">
+        <TextArea placeholder="Type your idea…" minRows={3} className="max-w-[64ch]" />
       </Row>
-      <Row title="TextArea — hero (The Box)">
-        <TextArea variant="hero" placeholder="A half-formed idea is enough." className="w-full" />
+      <Row title="TextArea — composer">
+        <TextArea
+          variant="composer"
+          placeholder="A half-formed idea is enough."
+          className="w-full"
+        />
       </Row>
 
       <Row title="InlineEditableField">
@@ -186,34 +191,40 @@ export function UiAtomsSection() {
         <InlineEditableListDemo />
       </Row>
 
-      <Row title="FilterPill">
-        <FilterPill defaultActive>Problem</FilterPill>
-        <FilterPill>What exists</FilterPill>
-        <FilterPill>Demand signals</FilterPill>
-        <FilterPill>Money</FilterPill>
-        <FilterPill>Practical</FilterPill>
+      <Row title="FilterPill — a chip at 4px, not a pill (rule 8); counts are mono">
+        <FilterPill defaultActive count={14}>
+          Problem
+        </FilterPill>
+        <FilterPill count={11}>Exists</FilterPill>
+        <FilterPill count={7}>Demand</FilterPill>
+        <FilterPill count={13}>Money</FilterPill>
+        <FilterPill count={2}>Practical</FilterPill>
       </Row>
 
-      <Row title="Card">
+      <Row title="Card — elevation is a border and a surface step; no shadow">
         <Card className="w-64">
-          <p style={{ color: 'var(--text-body)' }}>Default card.</p>
+          <p className="ob-body">Default.</p>
         </Card>
         <Card interactive className="w-64">
-          <p style={{ color: 'var(--text-body)' }}>Interactive — hover to lift.</p>
+          <p className="ob-body">Interactive — hover changes the hairline and the surface.</p>
         </Card>
-        <Card featured className="w-64">
-          <p style={{ color: 'var(--text-body)' }}>Featured — amber ring.</p>
+        <Card verified className="w-64">
+          <p className="ob-body">
+            Verified — an accent hairline, nothing else. Legal only where the object actually passed
+            verification.
+          </p>
         </Card>
       </Row>
 
       <Row title="Well (inside a Card)">
         <Card className="w-96">
-          <p style={{ color: 'var(--text-body)', marginBottom: 'var(--sp-3)' }}>
-            The excerpt below sits in a recessed Well — never a nested card.
+          <p className="ob-body mb-3">
+            The excerpt below sits in a recessed Well — never a nested card. Recessed reads as
+            darker here, not lighter.
           </p>
           <Well>
-            <p className="meta-line">{'EXAMPLE.COM // PUBLISHED 2026-02-14'}</p>
-            <p style={{ color: 'var(--text-body)', marginTop: 'var(--sp-2)' }}>
+            <MetaLine parts={['EXAMPLE.COM', 'PUBLISHED 2026-02-14']} />
+            <p className="ob-body mt-2">
               &ldquo;92% of dental no-shows are same-week cancellations.&rdquo;
             </p>
           </Well>
@@ -231,27 +242,25 @@ export function UiAtomsSection() {
       <Row title="Popover (citation-style peek)">
         <Popover
           trigger={
-            <button type="button" className="text-action">
+            <button type="button" className="ob-text-action">
               [12]
             </button>
           }
         >
-          <p className="meta-line" style={{ marginBottom: 'var(--sp-2)' }}>
-            {'EV_12 // VERIFIED 2026-08-19 14:22'}
-          </p>
+          <MetaLine parts={['EV_12', 'VERIFIED 2026-08-19 14:22']} className="mb-2" />
           <p>&ldquo;92% of dental no-shows are same-week cancellations.&rdquo;</p>
         </Popover>
       </Row>
 
       <Row title="Accordion (independent state, never auto-collapses siblings)">
-        <div className="w-full max-w-prose">
+        <div className="ob-prose w-full">
           <Accordion title="What we found" defaultOpen>
-            <p style={{ color: 'var(--text-body)' }}>
+            <p className="ob-body">
               12 findings support this claim. Expanding one accordion never closes another.
             </p>
           </Accordion>
           <Accordion title="Who else is doing this">
-            <p style={{ color: 'var(--text-body)' }}>3 competitors identified.</p>
+            <p className="ob-body">3 competitors identified.</p>
           </Accordion>
         </div>
       </Row>
@@ -262,21 +271,37 @@ export function UiAtomsSection() {
         </div>
       </Row>
 
-      <Row title="SectionLabel">
-        <SectionLabel>What you get</SectionLabel>
+      <Row title="SectionLabel — a numeral, the label, and a hairline running off right. No brackets, no blue.">
+        <div className="w-full">
+          <SectionLabel index="01">What we found</SectionLabel>
+        </div>
+        <div className="w-full">
+          <SectionLabel>Recent runs</SectionLabel>
+        </div>
       </Row>
 
-      <Row title="MetaLine">
-        <MetaLine
-          parts={['RUN 7f3a91c4', '19 QUERIES', '31 PAGES FETCHED', '47 VERIFIED', '18 DISCARDED']}
-        />
+      <Row title="MetaLine — wraps rather than truncating (R21); middot separators">
+        <div className="w-full">
+          <MetaLine
+            parts={[
+              'RUN 7f3a91c4',
+              '19 QUERIES',
+              '31 PAGES FETCHED',
+              '47 VERIFIED',
+              '18 DISCARDED',
+            ]}
+          />
+        </div>
+        <div style={{ width: 320 }}>
+          <MetaLine parts={['CHAIRSYNC', 'US, INDEPENDENT PRACTICES', '$299/MO PER LOCATION']} />
+        </div>
       </Row>
 
       <Row title="Prose">
         <Prose className="w-full">
           <p>
-            A person arrives with a half-formed idea. What survives verification becomes a report
-            [12]. This paragraph demonstrates the 68ch measure and relaxed leading.
+            A person arrives with a half-formed idea. What survives verification becomes a report.
+            This paragraph demonstrates the 580px measure and its leading.
           </p>
           <p>A second paragraph proves the vertical rhythm between prose blocks.</p>
         </Prose>
@@ -292,7 +317,7 @@ export function UiAtomsSection() {
         <EmptyNote>No runs yet — start one above.</EmptyNote>
         <EmptyNote
           action={
-            <button type="button" className="text-action">
+            <button type="button" className="ob-text-action">
               <HelpCircle size={14} />
               Learn why
             </button>
@@ -312,6 +337,17 @@ export function UiAtomsSection() {
 
       <Row title="RestIndicator">
         <RestIndicator />
+      </Row>
+
+      {/* **`StatusBadge` has no call site in the product, and A14 decided it
+          keeps none.** `RunFooterBar` does not carry it: `ALL SYSTEMS
+          OPERATIONAL` is a status-page claim this product cannot make from a
+          fixture, and its `.ob-dot` would put a second pulsing accent dot in
+          the same viewport as `PhaseStrip`'s active phase — which is capped at
+          one. This gallery is its only home; nobody should go hunting for
+          where it renders. */}
+      <Row title="StatusBadge — no call site, by decision">
+        <StatusBadge />
       </Row>
     </Section>
   );
