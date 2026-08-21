@@ -1,42 +1,57 @@
 import { type RunEvent, RunEventSchema } from '../schemas/run';
+import { discardedFixture } from './discarded';
 import { evidenceFixture } from './evidence';
+import { RUN_QUERIES } from './queries';
 
-const TARGET_TOTAL_MS = 75_000;
+/**
+ * The replayed SSE log for one research run.
+ *
+ * **Re-timed in A1 (D8).** The old generator front-loaded 16.3s of query
+ * chatter before the first finding and then absorbed ~40s of slack into a
+ * single `complete` delay — a dead tail on a screen whose entire job is to
+ * feel alive. It now runs ~45s end to end with the first verified finding on
+ * screen inside 6s, queries interleaved into the verification stream rather
+ * than stacked ahead of it, and no discard in the final four seconds, so the
+ * run ends on findings and the writing beat rather than a counter ticking
+ * alone.
+ *
+ * Checkpoints the timing test pins:
+ *   `phase verifying` at t=3,260ms · first `finding.verified` at t=3,880ms ·
+ *   `runEventsTotalMs` ≈ 45,080ms.
+ */
 
-const QUERIES = [
-  'dental practice no-show rate statistics',
-  'front desk waitlist rebooking process',
-  'SMS reminder software dental practices',
-  'dental appointment cancellation cost',
-  'waitlist dental office forum',
-  'ChairSync reviews dental',
-  'Recall360 pricing',
-  'FrontDeskPro scheduling add-ons',
-  'dental PMS webhook API cancellation',
-  'dental SMS opt-in patient survey',
-  'small dental practice software budget approval',
-  'dental SaaS pricing per month',
-  'per-message SMS pricing complaints',
-  'dental conference expo booth demand',
-  'dental startup rebooking shut down',
-  'dental practice management marketplace add-ons',
-  'independent dental practice owner decision maker',
-  'dental office manager forum tools',
-  'webhook rate limit API partner agreement',
-] as const;
-
-if (QUERIES.length !== 19) {
-  throw new Error(`Expected 19 queries, got ${QUERIES.length}`);
-}
 if (evidenceFixture.length !== 47) {
   throw new Error(`Expected 47 findings to replay, got ${evidenceFixture.length}`);
 }
+if (discardedFixture.length !== 18) {
+  throw new Error(`Expected 18 discards to replay, got ${discardedFixture.length}`);
+}
 
-/** Cycled, deterministic delays — no Math.random(), so the fixture is reproducible run to run. */
-const QUERY_START_DELAY = 220;
-const QUERY_DONE_DELAY = 640;
-const VERIFY_DELAY_CYCLE = [560, 640, 720, 900, 1040];
-const DISCARD_EVERY_N_VERIFIED = 3;
+/* Cycled, deterministic delays — no Math.random(), so the fixture is
+   reproducible run to run. */
+const QUERY_START_DELAY = 90;
+const QUERY_DONE_DELAY = 130;
+const FETCH_PHASE_DELAY = 220;
+const VERIFY_PHASE_DELAY = 180;
+const VERIFY_DELAY_CYCLE = [620, 700, 780, 860, 940, 660, 720]; // 7 values, mean 754ms
+const DISCARD_DELAY = 200;
+const WRITING_PHASE_DELAY = 420;
+const COMPLETE_DELAY = 900;
+
+/** After which verified-finding counts a discard lands. 18 entries; the last
+ *  is 45, so the final two findings and the writing beat run clean. */
+const DISCARD_AFTER_VERIFIED = [
+  2, 5, 8, 11, 14, 17, 20, 22, 25, 27, 30, 32, 34, 36, 38, 41, 43, 45,
+];
+
+/** The remaining six query pairs (indices 13–18) are emitted after these
+ *  verified counts, so the ticker keeps moving through the long middle. */
+const INTERLEAVED_QUERY_AFTER_VERIFIED = [1, 3, 5, 7, 9, 11];
+
+/** Queries 0–5 fire under `searching`, 6–12 under `fetching`, and 13–18
+ *  interleave into `verifying`. */
+const QUERIES_BEFORE_FETCHING = 6;
+const QUERIES_BEFORE_VERIFYING = 13;
 
 function buildRunEvents(): RunEvent[] {
   const events: RunEvent[] = [];
@@ -47,40 +62,62 @@ function buildRunEvents(): RunEvent[] {
     elapsed += event.delayMs;
   }
 
-  push({ type: 'phase', delayMs: 0, phase: 'searching', elapsed_ms: 0 });
-
-  QUERIES.forEach((query, index) => {
+  function pushQuery(index: number) {
+    const query = RUN_QUERIES[index];
     push({ type: 'query.start', delayMs: QUERY_START_DELAY, query, index });
     push({ type: 'query.done', delayMs: QUERY_DONE_DELAY, query, index });
-  });
+  }
 
-  push({ type: 'phase', delayMs: 300, phase: 'fetching', elapsed_ms: elapsed + 300 });
-  push({ type: 'phase', delayMs: 250, phase: 'verifying', elapsed_ms: elapsed + 300 + 250 });
+  push({ type: 'phase', delayMs: 0, phase: 'searching', elapsed_ms: 0 });
+  for (let i = 0; i < QUERIES_BEFORE_FETCHING; i += 1) pushQuery(i);
 
-  let discardedCount = 0;
-  let verifiedSinceDiscard = 0;
+  push({ type: 'phase', delayMs: FETCH_PHASE_DELAY, phase: 'fetching', elapsed_ms: elapsed });
+  for (let i = QUERIES_BEFORE_FETCHING; i < QUERIES_BEFORE_VERIFYING; i += 1) pushQuery(i);
+
+  push({ type: 'phase', delayMs: VERIFY_PHASE_DELAY, phase: 'verifying', elapsed_ms: elapsed });
+
+  let discardIndex = 0;
+  let interleavedQuery = QUERIES_BEFORE_VERIFYING;
+
   for (const [findingIndex, finding] of evidenceFixture.entries()) {
-    const delayMs = VERIFY_DELAY_CYCLE[findingIndex % VERIFY_DELAY_CYCLE.length];
-    push({ type: 'finding.verified', delayMs, finding });
-    verifiedSinceDiscard += 1;
+    push({
+      type: 'finding.verified',
+      delayMs: VERIFY_DELAY_CYCLE[findingIndex % VERIFY_DELAY_CYCLE.length],
+      finding,
+    });
+    const verifiedSoFar = findingIndex + 1;
 
-    if (verifiedSinceDiscard >= DISCARD_EVERY_N_VERIFIED && discardedCount < 18) {
-      discardedCount += 1;
-      push({ type: 'finding.discarded', delayMs: 380, count: discardedCount });
-      verifiedSinceDiscard = 0;
+    if (
+      INTERLEAVED_QUERY_AFTER_VERIFIED.includes(verifiedSoFar) &&
+      interleavedQuery < RUN_QUERIES.length
+    ) {
+      pushQuery(interleavedQuery);
+      interleavedQuery += 1;
+    }
+
+    if (
+      discardIndex < discardedFixture.length &&
+      DISCARD_AFTER_VERIFIED[discardIndex] === verifiedSoFar
+    ) {
+      push({
+        type: 'finding.discarded',
+        delayMs: DISCARD_DELAY,
+        count: discardIndex + 1,
+        discarded: discardedFixture[discardIndex],
+      });
+      discardIndex += 1;
     }
   }
-  // Any discards not yet emitted (rounding) land right before the writing phase.
-  while (discardedCount < 18) {
-    discardedCount += 1;
-    push({ type: 'finding.discarded', delayMs: 380, count: discardedCount });
+
+  if (discardIndex !== discardedFixture.length) {
+    throw new Error(`Emitted ${discardIndex} discards, expected ${discardedFixture.length}`);
+  }
+  if (interleavedQuery !== RUN_QUERIES.length) {
+    throw new Error(`Emitted ${interleavedQuery} queries, expected ${RUN_QUERIES.length}`);
   }
 
-  push({ type: 'phase', delayMs: 600, phase: 'writing', elapsed_ms: elapsed + 600 });
-
-  // Absorb whatever's left of the 75s budget into the pre-complete pause, floor 800ms.
-  const remaining = Math.max(TARGET_TOTAL_MS - elapsed, 800);
-  push({ type: 'complete', delayMs: remaining });
+  push({ type: 'phase', delayMs: WRITING_PHASE_DELAY, phase: 'writing', elapsed_ms: elapsed });
+  push({ type: 'complete', delayMs: COMPLETE_DELAY });
 
   return events;
 }

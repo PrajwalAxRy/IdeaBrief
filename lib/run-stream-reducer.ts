@@ -1,4 +1,9 @@
-import { DIMENSIONS, type Dimension, type Finding } from './schemas/evidence';
+import {
+  DIMENSIONS,
+  type Dimension,
+  type DiscardedFinding,
+  type Finding,
+} from './schemas/evidence';
 import type { RunEvent, RunPhaseName } from './schemas/run';
 
 export type QueryRowState = 'queued' | 'running' | 'done';
@@ -18,6 +23,11 @@ export interface RunStreamState {
   /** The most recently prepended finding's id, for the entrance animation — `null` after a bulk/no-animation update. */
   newestFindingId: string | null;
   discardedCount: number;
+  /** Newest first, like `findings`. The console decides whether to render
+   *  them; the reducer just accumulates. Kept alongside `discardedCount`
+   *  rather than replacing it — the count is the running total the event
+   *  carries and is never derived by accumulation. */
+  discarded: DiscardedFinding[];
   counts: Record<Dimension, number>;
   complete: boolean;
 }
@@ -29,6 +39,7 @@ export function initialRunStreamState(queries: string[]): RunStreamState {
     findings: [],
     newestFindingId: null,
     discardedCount: 0,
+    discarded: [],
     counts: Object.fromEntries(DIMENSIONS.map((dimension) => [dimension, 0])) as Record<
       Dimension,
       number
@@ -76,7 +87,11 @@ export function runStreamReducer(state: RunStreamState, event: RunEvent): RunStr
       };
 
     case 'finding.discarded':
-      return { ...state, discardedCount: event.count };
+      return {
+        ...state,
+        discardedCount: event.count,
+        discarded: [event.discarded, ...state.discarded],
+      };
 
     case 'complete':
       return { ...state, complete: true };
@@ -84,4 +99,22 @@ export function runStreamReducer(state: RunStreamState, event: RunEvent): RunStr
     default:
       return state;
   }
+}
+
+/**
+ * The bulk / resume path: fold a prefix of the event log into one state in a
+ * single synchronous pass.
+ *
+ * **It forces `newestFindingId: null`.** A resumed run — or one rendered
+ * whole under reduced motion — must animate nothing: twenty-two cards are
+ * already there, they did not *just arrive*, and flagging the last one as
+ * newest would play an entrance for a finding that landed eighteen seconds
+ * ago.
+ *
+ * Nothing else is added here. The newest discard is already `state.discarded[0]`
+ * from the newest-first array, and a second field holding the same fact is how
+ * two code paths start.
+ */
+export function foldRunEvents(events: RunEvent[], initial: RunStreamState): RunStreamState {
+  return { ...events.reduce(runStreamReducer, initial), newestFindingId: null };
 }

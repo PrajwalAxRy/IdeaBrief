@@ -5,6 +5,9 @@ export const roadmapFixture: Roadmap = {
     {
       id: 'Q01',
       number: 1,
+      priority: 2,
+      effort: 'days',
+      brief_field: 'who_decides',
       question:
         'Who actually has to say yes to a $200-300/month recurring tool at a small practice — the office manager or the owner?',
       why_it_matters:
@@ -28,10 +31,10 @@ export const roadmapFixture: Roadmap = {
       how_many: '8-10 conversations, across both solo-owner and multi-location group practices.',
       script: {
         lines: [
-          '1. Walk me through the last new recurring software tool you bought for the practice.',
-          '2. Who had to approve it before it got signed?',
-          '3. What would make you say no even if the office manager loved it?',
-          "4. Roughly what's the highest monthly fee you'd approve without a longer conversation?",
+          'Walk me through the last new recurring software tool you bought for the practice.',
+          'Who had to approve it before it got signed?',
+          'What would make you say no even if the office manager loved it?',
+          "Roughly what's the highest monthly fee you'd approve without a longer conversation?",
         ],
       },
       what_you_learn:
@@ -40,6 +43,9 @@ export const roadmapFixture: Roadmap = {
     {
       id: 'Q02',
       number: 2,
+      priority: 4,
+      effort: 'days',
+      brief_field: 'what_makes_this_different',
       question:
         "How is this different from ChairSync and Recall360's existing reminder/recall products, in a way a skeptical office manager would immediately understand?",
       why_it_matters:
@@ -52,10 +58,10 @@ export const roadmapFixture: Roadmap = {
       how_many: '5-6 practices already using a competing tool.',
       script: {
         lines: [
-          '1. When was the last time a same-week cancellation actually got refilled from your waitlist?',
-          '2. Walk me through exactly what happened, step by step.',
-          '3. If a text went out automatically the second that slot opened, what would need to be true for you to trust it?',
-          '4. What would make this feel redundant with what you already pay for?',
+          'When was the last time a same-week cancellation actually got refilled from your waitlist?',
+          'Walk me through exactly what happened, step by step.',
+          'If a text went out automatically the second that slot opened, what would need to be true for you to trust it?',
+          'What would make this feel redundant with what you already pay for?',
         ],
       },
       what_you_learn:
@@ -64,6 +70,9 @@ export const roadmapFixture: Roadmap = {
     {
       id: 'Q03',
       number: 3,
+      priority: 6,
+      effort: 'weeks',
+      brief_field: 'how_customers_find_it',
       question:
         'Which channel gets the first 10 clinics — dental conference expos, PMS marketplace listings, or cold outreach?',
       why_it_matters:
@@ -77,9 +86,9 @@ export const roadmapFixture: Roadmap = {
       how_many: '30 cold-outreach attempts and 1 marketplace listing, run for 4 weeks in parallel.',
       script: {
         lines: [
-          '1. How did you find the scheduling/reminder tools you use today?',
-          "2. Do you look at your PMS's own add-on marketplace, or search independently?",
-          '3. Would a conference demo actually get you to sign up, or just to remember the name?',
+          'How did you find the scheduling/reminder tools you use today?',
+          "Do you look at your PMS's own add-on marketplace, or search independently?",
+          'Would a conference demo actually get you to sign up, or just to remember the name?',
         ],
       },
       what_you_learn:
@@ -88,6 +97,16 @@ export const roadmapFixture: Roadmap = {
     {
       id: 'Q04',
       number: 4,
+      priority: 3,
+      effort: 'weeks',
+      /* The fourth brief link, and the only one that is *reachable*: the other
+         three trace to fields the fixture already ships `unknown`, which is why
+         Q01-Q03 exist at all. Q04 asks whether patients with no texting history
+         will opt in, and the brief's second assumption is literally "Patients
+         will opt in to receiving a scheduling text from their dentist" — so
+         marking `assumptions` unknown in Define is the one action that can make
+         D10's promotion visible. */
+      brief_field: 'assumptions',
       question:
         "Will patients who've never gotten a scheduling text from their dentist actually opt in, or does this only work at practices already texting?",
       why_it_matters:
@@ -100,24 +119,37 @@ export const roadmapFixture: Roadmap = {
       how_many: 'One pilot practice, ~200 patients offered opt-in over 4 weeks.',
       script: {
         lines: [
-          '1. Have you ever gotten a text from this office before today?',
-          '2. Would you want text updates about appointment openings, yes or no?',
-          '3. If no, what would change your mind?',
+          'Have you ever gotten a text from this office before today?',
+          'Would you want text updates about appointment openings, yes or no?',
+          'If no, what would change your mind?',
         ],
       },
       what_you_learn:
         'A real opt-in rate baseline for cold SMS, to size how much of the waitlist is actually reachable.',
       survey: {
+        /* The options are data, not decoration: a survey row without its answer
+           set is not a survey, it is a question. */
         questions: [
-          'Have you received a text from this practice before?',
-          'Would you like to receive a text if an earlier appointment opens up?',
+          {
+            text: 'Have you received a text from this practice before today?',
+            options: 'YES / NO / NOT SURE',
+          },
+          {
+            text: 'If an earlier appointment opened up, would you want a text about it?',
+            options: 'YES / NO',
+          },
+          { text: 'If no — what would change your mind?', options: 'FREE TEXT' },
         ],
-        note: 'Two-question intercept survey, handed out at check-in for two weeks.',
+        sample_size: '~200 patients over 4 weeks at one practice.',
+        note: 'Three-question intercept, handed to patients at check-in for two weeks.',
       },
     },
     {
       id: 'Q05',
       number: 5,
+      priority: 5,
+      effort: 'weeks',
+      brief_field: null,
       question: 'What conversion rate is realistic for a first-touch SMS rebooking offer?',
       why_it_matters:
         "The whole pitch — 'we fill your cancelled slots' — is only as strong as the real conversion rate from text to booked appointment, and existing reminder-text open rates aren't the same metric.",
@@ -136,9 +168,9 @@ export const roadmapFixture: Roadmap = {
       how_many: '2 weeks of manually-sent texts at one practice, covering every real cancellation.',
       script: {
         lines: [
-          '1. Every time a slot opens, text the next 3 people on the waitlist by hand.',
-          '2. Log who replied, how fast, and whether they actually showed up.',
-          '3. Repeat for every cancellation over two weeks.',
+          'Every time a slot opens, text the next 3 people on the waitlist by hand.',
+          'Log who replied, how fast, and whether they actually showed up.',
+          'Repeat for every cancellation over two weeks.',
         ],
       },
       what_you_learn:
@@ -147,6 +179,9 @@ export const roadmapFixture: Roadmap = {
     {
       id: 'Q06',
       number: 6,
+      priority: 1,
+      effort: 'hours',
+      brief_field: null,
       question: 'Which PMS integration should be built first?',
       why_it_matters:
         'Same-day rebooking only works if the cancellation event reaches the product within minutes — that depends entirely on which PMS a pilot practice runs.',
@@ -163,9 +198,9 @@ export const roadmapFixture: Roadmap = {
         'Confirm webhook behaviour with 2-3 PMS vendors before committing to the first integration.',
       script: {
         lines: [
-          '1. Does your platform expose a cancellation event via API or webhook?',
-          '2. How quickly does it fire after the change happens in the schedule?',
-          "3. What's required to get partner/developer access — is it a quick signup or a sales conversation?",
+          'Does your platform expose a cancellation event via API or webhook?',
+          'How quickly does it fire after the change happens in the schedule?',
+          "What's required to get partner/developer access — is it a quick signup or a sales conversation?",
         ],
       },
       what_you_learn:
@@ -174,14 +209,21 @@ export const roadmapFixture: Roadmap = {
   ],
   steps: [
     {
+      id: 'S01',
       phase: 'BEFORE_YOU_BUILD',
+      kind: 'build',
+      start_week: 1,
+      duration_weeks: 2,
       description:
         "Before writing any code, settle who the buyer actually is and confirm at least one PMS's cancellation webhook is fast enough to act on same-day.",
       dependencies: ['Q01', 'Q06'],
-      estimate: '1-2 weeks',
     },
     {
+      id: 'S02',
       phase: 'FIRST_THING_TO_BUILD',
+      kind: 'build',
+      start_week: 3,
+      duration_weeks: 4,
       description:
         'A manual-trigger MVP: front desk marks a slot cancelled, the product texts the next N waitlisted patients in priority order, and the first YES reply auto-books them. No PMS integration yet — the practice enters the cancellation by hand.',
       cut_list: [
@@ -191,17 +233,23 @@ export const roadmapFixture: Roadmap = {
         'A native mobile app',
       ],
       dependencies: ['Q02', 'Q04', 'Q05'],
-      estimate: '3-4 weeks',
     },
     {
+      id: 'S03',
       phase: 'THEN',
+      kind: 'build',
+      start_week: 7,
+      duration_weeks: 5,
       description:
         'Once the manual-trigger version proves out a real conversion rate, add the first live PMS webhook integration so cancellations trigger the text automatically instead of requiring a front-desk click.',
       dependencies: ['Q06'],
-      estimate: '3-5 weeks',
     },
     {
+      id: 'S04',
       phase: 'LATER_AND_ONLY_IF',
+      kind: 'build',
+      start_week: 12,
+      duration_weeks: null,
       description:
         "Only build a second and third PMS integration if the first pilot practice's PMS isn't representative of where the next 10 customers actually come from.",
       cut_list: [
@@ -209,10 +257,13 @@ export const roadmapFixture: Roadmap = {
         'Support for practice management systems with no API at all',
       ],
       dependencies: ['Q03', 'Q06'],
-      estimate: 'ongoing, demand-driven',
     },
     {
+      id: 'S05',
       phase: 'WHAT_WOULD_CHANGE_THIS_PLAN',
+      kind: 'tripwire',
+      start_week: null,
+      duration_weeks: null,
       description:
         'If cold SMS opt-in rates come back far lower than reminder-text benchmarks, or if the buyer turns out to always be the practice owner rather than the office manager, the go-to-market motion and the pricing conversation both need to be rebuilt before any more product work.',
       dependencies: ['Q01', 'Q04'],

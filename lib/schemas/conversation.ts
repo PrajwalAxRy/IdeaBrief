@@ -37,5 +37,22 @@ export const ConversationTurnSchema = z.object({
 });
 export type ConversationTurn = z.infer<typeof ConversationTurnSchema>;
 
-export const ConversationSchema = z.array(ConversationTurnSchema).min(1);
+export const ConversationTurnsSchema = z.array(ConversationTurnSchema).min(1);
+export type ConversationTurns = z.infer<typeof ConversationTurnsSchema>;
+
+/**
+ * What the AI says once the script has run out and the user keeps typing.
+ * Cycled, never the same line twice running, and they fill no fields — the
+ * conversation has a real end state now rather than a question the script can
+ * never answer.
+ */
+export const ClosingLinesSchema = z.array(z.string().min(1)).min(1);
+export type ClosingLines = z.infer<typeof ClosingLinesSchema>;
+
+export const ConversationSchema = z.object({
+  turns: ConversationTurnsSchema,
+  closing: ClosingLinesSchema,
+  /** Played after `I don't know`, before the next scripted question. */
+  dontKnowAcks: ClosingLinesSchema,
+});
 export type Conversation = z.infer<typeof ConversationSchema>;

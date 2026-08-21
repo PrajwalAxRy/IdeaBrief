@@ -36,8 +36,24 @@ export const BriefSchema = z.object({
 });
 export type Brief = z.infer<typeof BriefSchema>;
 
-export const BRIEF_FIELD_KEYS = BriefSchema.keyof().options;
+/** The key enum itself, exported so `OpenQuestion.brief_field` can be a real
+ *  Zod-validated reference rather than a bare `string` (C6). */
+export const BriefFieldKeySchema = BriefSchema.keyof();
+export const BRIEF_FIELD_KEYS = BriefFieldKeySchema.options;
 export type BriefFieldKey = (typeof BRIEF_FIELD_KEYS)[number];
+
+/** The three array-valued fields. `resolveBrief` needs to know which keys take
+ *  `[]` rather than `''` when a field is marked unknown. */
+export const BRIEF_LIST_FIELD_KEYS = [
+  'how_they_solve_it_today',
+  'assumptions',
+  'open_questions',
+] as const satisfies readonly BriefFieldKey[];
+export type BriefListFieldKey = (typeof BRIEF_LIST_FIELD_KEYS)[number];
+
+export function isBriefListField(key: BriefFieldKey): key is BriefListFieldKey {
+  return (BRIEF_LIST_FIELD_KEYS as readonly string[]).includes(key);
+}
 
 /** Panel footer: "{n} unknown -> open questions". */
 export function countUnknownFields(brief: Brief): number {

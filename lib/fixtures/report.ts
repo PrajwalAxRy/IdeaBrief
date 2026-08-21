@@ -19,7 +19,7 @@ export const reportFixture: Report = {
   },
   dimensions: {
     PROBLEM: {
-      label: 'The problem',
+      dimension: 'PROBLEM',
       meta: { count: 14, sources: 12, date_range: '2025-01 to 2025-12' },
       confidence: 'solid',
       prose: {
@@ -34,7 +34,7 @@ export const reportFixture: Report = {
       findings: findingsFor('PROBLEM'),
     },
     WHAT_EXISTS: {
-      label: 'What exists',
+      dimension: 'WHAT_EXISTS',
       meta: { count: 11, sources: 11, date_range: '2025-01 to 2025-11' },
       confidence: 'solid',
       prose: {
@@ -49,7 +49,7 @@ export const reportFixture: Report = {
       findings: findingsFor('WHAT_EXISTS'),
     },
     DEMAND_SIGNALS: {
-      label: 'Demand signals',
+      dimension: 'DEMAND_SIGNALS',
       meta: { count: 7, sources: 7, date_range: '2025-04 to 2025-11' },
       confidence: 'mixed',
       prose: {
@@ -64,7 +64,7 @@ export const reportFixture: Report = {
       findings: findingsFor('DEMAND_SIGNALS'),
     },
     MONEY: {
-      label: 'Money',
+      dimension: 'MONEY',
       meta: { count: 13, sources: 12, date_range: '2025-01 to 2025-12' },
       confidence: 'solid',
       prose: {
@@ -79,7 +79,7 @@ export const reportFixture: Report = {
       findings: findingsFor('MONEY'),
     },
     PRACTICAL: {
-      label: 'Practical',
+      dimension: 'PRACTICAL',
       meta: { count: 2, sources: 2, date_range: '2025-09 to 2025-10' },
       confidence: 'thin',
       prose: {
@@ -103,6 +103,13 @@ export const reportFixture: Report = {
       take_from_them:
         'Their onboarding call model builds trust with skeptical office managers before asking for a contract.',
       ignore: "The 12-month contract requirement — it's cited as a signup blocker, not a strength.",
+      capabilities: [
+        { key: 'reminders', level: 'yes', citations: [15] },
+        { key: 'recall', level: 'yes', citations: [15] },
+        { key: 'waitlist', level: 'no', citations: [15] },
+        { key: 'auto_rebook', level: 'no', citations: [15, 19] },
+        { key: 'pms_integration', level: 'unknown', citations: [] },
+      ],
     },
     {
       name: 'Recall360',
@@ -115,6 +122,13 @@ export const reportFixture: Report = {
         'The annual-billing discount lands well with budget-conscious owners, per pricing discussion threads.',
       ignore:
         "Marketing it as an 'all-in-one' platform, given it still can't act on a cancellation in real time.",
+      capabilities: [
+        { key: 'reminders', level: 'yes', citations: [16, 23] },
+        { key: 'recall', level: 'yes', citations: [18, 23] },
+        { key: 'waitlist', level: 'partial', citations: [16] },
+        { key: 'auto_rebook', level: 'no', citations: [16, 19] },
+        { key: 'pms_integration', level: 'unknown', citations: [] },
+      ],
     },
     {
       name: 'FrontDeskPro',
@@ -126,17 +140,77 @@ export const reportFixture: Report = {
       take_from_them:
         'Its existing marketplace of add-ons is a plausible distribution channel worth testing before cold outreach.',
       // moat and ignore deliberately absent — exercises "not established from available evidence"
+      capabilities: [
+        { key: 'reminders', level: 'partial', citations: [17] },
+        { key: 'recall', level: 'unknown', citations: [] },
+        { key: 'waitlist', level: 'unknown', citations: [] },
+        { key: 'auto_rebook', level: 'no', citations: [19] },
+        { key: 'pms_integration', level: 'yes', citations: [17, 24] },
+      ],
     },
   ],
+  /* A list of keys with no `level`, deliberately — there is nothing to draw a
+     mark from, which is what keeps the idea a fourth *column* in a different
+     register rather than a fourth row of marks (C7). */
+  idea_capabilities: ['waitlist', 'auto_rebook', 'pms_integration'],
   surprises: [
-    "The office manager isn't always the one who signs off — several threads mention the practice owner has to approve anything recurring, even at solo-owner shops with an office manager running daily operations.",
-    'At least one well-funded rebooking-specific startup already tried this exact wedge and appears to have quietly shut down.',
-    'Pricing resistance was almost entirely about contract length and per-message billing, not the flat monthly fee itself.',
+    {
+      headline: 'The owner signs off, not the office manager.',
+      detail: {
+        text:
+          'Several threads mention the practice owner has to approve anything recurring, even at ' +
+          'solo-owner shops where an office manager runs daily operations [44]. Above roughly $300 a ' +
+          'month it stops being the office manager’s decision at all [42].',
+        citations: [42, 44],
+      },
+    },
+    {
+      /* [25][29], never [25][31]. EV_31 is ChairSync's *live* $6M raise, and
+         ChairSync is priced two sections earlier in this same report; pairing
+         it with a shutdown claim would make the fixture assert that a
+         still-trading competitor has closed. `CitedTextSchema.refine()` passes
+         it happily because both numbers resolve — which is exactly why the
+         fixture, not the schema, is where this has to be got right. EV_29 is
+         the practice that remembers a pitch that never shipped, and it is what
+         the sentence actually says. */
+      headline: 'Someone already tried this wedge and shut down.',
+      detail: {
+        text:
+          'A rebooking-specific startup listed in a 2022 directory no longer has an active website ' +
+          '[25], and at least one practice remembers being pitched something similar that never ' +
+          'shipped [29].',
+        citations: [25, 29],
+      },
+    },
+    {
+      headline: 'The objection is the contract, not the price.',
+      detail: {
+        text:
+          'Pricing resistance was almost entirely about contract length and per-message billing rather ' +
+          'than the flat monthly fee [35][36]. A 12-month minimum almost stopped one practice signing ' +
+          'with a competitor [36].',
+        citations: [35, 36],
+      },
+    },
   ],
   unanswered: [
-    'Which specific PMS platforms need direct integrations first, versus which practices would tolerate a manual CSV-based waitlist as a v1 workaround.',
-    "Whether patients who've never received a scheduling text from their dentist will opt in at meaningfully different rates than patients already used to reminder texts.",
-    'What conversion rate is realistic for a first-touch SMS rebooking offer, versus the reminder-text open rates cited in existing tool reviews.',
+    {
+      question:
+        'Which specific PMS platforms need direct integrations first, versus which practices would tolerate a manual CSV-based waitlist as a v1 workaround.',
+      why_unanswered:
+        'No public source lists PMS market share by practice size; every figure found was vendor-published.',
+    },
+    {
+      question:
+        "Whether patients who've never received a scheduling text from their dentist will opt in at meaningfully different rates than patients already used to reminder texts.",
+      why_unanswered:
+        'Every opt-in rate found was measured at practices already sending reminder texts.',
+    },
+    {
+      question:
+        'What conversion rate is realistic for a first-touch SMS rebooking offer, versus the reminder-text open rates cited in existing tool reviews.',
+      why_unanswered: 'Reviews quote reminder open rates, never a rebooking-offer conversion rate.',
+    },
   ],
 };
 

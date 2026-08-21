@@ -1,3 +1,4 @@
+import { discardedFixture } from '@/lib/fixtures/discarded';
 import { initialRunStreamState, runStreamReducer } from '@/lib/run-stream-reducer';
 import type { Finding } from '@/lib/schemas/evidence';
 import type { RunEvent } from '@/lib/schemas/run';
@@ -80,10 +81,39 @@ describe('run-stream-reducer — pure event -> state transitions', () => {
 
   it('sets the discard counter to the event count, not an accumulator', () => {
     let state = initialRunStreamState(QUERIES);
-    state = runStreamReducer(state, { type: 'finding.discarded', delayMs: 0, count: 3 });
+    state = runStreamReducer(state, {
+      type: 'finding.discarded',
+      delayMs: 0,
+      count: 3,
+      discarded: discardedFixture[0],
+    });
     expect(state.discardedCount).toBe(3);
-    state = runStreamReducer(state, { type: 'finding.discarded', delayMs: 0, count: 7 });
+    state = runStreamReducer(state, {
+      type: 'finding.discarded',
+      delayMs: 0,
+      count: 7,
+      discarded: discardedFixture[1],
+    });
     expect(state.discardedCount).toBe(7);
+  });
+
+  it('accumulates discarded records newest-first while still setting the count from the event', () => {
+    let state = initialRunStreamState(QUERIES);
+    state = runStreamReducer(state, {
+      type: 'finding.discarded',
+      delayMs: 0,
+      count: 1,
+      discarded: discardedFixture[0],
+    });
+    state = runStreamReducer(state, {
+      type: 'finding.discarded',
+      delayMs: 0,
+      count: 2,
+      discarded: discardedFixture[1],
+    });
+
+    expect(state.discarded.map((record) => record.id)).toEqual(['DS_02', 'DS_01']);
+    expect(state.discardedCount).toBe(2);
   });
 
   it('flags complete on the terminal event', () => {
@@ -101,7 +131,7 @@ describe('run-stream-reducer — pure event -> state transitions', () => {
       { type: 'query.done', delayMs: 0, query: QUERIES[0], index: 0 },
       { type: 'phase', delayMs: 0, phase: 'verifying', elapsed_ms: 0 },
       { type: 'finding.verified', delayMs: 0, finding: finding({ id: 'EV_01' }) },
-      { type: 'finding.discarded', delayMs: 0, count: 1 },
+      { type: 'finding.discarded', delayMs: 0, count: 1, discarded: discardedFixture[0] },
       { type: 'phase', delayMs: 0, phase: 'writing', elapsed_ms: 0 },
       { type: 'complete', delayMs: 0 },
     ];

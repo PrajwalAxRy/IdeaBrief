@@ -1,5 +1,9 @@
 import { briefFixture } from '@/lib/fixtures/brief';
-import { conversationFixture } from '@/lib/fixtures/conversation';
+import {
+  closingLinesFixture,
+  conversationFixture,
+  dontKnowAcksFixture,
+} from '@/lib/fixtures/conversation';
 import { evidenceFixture } from '@/lib/fixtures/evidence';
 import { reportFixture } from '@/lib/fixtures/report';
 import { roadmapFixture } from '@/lib/fixtures/roadmap';
@@ -38,8 +42,28 @@ describe('every fixture parses through its schema', () => {
     expect(roadmap.steps).toHaveLength(5);
   });
 
-  it('conversation', () => {
-    expect(() => ConversationSchema.parse(conversationFixture)).not.toThrow();
+  it('conversation — turns plus the closing lines the script ends on', () => {
+    const conversation = ConversationSchema.parse({
+      turns: conversationFixture,
+      closing: closingLinesFixture,
+      dontKnowAcks: dontKnowAcksFixture,
+    });
+    expect(conversation.turns).toHaveLength(11);
+    expect(conversation.closing.length).toBeGreaterThan(1);
+    /* Four of the eleven turns carry chips — the questions with a genuinely
+       enumerable answer space. One of eleven read as a glitch. */
+    expect(conversation.turns.filter((turn) => turn.chips !== undefined)).toHaveLength(4);
+    /* The last turn stops asking a question: it has a real end state. */
+    expect(conversation.turns[10].text.endsWith('?')).toBe(false);
+    /* D12: the five core fields are reached by turn 5, which is what puts
+       Approve on screen there rather than at turn 7. */
+    expect(conversation.turns.slice(0, 5).flatMap((turn) => turn.fills)).toEqual([
+      'product',
+      'customer',
+      'problem',
+      'how_they_solve_it_today',
+      'first_version_scope',
+    ]);
   });
 
   it('run', () => {
@@ -57,7 +81,10 @@ describe('every fixture parses through its schema', () => {
     expect(byType('finding.discarded')).toBe(18);
     expect(byType('phase')).toBe(4);
     expect(byType('complete')).toBe(1);
-    expect(runEventsTotalMs).toBe(75_000);
+    /* Re-timed to ~45s by D8. The exact checkpoints live in
+       run-events-timing.test.ts; this file only cares that the volumes and the
+       schema still hold. */
+    expect(runEventsTotalMs).toBe(45_080);
   });
 });
 
@@ -111,5 +138,80 @@ describe('schemas reject malformed payloads', () => {
   it('rejects a brief missing a required field', () => {
     const { one_liner, ...rest } = briefFixture;
     expect(() => BriefSchema.parse(rest)).toThrow();
+  });
+
+  /* ------------------------------------------------------------- A1 --- */
+
+  it('every fact carries a value, unit, label and kind', () => {
+    const facts = evidenceFixture.flatMap((finding) => finding.facts ?? []);
+    expect(facts).toHaveLength(28);
+    for (const fact of facts) {
+      expect(Number.isFinite(fact.value)).toBe(true);
+      expect(fact.unit.length).toBeGreaterThan(0);
+      expect(fact.label.length).toBeGreaterThan(0);
+      expect(['money', 'rate', 'count', 'duration']).toContain(fact.kind);
+    }
+    expect(evidenceFixture.filter((f) => f.facts !== undefined)).toHaveLength(20);
+  });
+
+  it('rejects a percentage fact above 100', () => {
+    const malformed = structuredClone(evidenceFixture);
+    malformed[1].facts = [{ value: 140, unit: '%', label: 'Impossible', kind: 'rate' }];
+    expect(() => EvidenceSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects a capability claim with no citation', () => {
+    const malformed = structuredClone(reportFixture);
+    malformed.competitors[0].capabilities[0].citations = [];
+    expect(() => ReportSchema.parse(malformed)).toThrow();
+  });
+
+  it('accepts an unknown capability cell with no citation', () => {
+    const ok = structuredClone(reportFixture);
+    ok.competitors[0].capabilities[0] = { key: 'reminders', level: 'unknown', citations: [] };
+    expect(() => ReportSchema.parse(ok)).not.toThrow();
+  });
+
+  it('rejects a tripwire step carrying a week span', () => {
+    const malformed = structuredClone(roadmapFixture);
+    malformed.steps[4].start_week = 12;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects a build step missing start_week', () => {
+    const malformed = structuredClone(roadmapFixture);
+    malformed.steps[0].start_week = null;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('accepts a build step with a null duration', () => {
+    const ok = structuredClone(roadmapFixture);
+    ok.steps[2].duration_weeks = null;
+    expect(() => RoadmapSchema.parse(ok)).not.toThrow();
+  });
+
+  it('rejects duplicate step ids', () => {
+    const malformed = structuredClone(roadmapFixture);
+    malformed.steps[1].id = malformed.steps[0].id;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects a surprise whose detail has no citation', () => {
+    const malformed = structuredClone(reportFixture);
+    malformed.surprises[0].detail = { text: 'A claim with no source at all.', citations: [] };
+    expect(() => ReportSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects an open question with an unknown brief_field', () => {
+    const malformed = structuredClone(roadmapFixture);
+    // @ts-expect-error — deliberately outside BriefFieldKey
+    malformed.open_questions[0].brief_field = 'not_a_brief_field';
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects a dimension section whose dimension does not match its key', () => {
+    const malformed = structuredClone(reportFixture);
+    malformed.dimensions.PROBLEM.dimension = 'MONEY';
+    expect(() => ReportSchema.parse(malformed)).toThrow();
   });
 });

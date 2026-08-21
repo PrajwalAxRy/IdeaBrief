@@ -26,6 +26,7 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-11-03',
     stance: 'supports',
     verified: true,
+    facts: [{ value: 20, unit: 'min', label: 'Per manual call-down', kind: 'duration' }],
   },
   {
     id: 'EV_02',
@@ -36,6 +37,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-09-18',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 14.2,
+        unit: '%',
+        label: 'Same-week cancellation rate',
+        kind: 'rate',
+        callout: true,
+      },
+    ],
   },
   {
     id: 'EV_03',
@@ -47,6 +57,9 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-08-02',
     stance: 'supports',
     verified: true,
+    facts: [
+      { value: 180, unit: 'USD', label: 'Lost production per empty chair-hour', kind: 'money' },
+    ],
   },
   {
     id: 'EV_04',
@@ -90,6 +103,24 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-04-11',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 16.8,
+        unit: '%',
+        label: 'No-show rate, no automated reminders',
+        kind: 'rate',
+        series: 'no_show',
+        callout: true,
+      },
+      {
+        value: 9.1,
+        unit: '%',
+        label: 'No-show rate, with them',
+        kind: 'rate',
+        series: 'no_show',
+        callout: true,
+      },
+    ],
   },
   {
     id: 'EV_08',
@@ -101,6 +132,22 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-03-27',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 45,
+        unit: 'min/day',
+        label: 'Front-desk rebooking calls, low',
+        kind: 'duration',
+        series: 'desk_time',
+      },
+      {
+        value: 90,
+        unit: 'min/day',
+        label: 'Front-desk rebooking calls, high',
+        kind: 'duration',
+        series: 'desk_time',
+      },
+    ],
   },
   {
     id: 'EV_09',
@@ -112,6 +159,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-02-19',
     stance: 'challenges',
     verified: true,
+    facts: [
+      {
+        value: 18,
+        unit: '%',
+        label: 'Patients who prefer a phone call',
+        kind: 'rate',
+        callout: true,
+      },
+    ],
   },
   {
     id: 'EV_10',
@@ -154,6 +210,22 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-06-20',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 15,
+        unit: 'names',
+        label: 'Waitlist length, low',
+        kind: 'count',
+        series: 'waitlist',
+      },
+      {
+        value: 20,
+        unit: 'names',
+        label: 'Waitlist length, high',
+        kind: 'count',
+        series: 'waitlist',
+      },
+    ],
   },
   {
     id: 'EV_14',
@@ -221,6 +293,24 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-07-08',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 0,
+        unit: 'tools',
+        label: 'Rebook end-to-end',
+        kind: 'count',
+        series: 'coverage',
+        callout: true,
+      },
+      {
+        value: 9,
+        unit: 'tools',
+        label: 'Reviewed',
+        kind: 'count',
+        series: 'coverage',
+        callout: true,
+      },
+    ],
   },
   {
     id: 'EV_20',
@@ -232,6 +322,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-06-02',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 30,
+        unit: 's',
+        label: 'Webhook latency after a status change',
+        kind: 'duration',
+        callout: true,
+      },
+    ],
   },
   {
     id: 'EV_21',
@@ -274,6 +373,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-02-27',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 14,
+        unit: 'add-ons',
+        label: 'Already listed on one PMS marketplace',
+        kind: 'count',
+        callout: true,
+      },
+    ],
   },
   {
     id: 'EV_25',
@@ -297,6 +405,22 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-11-20',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 150,
+        unit: 'USD/mo',
+        label: 'Willingness to pay, low',
+        kind: 'money',
+        series: 'price_ladder',
+      },
+      {
+        value: 250,
+        unit: 'USD/mo',
+        label: 'Willingness to pay, high',
+        kind: 'money',
+        series: 'price_ladder',
+      },
+    ],
   },
   {
     id: 'EV_27',
@@ -351,6 +475,14 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-05-22',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 6000000,
+        unit: 'USD',
+        label: 'Series A raised by the largest adjacent competitor',
+        kind: 'money',
+      },
+    ],
   },
   {
     id: 'EV_32',
@@ -362,6 +494,24 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-04-02',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 130000,
+        unit: 'practices',
+        label: 'Addressable market',
+        kind: 'count',
+        series: 'market',
+        callout: true,
+      },
+      {
+        value: 70,
+        unit: '%',
+        label: 'Independent or small-group',
+        kind: 'rate',
+        series: 'market',
+        callout: true,
+      },
+    ],
   },
 
   // ---------- MONEY (13) ----------
@@ -374,6 +524,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-11-09',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 299,
+        unit: 'USD/mo',
+        label: 'ChairSync, per location',
+        kind: 'money',
+        series: 'price_ladder',
+      },
+    ],
   },
   {
     id: 'EV_34',
@@ -384,6 +543,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-10-16',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 199,
+        unit: 'USD/mo',
+        label: 'Recall360 starter, billed annually',
+        kind: 'money',
+        series: 'price_ladder',
+      },
+    ],
   },
   {
     id: 'EV_35',
@@ -460,6 +628,22 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-03-11',
     stance: 'supports',
     verified: true,
+    facts: [
+      {
+        value: 2000,
+        unit: 'USD/mo',
+        label: 'Lost production, low',
+        kind: 'money',
+        series: 'roi_gap',
+      },
+      {
+        value: 4000,
+        unit: 'USD/mo',
+        label: 'Lost production, high',
+        kind: 'money',
+        series: 'roi_gap',
+      },
+    ],
   },
   {
     id: 'EV_42',
@@ -470,6 +654,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-02-08',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 300,
+        unit: 'USD/mo',
+        label: 'Owner sign-off threshold',
+        kind: 'money',
+        series: 'price_ladder',
+      },
+    ],
   },
   {
     id: 'EV_43',
@@ -481,6 +674,7 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-01-17',
     stance: 'neutral',
     verified: true,
+    facts: [{ value: 20, unit: '%', label: 'PMS marketplace revenue share', kind: 'rate' }],
   },
   {
     id: 'EV_44',
@@ -516,6 +710,24 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-10-05',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 2,
+        unit: 'weeks',
+        label: 'Partner agreement, low',
+        kind: 'duration',
+        series: 'partner',
+        callout: true,
+      },
+      {
+        value: 3,
+        unit: 'weeks',
+        label: 'Partner agreement, high',
+        kind: 'duration',
+        series: 'partner',
+        callout: true,
+      },
+    ],
   },
   {
     id: 'EV_47',
@@ -526,6 +738,15 @@ export const evidenceFixture: Finding[] = [
     source_date: '2025-09-14',
     stance: 'neutral',
     verified: true,
+    facts: [
+      {
+        value: 100,
+        unit: 'events/min',
+        label: 'Webhook rate limit per integration',
+        kind: 'count',
+        callout: true,
+      },
+    ],
   },
 ];
 

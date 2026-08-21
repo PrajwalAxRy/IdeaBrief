@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FindingSchema } from './evidence';
+import { DiscardedFindingSchema, FindingSchema } from './evidence';
 
 export const RunStatusSchema = z.enum(['define', 'validating', 'complete']);
 export type RunStatus = z.infer<typeof RunStatusSchema>;
@@ -47,6 +47,13 @@ export const RunEventSchema = z.discriminatedUnion('type', [
     delayMs: z.number().int().nonnegative(),
     /** Running total discarded so far — the client just displays it, never accumulates. */
     count: z.number().int().nonnegative(),
+    /**
+     * The whole record, not a `{ domain, reason }` pair. A pair is a second,
+     * lossier shape for data that already exists — the console derives both
+     * from the record via `formatDomain(record.source_url)` and
+     * `DISCARD_REASON_LABEL[record.discard_reason]`.
+     */
+    discarded: DiscardedFindingSchema,
   }),
   z.object({
     type: z.literal('complete'),
