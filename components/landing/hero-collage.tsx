@@ -78,7 +78,15 @@ export function HeroCollage() {
             height: card.height,
             transform: `rotate(${card.rotate}deg)`,
             opacity: mounted ? card.opacity : 0,
-            transition: `opacity 1400ms cubic-bezier(0.16, 1, 0.3, 1) ${180 + i * 110}ms`,
+            /* **A15 retune: 1400ms → `--ob-enter` (900ms).** 1400ms sat in the
+               dead zone between the structural band (150–900ms) and the ambient
+               band (20–50s). This is an entrance, so it belongs at the top of
+               the structural band — the same call the plan makes for count-ups,
+               and for the same reason: the system has exactly three durations
+               and will not grow a fourth. The easing is now the token rather
+               than a repeated literal. The stagger is a *delay*, not a
+               duration, and is unchanged. */
+            transition: `opacity var(--ob-enter) var(--ob-ease) ${180 + i * 110}ms`,
           }}
         >
           {/* Plain <img>, not next/image: these are temporary hotlinked
