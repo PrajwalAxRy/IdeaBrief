@@ -8,7 +8,17 @@
 > reading. This file re-cuts it into 12 *buildable* phases, each sized to fit
 > in one Claude session's context.
 >
-> **Status:** not started.
+> **Status:** complete. All 12 phases plus the Deep Canopy overhaul and the
+> Obsidian landing-page rebuild are done.
+>
+> **Superseded for new work.** The next body of work — porting `/r/[slug]/*`
+> off Deep Canopy onto Obsidian, and reworking those four pages' UX along with
+> their visuals — lives in
+> [`obsidian_app_build_plan.md`](obsidian_app_build_plan.md), phases A0–A15.
+> **Pick that file up, not this one.** Standing rule 0 below is stale: the
+> design skill is now `obsidian-design`, not `dark-luxury-design`. This file is
+> retained for its build log, which is still the record of why the codebase is
+> shaped the way it is.
 
 > **Design skill — imperative:** every phase in this plan must be built using
 > the Claude skill **`dark-luxury-design`** as the primary design system. Only

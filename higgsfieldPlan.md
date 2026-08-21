@@ -159,10 +159,17 @@ typing is the motion.
 
 ---
 
-## 6. Open Graph / social card `[HIGH — genuinely missing]`
+## 6. Open Graph / social card `[SHIPPED — A15]`
 
-**Currently:** nothing. `app/layout.tsx` has `title` and `description` but no
-`openGraph` block and no image. Any link to this page previews as bare text.
+> **Closed 2026-08-21 by A15. Generate nothing for this.** The card ships as
+> `public/og/default.png`, drawn in code by `app/style-guide/og/page.tsx` and
+> committed at 1200×630. `app/layout.tsx` carries `metadataBase`, `openGraph`
+> and `twitter`. **The delivery path below was `public/og.png` in the original
+> draft; it shipped as `public/og/default.png`** — use the real path if this is
+> ever redrawn. The brief is kept for that redraw, not as an outstanding ask.
+
+**Was:** nothing. `app/layout.tsx` had `title` and `description` but no
+`openGraph` block and no image, so any link to this page previewed as bare text.
 
 **Brief:** the wordmark and the headline "From a hunch to something you can
 defend." set in Geist 400 on `#060607`, with a heavily darkened version of the
@@ -170,7 +177,8 @@ defend." set in Geist 400 on `#060607`, with a heavily darkened version of the
 Essentially a still of the hero, cropped to 1.91:1.
 
 **Format:** 1200×630 PNG.
-**Deliver to:** `public/og.png`
+**Deliver to:** `public/og/default.png` (shipped path — **not** `public/og.png`,
+which this draft named and which does not exist)
 **Code change:** add an `openGraph` and `twitter` block to the `metadata` export
 in `app/layout.tsx`.
 
@@ -179,21 +187,10 @@ absence rather than an upgrade.
 
 ---
 
-## 7. Favicon / app mark `[LOW]`
-
-**Currently:** `app/favicon.ico` is the inherited Next.js default.
-**Brief:** the nav mark — an outlined square with a filled lower-left corner
-stone (see `Mark()` in `components/landing/site-nav.tsx`) — as a standalone
-icon, chalk on `#0A0A0B`.
-**Format:** SVG plus 32/180/512px PNGs.
-
----
-
 ## Priority order
 
 1. **§6 OG image** — a real gap, cheap to fill, visible every time the link is shared.
 2. **§1 hero collage** — the largest single lift in how designed the page feels.
 3. **§2 ambient field** — only if §1 lands and the hero still feels static.
-4. **§7 favicon** — housekeeping.
-5. §3 / §5 — optional, and easy to make worse.
-6. **§4 — do not touch.**
+4. §3 / §5 — optional, and easy to make worse.
+5. **§4 — do not touch.**
