@@ -1,150 +1,110 @@
 import { VerifiedBadge } from '@/components/status/verified-badge';
-import { Card } from '@/components/ui/card';
-import { Well } from '@/components/ui/well';
-import { formatDomain } from '@/lib/format';
-import type { Dimension, Finding } from '@/lib/schemas/evidence';
-
-const DIMENSION_CARD_LABEL: Record<Dimension, string> = {
-  PROBLEM: 'THE PROBLEM',
-  WHAT_EXISTS: 'WHAT EXISTS',
-  DEMAND_SIGNALS: 'DEMAND SIGNALS',
-  MONEY: 'MONEY',
-  PRACTICAL: 'PRACTICAL',
-};
+import { APP_EVIDENCE } from '@/lib/content/app';
+import { formatDate, formatDomain } from '@/lib/format';
+import { DIMENSION_LABEL, type Finding } from '@/lib/schemas/evidence';
+import { StanceMark } from './stance-mark';
 
 interface FindingCardProps {
   finding: Finding;
   variant: 'stream' | 'accordion' | 'row';
-  /** Stream only — plays the entrance + delayed-badge animation for a just-verified card. */
-  entering?: boolean;
+  /** Stream only — A8 flips this; A5 supplies the CSS the flip drives. */
+  state?: 'pending' | 'verified';
   /**
-   * Click-to-open-evidence handler. Left undefined in Server Component call
-   * sites (the Report's dimension accordions, per P8: "the interactive
-   * islands are CitationChip, Accordion, and SectionIndex only") — `FindingCard`
-   * itself never needs `'use client'` because it only ever attaches an
-   * `onClick` when a caller that's already inside a client subtree
-   * (`FindingStream`, `SourcesList`) supplies one.
+   * The claim becomes a `<button>` when this is supplied. Left undefined in
+   * Server Component call sites (the report's dimension accordions), which is
+   * why this component itself never needs `'use client'`.
    */
   onOpenEvidence?: () => void;
-  /** Row variant only — the sources page's leading `[03]` citation number. */
+  /** Row variant — the explorer's leading `[03]`. Outside prose, so legal (C12). */
   citationNumber?: number;
+  /** From `citedFindingIds(report)`. Renders `CITED` when true and **nothing**
+   *  when false: 23 of 47 findings are cited nowhere, and labelling them
+   *  "uncited" would read as a verdict on them. Absence is the signal. */
+  citedInReport?: boolean;
 }
 
 /**
- * One verified finding: dimension, `VerifiedBadge`, claim, excerpt `Well`,
- * source line — the most reused product component (10-component-system.md).
- * `variant` selects layout, not a distinct component, per convention ⑥.
+ * One verified finding — the most reused product component. `variant` selects
+ * layout, not a distinct component.
+ *
+ * **R12 is dead, and the fix deletes three hacks at once.** This used to be a
+ * `<div role="button" tabIndex={0} onKeyDown>` wrapping an `<a>`: nested
+ * interactive content, a screen reader announcing the whole row as one enormous
+ * button label, a `stopPropagation` on the anchor, and a "only attach onClick
+ * when a client caller supplies one" contortion. **The card is not the button;
+ * the claim is.** A real `<button>` gets Enter and Space for free, and with no
+ * ancestor handler there is nothing left to stop propagating.
+ *
+ * **Stance renders in all three variants.** It used to render only in the
+ * drawer and the row, which meant that in the console stream and in every
+ * report accordion a finding that contradicts the idea was pixel-identical to
+ * one that supports it. For a product whose entire pitch is honest evidence,
+ * that was the worst omission in the app.
  */
 export function FindingCard({
   finding,
   variant,
-  entering = false,
+  state,
   onOpenEvidence,
   citationNumber,
+  citedInReport = false,
 }: FindingCardProps) {
-  const dimensionLabel = DIMENSION_CARD_LABEL[finding.dimension];
-  const clickable = Boolean(onOpenEvidence);
+  const citationLabel =
+    citationNumber === undefined ? undefined : `[${String(citationNumber).padStart(2, '0')}]`;
 
-  const header = (
-    <div className="finding-card-header">
-      <span className="finding-card-dimension">
-        {variant === 'row' && citationNumber !== undefined && (
-          <span className="finding-card-citation">[{String(citationNumber).padStart(2, '0')}]</span>
+  return (
+    <article
+      className="ob-finding"
+      data-variant={variant}
+      data-stance={finding.stance}
+      data-state={variant === 'stream' ? state : undefined}
+    >
+      <header className="ob-finding-head gap-3">
+        {citationLabel && <span className="ob-meta">{citationLabel}</span>}
+        <span className="ob-meta">{DIMENSION_LABEL[finding.dimension]}</span>
+        <StanceMark stance={finding.stance} />
+        {citedInReport && (
+          <span className="ob-finding-cited ob-meta" title={APP_EVIDENCE.citedTitle}>
+            {APP_EVIDENCE.citedMarker}
+          </span>
         )}
-        {dimensionLabel}
-      </span>
-      <VerifiedBadge />
-    </div>
-  );
+        <VerifiedBadge />
+      </header>
 
-  const body = (
-    <>
-      {header}
-      <p className="finding-card-text">{finding.text}</p>
-      {variant === 'row' ? (
-        <p className="finding-card-excerpt finding-card-excerpt--plain">
-          &ldquo;{finding.excerpt}&rdquo;
-        </p>
+      {onOpenEvidence ? (
+        <button
+          type="button"
+          className="ob-finding-claim"
+          onClick={onOpenEvidence}
+          aria-label={`Open evidence ${citationNumber ?? ''}: ${finding.text}`}
+        >
+          {finding.text}
+        </button>
       ) : (
-        <Well className="finding-card-excerpt">
-          <p>&ldquo;{finding.excerpt}&rdquo;</p>
-        </Well>
+        <p className="ob-finding-claim">{finding.text}</p>
       )}
-      <p className="finding-card-source-line">
-        <span>{formatDomain(finding.source_url)}</span>
-        <span aria-hidden="true"> · </span>
-        <span>{finding.source_date}</span>
-        {variant === 'row' && (
-          <>
-            <span aria-hidden="true"> · </span>
-            <span>{finding.stance}</span>
-          </>
-        )}
+
+      <blockquote className="ob-finding-excerpt">{finding.excerpt}</blockquote>
+
+      {/* Always in the DOM in the stream variant so its 1px is reserved from
+          the first frame (rule 12). `display: none` in the other two —
+          verification happened minutes ago. */}
+      <div className="ob-verify-rule" aria-hidden="true" />
+
+      <p className="ob-finding-source">
         <a
+          className="ob-finding-source-link"
           href={finding.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="finding-card-source-link"
-          // Only attached when `clickable` — otherwise this renders from a plain
-          // Server Component (the Report's accordion variant), which cannot
-          // attach any event handler, not even a no-op one (verified live: Next
-          // throws "Event handlers cannot be passed to Client Component props").
-          onClick={clickable ? (event) => event.stopPropagation() : undefined}
-          aria-label={`Open source: ${finding.source_url}`}
         >
-          ↗
+          {formatDomain(finding.source_url)}{' '}
+          <span className="ob-arrow" aria-hidden="true">
+            ↗
+          </span>
         </a>
+        <span className="ob-meta">{formatDate(finding.source_date)}</span>
       </p>
-    </>
-  );
-
-  if (variant === 'row') {
-    return (
-      <div
-        className={['finding-row', clickable ? 'finding-row--clickable' : '']
-          .filter(Boolean)
-          .join(' ')}
-        onClick={onOpenEvidence}
-        role={clickable ? 'button' : undefined}
-        tabIndex={clickable ? 0 : undefined}
-        onKeyDown={
-          clickable
-            ? (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  onOpenEvidence?.();
-                }
-              }
-            : undefined
-        }
-      >
-        {body}
-      </div>
-    );
-  }
-
-  return (
-    <Card
-      interactive={clickable}
-      padding="compact"
-      className={['finding-card', variant === 'stream' && entering ? 'finding-card--entering' : '']
-        .filter(Boolean)
-        .join(' ')}
-      onClick={onOpenEvidence}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      onKeyDown={
-        clickable
-          ? (event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                onOpenEvidence?.();
-              }
-            }
-          : undefined
-      }
-    >
-      {body}
-    </Card>
+    </article>
   );
 }
