@@ -28,7 +28,11 @@ export default function Home() {
           `SkipLink`, which `RunShell` also mounts (R19). */}
       <SkipLink />
 
-      <div className="ob-backdrop" aria-hidden="true" />
+      <div className="ob-backdrop" data-image="true" aria-hidden="true">
+        <div className="ob-backdrop-plate">
+          <img className="ob-backdrop-media" src="/media/backdrop-field.webp" alt="" />
+        </div>
+      </div>
 
       <div className="ob-layer">
         <SiteNav />

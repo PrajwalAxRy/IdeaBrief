@@ -56,13 +56,10 @@ export type CollageCard = {
   opacity: number;
 };
 
-const UNSPLASH = (id: string, w: number) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=70`;
-
 export const COLLAGE: CollageCard[] = [
   {
     id: 'far-left',
-    src: UNSPLASH('1454165804606-c3d57bc86b40', 900),
+    src: '/media/hero/far-left.webp',
     left: '-8%',
     top: '30%',
     width: '26%',
@@ -73,7 +70,7 @@ export const COLLAGE: CollageCard[] = [
   },
   {
     id: 'left',
-    src: UNSPLASH('1517048676732-d65bc937f952', 900),
+    src: '/media/hero/left.webp',
     left: '10%',
     top: '58%',
     width: '22%',
@@ -84,7 +81,7 @@ export const COLLAGE: CollageCard[] = [
   },
   {
     id: 'centre',
-    src: UNSPLASH('1553877522-43269d4ea984', 1400),
+    src: '/media/hero/centre.webp',
     left: '27%',
     top: '24%',
     width: '46%',
@@ -95,7 +92,7 @@ export const COLLAGE: CollageCard[] = [
   },
   {
     id: 'right',
-    src: UNSPLASH('1522202176988-66273c2fd55f', 900),
+    src: '/media/hero/right.webp',
     left: '70%',
     top: '55%',
     width: '24%',
@@ -106,7 +103,7 @@ export const COLLAGE: CollageCard[] = [
   },
   {
     id: 'far-right',
-    src: UNSPLASH('1460925895917-afdab827c52f', 900),
+    src: '/media/hero/far-right.webp',
     left: '82%',
     top: '28%',
     width: '26%',
