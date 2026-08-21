@@ -2,18 +2,28 @@
 @import "tailwindcss";
 
 @import "./tokens.css";
-@import "./components.css";
-/* Landing-page system. Every rule is scoped under [data-theme='obsidian'], so
-   importing it globally restyles nothing outside the landing route.
 
-   Imported INTO `@layer components` on purpose. Unlayered rules beat every
-   layered rule regardless of specificity, so leaving these recipes unlayered
-   meant `.ob-h1 { margin: 0 }` silently won against `mt-8` and every other
-   Tailwind utility on the same element. Inside `components` — which Tailwind
-   declares ahead of `utilities` — the recipe is the default and a layout
-   utility at the call site can still override it, which is the whole contract
-   between the two. */
+/* Every recipe stylesheet below is imported INTO `@layer components`, and that
+   is not optional. Unlayered rules beat every layered rule regardless of
+   specificity, so an unlayered recipe file means `.ob-eyebrow { margin: 0 }`
+   silently wins against `mb-0` and every other Tailwind utility on the same
+   element. It produces no error and the page still looks plausible; it has
+   silently zeroed out this app's spacing three times. Inside `components` —
+   which Tailwind declares ahead of `utilities` — the recipe is the default and
+   a layout utility at the call site can still override it, which is the whole
+   contract between the two.
+
+   Import order is tokens → obsidian (landing) → obsidian-app (app). The last
+   two share one layer, so source order decides ties.
+
+   **`components.css` is gone.** A15 deleted it: 1843 lines of Deep Canopy, the
+   forest-green system Obsidian replaced. Before deleting, every `var(--…)` that
+   was not `var(--ob-…)` and every one of its 142 recipe classes was checked
+   against the tree — the only live call sites were four files (`app/error.tsx`,
+   `app/not-found.tsx`, the invalid-run page and the roadmap boundary), all of
+   which A14 had already rewritten onto Obsidian. */
 @import "./obsidian.css" layer(components);
+@import "./obsidian-app.css" layer(components);
 
 /* Everything below MUST stay inside `@layer base`. Unlayered rules beat every
    layered rule regardless of specificity — an unlayered `body` once silently
@@ -25,43 +35,62 @@
     scroll-behavior: smooth;
   }
 
+  /* **Obsidian is the base now, not an override on top of one.**
+     A0 could not write it this way: `data-theme` on <html> put the Obsidian
+     canvas and font on the root element, but this `body` rule was a *direct*
+     declaration and beat inheritance — so A0 landed a higher-specificity
+     `[data-theme='obsidian'] body` alongside it to win.
+
+     That pair was a trap with a fuse in it. Removing the attribute (step 6)
+     would have stopped both scoped rules matching, and the entire app would
+     have reverted to Inter Tight on a forest-green body with no error and no
+     warning. So the fold *is* the fix: the `--ob-*` values move into the plain
+     rules here and both scoped overrides are deleted in the same edit.
+
+     `background` is `--ob-canvas` rather than the `transparent` A0 needed.
+     Transparent was only ever there to stop the green `--bg-base` painting over
+     the canvas <html> carries; with the green gone, painting the same colour
+     twice is a no-op, and it makes `getComputedStyle(document.body)
+     .backgroundColor` an honest thing to assert. `.ob-backdrop` is `z-index: 0`,
+     not negative, so it still paints above this. */
   body {
-    background: var(--bg-base);
-    color: var(--text-body);
-    font-family: var(--font-text);
-    font-size: var(--text-body-size);
-    line-height: var(--leading-relaxed);
+    background: var(--ob-canvas);
+    color: var(--ob-muted);
+    font-family: var(--ob-font);
+    font-size: var(--ob-body);
+    line-height: var(--ob-leading-body);
+    letter-spacing: var(--ob-tracking-snug);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
     position: relative;
   }
 
-  /* Global grain. Sits above everything, catches no pointer events. It is the
-     one texture in the system — it keeps the flat green surfaces from reading
-     as plastic. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: var(--grain-opacity);
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
+  /* R22 — and it must live in `base`. In `components` its specificity (0,0,1)
+     against `.ob-h1` (0,1,0) would be fine, but `:is()` here takes the highest
+     specificity of its arguments, and the rule would then eat every headline's
+     own tracking.
 
+     **Weight is `--ob-weight` (400).** This was `--weight-bold` under Deep
+     Canopy; a weight-400 display face is Obsidian law 4, and authority comes
+     from scale and negative tracking instead.
+
+     Tracking stays `--ob-tracking-snug`, which is what A0's fold chose and what
+     every route was measured against. The plan's step 4 maps it to
+     `--ob-tracking-h2`, but that mapping was written before A0 landed this rule
+     — and every heading that matters carries `.ob-display` / `.ob-h1` /
+     `.ob-h2` / `.ob-h3`, each of which sets its own. */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    font-family: var(--font-display);
-    color: var(--text-primary);
-    font-weight: var(--weight-bold);
-    letter-spacing: var(--tracking-snug);
-    line-height: var(--leading-tight);
+    font-family: var(--ob-font);
+    color: var(--ob-text);
+    font-weight: var(--ob-weight);
+    letter-spacing: var(--ob-tracking-snug);
+    line-height: var(--ob-leading-tight);
     text-wrap: balance;
   }
 
@@ -79,47 +108,28 @@
   }
 
   ::selection {
-    background: var(--accent);
-    color: var(--text-on-accent);
+    background: var(--ob-accent);
+    color: var(--ob-on-accent);
   }
 
+  /* `outline` + `outline-offset` are the whole indicator. The `border-radius`
+     that used to live here applied to the *element*, visibly squaring off every
+     pill button the instant it took focus (pitfalls §2).
+
+     **`transition: none` is required, not tidy.** A ring that fades in over
+     320ms is a usability bug, and it also makes you measure a nonsense
+     interpolated value and conclude the ring doesn't exist (pitfalls §7). */
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--ob-accent);
     outline-offset: 2px;
-    border-radius: var(--r-md);
+    transition: none;
   }
 
-  /* Reduced motion kills ambient and reveal motion. Drawers, accordions, and
-     hover colour survive — they communicate state rather than decorate. */
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-
-    .hero-bloom::before,
-    .hero-bloom::after,
-    .orb,
-    .marquee-track,
-    .skeleton {
-      animation: none;
-    }
-
-    .reveal {
-      opacity: 1;
-      transform: none;
-      transition: none;
-    }
-
-    .hero-reveal-1,
-    .hero-reveal-2,
-    .hero-reveal-3,
-    .hero-reveal-4,
-    .reveal,
-    .message,
-    .finding-row {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
-  }
+  /* The reduced-motion block that used to sit here named only Deep Canopy
+     classes (`.hero-bloom`, `.orb`, `.marquee-track`, `.skeleton`, `.reveal`,
+     `.hero-reveal-*`, `.message`, `.finding-row`) and matched nothing. It is
+     deleted rather than translated: the contract has exactly two homes now —
+     `obsidian.css` §16 for the global blanket and the landing end states, and
+     `obsidian-app.css` §16 for every app-side end state. A third would make the
+     completeness diff unreadable, which is the one thing that diff has to be. */
 }

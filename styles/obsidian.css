@@ -1,18 +1,19 @@
 /* ============================================================================
    OBSIDIAN — landing-page component recipes.
    ----------------------------------------------------------------------------
-   Everything here is scoped under [data-theme='obsidian'] and reads a token
-   from tokens.css. No colour literal may appear in this file.
+   Every rule here reads a token from tokens.css. No colour literal may appear
+   in this file. **Nothing is theme-scoped any more**: A15 deleted Deep Canopy,
+   so Obsidian is the only system and these selectors are global.
 
    The rule the whole system rests on: sections are separated by a 1px hairline
    and nothing else. No background bands, no gradients between sections, no
    shadows anywhere. Elevation is a border. Hierarchy is scale and tracking.
 
-   Every custom property used below is defined in the [data-theme='obsidian']
-   block of tokens.css — an undefined one would silently void its declaration.
+   Every custom property used below is defined on `:root` in tokens.css — an
+   undefined one would silently void its whole declaration, with no error.
    ============================================================================ */
 
-[data-theme="obsidian"] {
+:root {
   position: relative;
   z-index: 0;
   min-height: 100vh;
@@ -24,28 +25,48 @@
   line-height: var(--ob-leading-body);
   letter-spacing: var(--ob-tracking-snug);
   font-feature-settings: "ss01" on, "cv11" on;
-  overflow-x: clip;
 }
 
-/* ------------------------------------------------------------------
-   Overrides for the two global `@layer base` rules in globals.css that
-   hard-code the Deep Canopy accent (`--accent`, #7FB8E8). Both are visible on
-   this page — a focus ring on anything without its own focus style, and every
-   text selection — and both would render a green-system colour on an obsidian
-   surface. Scoped here rather than changed there, because the run pages still
-   want the original.
+/* `overflow-x: clip` used to live in the block above. A0 moved `data-theme` to
+   <html>, which silently promoted it to the document root — and a clipping
+   root is the classic way for `position: fixed` and `position: sticky` to go
+   strange (pitfalls §5). A4's fixed run header and A9's sticky section index
+   both depend on it not being there.
+   It is not needed: the two elements that actually overflow horizontally clip
+   themselves — `.ob-hero` is `overflow: clip` and `.ob-marquee` is
+   `overflow: hidden`. Measured on every route: `scrollWidth === clientWidth`.
+   If a future section overflows, it clips itself; do not put this back on the
+   root. */
 
-   These sit in `@layer components`, which Tailwind declares after `base`, so
-   the layer order alone wins; no specificity war.
+/* The `:focus-visible` and `::selection` overrides that used to sit here are
+   **deleted, not de-scoped.** They existed only to beat globals.css's
+   `@layer base` copies, which hard-coded Deep Canopy's `--accent` (#7FB8E8) —
+   a green focus ring on an obsidian surface. A15 rewrote those base rules onto
+   `--ob-accent`, so these became two rules restating what they were overriding.
+   The remaining risk they were flagged for — losing a class of specificity when
+   the attribute went — is gone with them.
+
    ------------------------------------------------------------------ */
 
-[data-theme="obsidian"] :focus-visible {
-  outline-color: var(--ob-accent);
-}
+/* The global grain, moved here from globals.css's `@layer base` when Deep
+   Canopy was deleted. **It belongs with the backdrop, not in a base layer** —
+   it is atmosphere, and §1 is where atmosphere lives.
 
-[data-theme="obsidian"] ::selection {
-  background: var(--ob-accent);
-  color: var(--ob-on-accent);
+   The opacity is a literal rather than a token on purpose: C2 closes the token
+   list, and a custom property with exactly one consumer is not earning its
+   place. It read `var(--grain-opacity)`, a Deep Canopy token with no `--ob-*`
+   equivalent, which would have silently voided the whole declaration the moment
+   tokens.css lost its first `:root` block — leaving a fully opaque noise layer
+   over the entire product with no error. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ============================================================
@@ -470,11 +491,14 @@
 }
 
 /* Skip link — obsidian-scoped so it doesn't inherit the Deep Canopy chrome. */
+/* z-index 70 clears the run header's 50 and the landing nav's 60. It is the
+   highest thing in the app on purpose: a skip link that lands behind a fixed
+   header is a skip link that does nothing (R19). */
 .ob-skip {
   position: absolute;
   left: -9999px;
   top: 0;
-  z-index: 100;
+  z-index: 70;
   padding: 12px 20px;
   background: var(--ob-accent);
   color: var(--ob-on-accent);
@@ -582,7 +606,11 @@
   inset-inline: 0;
   height: 18px;
   background: var(--ob-accent);
-  animation: ob-cue 2.6s var(--ob-ease) infinite;
+  /* **A15 retune: 2.6s → 2400ms.** 2600ms was in the dead zone. It joins the
+     system's one infinite period; three elements now share 2400ms — this cue,
+     the accent `.ob-dot` and the dim `.ob-rest-dot` — and the rule the binary
+     checks is that there is exactly *one* infinite duration, not one user. */
+  animation: ob-cue 2400ms var(--ob-ease) infinite;
 }
 
 @keyframes ob-cue {
@@ -850,7 +878,14 @@
   border-bottom-left-radius: var(--ob-r-tag);
 }
 
-/* Typing caret — the one blinking thing. */
+/* Typing caret — the one blinking thing.
+
+   **A sanctioned exception to the motion binary, allowlisted by name rather
+   than by widening the band.** 1s sits in the dead zone, and that is correct
+   here for the same reason the typewriter's 15ms/char is: a caret blink is not
+   a transition, it is a depiction of a real object, and a hardware cursor
+   blinks at about 1Hz. At 2400ms it reads as broken rather than as typing.
+   Under reduced motion §16 stops it and pins it visible. */
 .ob-caret {
   display: inline-block;
   width: 2px;
@@ -1124,9 +1159,9 @@
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="obsidian"] *,
-  [data-theme="obsidian"] *::before,
-  [data-theme="obsidian"] *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;

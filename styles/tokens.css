@@ -1,144 +1,17 @@
-/* The only file in the codebase permitted to contain colour values.
-   System: Deep Canopy — see .claude/skills/deep-canopy-design/SKILL.md */
-
-:root {
-  /* Surfaces — four levels, elevation reads through lightness + inset highlight */
-  --bg-base: #071613;
-  --bg-surface: #0c201a;
-  --bg-card: #112a22;
-  --bg-footer: #050f0d;
-
-  /* Borders — a last resort; prefer a surface change */
-  --border-subtle: rgba(224, 255, 244, 0.07);
-  --border-medium: rgba(224, 255, 244, 0.13);
-  --border-strong: rgba(224, 255, 244, 0.28);
-  --border-accent: rgba(127, 184, 232, 0.55);
-
-  /* Text — four levels */
-  --text-primary: #ffffff;
-  --text-body: #a6c0b6;
-  --text-muted: #7b958a;
-  --text-tertiary: #6b857b;
-  /* Text that sits ON the accent (primary buttons) */
-  --text-on-accent: #04120f;
-
-  /* Accent — one hue, three jobs: primary action, active nav, verification */
-  --accent: #7fb8e8;
-  --accent-bright: #a5d2f5;
-  --accent-glow: rgba(127, 184, 232, 0.18);
-  --accent-subtle: rgba(127, 184, 232, 0.1);
-  --accent-ring: rgba(127, 184, 232, 0.28);
-
-  /* Shadow / scrim — expressed here so components never write a colour */
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
-  --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.55);
-  --shadow-overlay: 0 24px 80px rgba(0, 0, 0, 0.65);
-  --highlight-inset: inset 0 1px 0 rgba(224, 255, 244, 0.08);
-  --highlight-inset-strong: inset 0 1px 0 rgba(224, 255, 244, 0.12);
-  --scrim: rgba(3, 10, 8, 0.72);
-  --nav-scrim: rgba(7, 22, 19, 0.72);
-  --hover-wash: rgba(224, 255, 244, 0.03);
-
-  /* Semantic — there is no second hue. Verification reads as accent. */
-  --success: var(--accent);
-  --conf-solid: var(--accent);
-  --conf-mixed: var(--text-primary);
-  --conf-thin: var(--text-muted);
-  --stance-supports: var(--text-body);
-  --stance-contests: var(--text-body);
-
-  /* Fonts — variables populated by next/font in app/layout.tsx.
-     Sans everywhere; mono is metadata only (timestamps, counts, ids, domains). */
-  --font-display: var(--font-inter-tight), "Inter", system-ui, sans-serif;
-  --font-text: var(--font-inter-tight), "Inter", system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
-  /* Legacy alias — call sites still saying `--font-sans` mean the text face. */
-  --font-sans: var(--font-text);
-
-  /* Type scale — bigger than feels comfortable, tracked tighter than feels safe */
-  --text-display: clamp(56px, 8vw, 112px);
-  --text-h1: clamp(40px, 5vw, 68px);
-  --text-h2: clamp(32px, 3.4vw, 48px);
-  --text-h3: clamp(19px, 1.7vw, 23px);
-  --text-lead: 20px;
-  --text-body-size: 17px;
-  --text-sm: 14px;
-  --text-label: 12px;
-
-  /* Tracking — hard negative at display sizes, never on body */
-  --tracking-tight: -0.04em;
-  --tracking-snug: -0.02em;
-  --tracking-widest: 0.08em;
-  --leading-display: 0.95;
-  --leading-tight: 1.1;
-  --leading-relaxed: 1.65;
-
-  /* Weights — the hero pairs 800 display against 300 lead */
-  --weight-light: 300;
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
-  --weight-display: 800;
-
-  /* Texture */
-  --grain-opacity: 0.035;
-
-  /* Radius */
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 20px;
-  --r-xl: 28px;
-  --r-pill: 999px;
-
-  /* Motion — ambient is slow and infinite, structural is fast and triggered */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-fast: 150ms;
-  --dur-base: 220ms;
-  --dur-enter: 600ms;
-  --dur-strike: 420ms; /* the verification rule drawing itself under an excerpt */
-  --dur-ambient: 30s;
-
-  /* Spacing — --sp-N = N * 4px */
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-6: 24px;
-  --sp-8: 32px;
-  --sp-12: 48px;
-  --sp-16: 64px;
-  --sp-24: 96px;
-  --sp-32: 128px;
-  --sp-48: 192px;
-
-  /* Reading measure */
-  --measure-prose: 68ch;
-  --measure-conversation: 64ch;
-
-  /* Container widths */
-  --container-marketing: 1200px;
-  --container-app: 1360px;
-}
-
 /* ============================================================================
-   OBSIDIAN — the landing-page system. Scoped, not global.
-   ----------------------------------------------------------------------------
-   References: design_inspiration/Hyperstudio (hairline structure, weight-400
-   display type, no shadows) + design_inspiration/pageTheme (near-black canvas,
-   oversized headline over a perspective media collage, one electric-blue
-   accent).
+   OBSIDIAN — the design tokens. **This file is the only place in the repository
+   permitted to contain a colour value.** Not a component, not a Tailwind class,
+   not a `style={{}}`. A colour you need that isn't here means you need a token
+   or a different design.
 
-   This block is deliberately isolated behind [data-theme='obsidian'] so it
-   restyles `/` and nothing else — the /r/[slug]/* run pages keep Deep Canopy
-   until the system is ported inward as its own pass. Every name is prefixed
-   `--ob-` so a token can never be read by accident from outside the scope.
-
-   Colour values live here because this is the only file permitted to hold one.
-   Recipes that consume them live in styles/obsidian.css.
+   A15 deleted the Deep Canopy `:root` block that used to sit above this one —
+   119 lines of forest green, amber and Inter Tight, for a system the app no
+   longer renders. The `--ob-*` block below has been on plain `:root` since A0
+   and is unchanged by that deletion; C2 closes the list, so no later phase
+   adds to it.
    ============================================================================ */
 
-[data-theme="obsidian"] {
+:root {
   /* Surfaces — four levels. Elevation reads through lightness, never shadow. */
   --ob-canvas: #0a0a0b;
   --ob-void: #060607;
@@ -217,4 +90,39 @@
   --ob-container: 1200px;
   --ob-gutter: 40px;
   --ob-section-gap: 160px;
+
+  /* ------------------------------------------------------------------
+     App surfaces — added by the app port.
+     Declared once, here, by A0. No later phase adds a token (C2).
+     ------------------------------------------------------------------ */
+
+  /* Container widths. The app chrome is wider than `/` because the evidence
+     explorer is a facet rail plus 65 dense rows; the report is narrower
+     because D5's editorial two-column is prose plus an aside, not a
+     dashboard. */
+  --ob-container-app: 1360px;
+  --ob-container-report: 1080px;
+
+  /* D5's two columns, fixed once so A9 and A10 cannot disagree about the
+     measure. */
+  --ob-report-prose: 580px;
+  --ob-report-aside: 400px;
+
+  /* D19's sticky condensing header, at rest and condensed. */
+  --ob-header-h: 72px;
+  --ob-header-h-condensed: 56px;
+
+  /* 56px condensed header + 48px sticky section index + 32px of air.
+     Applied by exactly one rule, in obsidian-app.css §1. */
+  --ob-anchor-inset: 136px;
+
+  /* Standing rule 9's app-side section gap. `--ob-section-gap` (160px) stays
+     marketing-only. */
+  --ob-section-gap-app: 96px;
+
+  /* Figure axes/gridlines, and the contests-stance hatch. Colour values, so
+     they may exist nowhere but this file. C12 pins the hatch's one geometry;
+     the geometry itself is written in the recipes, not stored here. */
+  --ob-grid: rgba(244, 244, 245, 0.06);
+  --ob-hatch: rgba(244, 244, 245, 0.1);
 }

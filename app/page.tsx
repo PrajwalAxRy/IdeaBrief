@@ -5,6 +5,7 @@ import { Pillars } from '@/components/landing/pillars';
 import { SiteFooter } from '@/components/landing/site-footer';
 import { SiteNav } from '@/components/landing/site-nav';
 import { Verification } from '@/components/landing/verification';
+import { SkipLink } from '@/components/ui/skip-link';
 
 /**
  * The landing page.
@@ -16,16 +17,16 @@ import { Verification } from '@/components/landing/verification';
  *   Verification    02  the mechanic that makes the second one trustworthy
  *   Cofounder chat  03  the demo and the live entry point, same surface
  *
- * `data-theme="obsidian"` scopes the entire visual system — every token and
- * recipe it uses is namespaced under that attribute, so this route restyles
- * itself and nothing else. The /r/[slug]/* run pages are untouched.
+ * Obsidian is not a theme, it is the system: A15 deleted Deep Canopy and with
+ * it the `data-theme` attribute, so every recipe in styles/obsidian.css is
+ * global and this page declares nothing.
  */
 export default function Home() {
   return (
-    <div data-theme="obsidian">
-      <a href="#main" className="ob-skip">
-        Skip to content
-      </a>
+    <div>
+      {/* One definition — the hand-rolled anchor that lived here is now
+          `SkipLink`, which `RunShell` also mounts (R19). */}
+      <SkipLink />
 
       <div className="ob-backdrop" aria-hidden="true" />
 
