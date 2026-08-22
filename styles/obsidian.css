@@ -1939,19 +1939,10 @@ body::before {
   transform: translate3d(0, 0, 0);
 }
 
-/* Recedes rather than leaving — the same treatment the Curve gets once the
-   competitors arrive: it dims, sinks back in z and softens, but never drops to
-   zero. The card stays on screen while its own conclusion (the Strip at the
-   same index) comes forward in front of it and answers it. */
-.ob-vf-pane[data-receded="true"] {
-  opacity: 0.4;
-  filter: blur(3px);
-  /* Uniform, so the row recedes as a row. The per-card x offset that used to
-     live here re-introduced the stagger at the exact moment the strips in front
-     of it are being read as an aligned stack. */
-  transform: translate3d(0, -18px, -340px) scale(0.92);
-  transition-delay: calc(var(--i) * 150ms);
-}
+/* No receded state for a pane. The card row is the last plane to arrive and the
+   scene's final state — nothing lands on top of it to hand off to. The recede
+   that used to live here now belongs to `.ob-vf-strip`, which is what this row
+   lands on. */
 
 .ob-vf-pane .ob-vf-glass {
   display: flex;
@@ -2099,6 +2090,25 @@ body::before {
   opacity: 1;
   filter: none;
   transform: translate3d(0, 0, 0);
+}
+
+/* Recedes rather than leaving, once the competitive field lands on top of it:
+   dims, softens and sinks back in z, but never drops to zero — the conclusion is
+   still there, behind the evidence for it. Only the strips the card row actually
+   covers get this; the first one clears the row and keeps its full strength and
+   its crossing over the callout. The component decides which, from geometry —
+   see `FIRST_STRIP_UNDER_FIELD`.
+
+   -150px, not the -340px the panes used to recede by. These are 524px wide, and
+   at perspective 1300 a -340 sink takes ~140px off that width; the stack visibly
+   shrank into the middle of the scene instead of sinking. -150 reads as depth
+   and costs ~54px. Must stay AFTER the `[data-in]` rule — equal specificity,
+   and both are true at once. */
+.ob-vf-strip[data-receded="true"] {
+  opacity: 0.4;
+  filter: blur(3px);
+  transform: translate3d(0, -10px, -150px);
+  transition-delay: calc(var(--i) * 150ms);
 }
 
 .ob-vf-strip .ob-vf-glass {

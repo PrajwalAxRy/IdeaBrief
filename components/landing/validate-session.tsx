@@ -50,8 +50,31 @@ function spline(pts: Pt[], tension = 0.19): string {
 
 /* ---------------------------------------------------------------- stage --- */
 
-const STAGES = ['wake', 'model', 'field', 'verify', 'rest'] as const;
+/**
+ * Order matters and is the whole narrative: the model, then the claims it
+ * produced, then the competitive field arriving ON TOP of them. The field used
+ * to run second and collapse into the claims; it now closes the scene, so the
+ * last plane the reader sees is the evidence rather than the conclusions.
+ *
+ * Each stage keeps its own duration from `VALIDATE_STAGE_MS`, so reordering
+ * here does not change how long a pass takes.
+ */
+const STAGES = ['wake', 'model', 'verify', 'field', 'rest'] as const;
 type Stage = (typeof STAGES)[number];
+
+/**
+ * The first strip the competitive field actually lands on.
+ *
+ * A strip recedes because something arrives in front of it — so a strip nothing
+ * arrives in front of has no reason to. The card row sits at y 240; the stack
+ * runs `180 + i * 64` at 46px tall, which puts strip 0 at 180–226, clear of it,
+ * and every strip after that underneath it. So strip 0 keeps its full strength
+ * and its crossing over the callout, and the rest hand off.
+ *
+ * Both numbers live in `.ob-vf-strip` and `.ob-vf-pane`. Move either and this
+ * has to be re-derived — it is a fact about the geometry, not a preference.
+ */
+const FIRST_STRIP_UNDER_FIELD = 1;
 
 const STAGE_HOLD: Record<Stage, number | null> = {
   wake: VALIDATE_STAGE_MS.wake,
@@ -119,10 +142,15 @@ export function ValidateSession() {
   const at = reduced ? STAGES.length - 1 : index;
   const shownStage: Stage = STAGES[at] ?? 'rest';
   const lit = at >= 1;
+  /* The curve sinks back the moment a plane arrives in front of it. */
   const receded = at >= 2;
-  const fielded = at >= 2 && at < 3;
-  const panesReceded = at >= 3;
-  const settled = at >= 3;
+  /* Conclusions land at `verify` and recede again when the field lands on them,
+     which is the same hand-off gesture, pointed the other way. */
+  const settled = at >= 2;
+  const stripsReceded = at >= 3;
+  /* The competitors are the LAST plane and the final state — they arrive at
+     `field`, in front of everything, and never recede. */
+  const fielded = at >= 3;
   const done = at >= 4;
   const shown = reduced ? rows.length : resolved;
 
@@ -140,12 +168,11 @@ export function ValidateSession() {
     return () => window.clearTimeout(timer);
   }, [playing, stage]);
 
-  /* Each competitor recedes and its conclusion focuses in front of it, one at a
-     time. All four at once reads as a state change; in turn reads as each claim
-     being checked. */
+  /* Each claim resolves one at a time, after the stack has landed. All four at
+     once reads as a state change; in turn reads as each claim being checked. */
   useEffect(() => {
     if (!playing || !settled || resolved >= rows.length) return;
-    const wait = resolved === 0 ? VALIDATE_VERIFY_MS.collapse : VALIDATE_VERIFY_MS.row;
+    const wait = resolved === 0 ? VALIDATE_VERIFY_MS.settle : VALIDATE_VERIFY_MS.row;
     const timer = window.setTimeout(() => setResolved((n) => n + 1), wait);
     return () => window.clearTimeout(timer);
   }, [playing, settled, resolved]);
@@ -218,12 +245,22 @@ export function ValidateSession() {
         <Curve lit={lit} receded={receded} />
         <Callout lit={lit} receded={receded} />
 
-        {competitors.map((c, i) => (
-          <Pane key={c.name} competitor={c} i={i} shown={fielded} receded={panesReceded} />
+        {/* Conclusions first — and the competitors AFTER them, because in a
+            `transform-style: flat` volume tree order is the z-order. Swapping
+            these two blocks is the whole of "the field lands in front". */}
+        {rows.map((row, i) => (
+          <Strip
+            key={row.text}
+            row={row}
+            i={i}
+            settled={settled}
+            receded={stripsReceded && i >= FIRST_STRIP_UNDER_FIELD}
+            resolved={i < shown}
+          />
         ))}
 
-        {rows.map((row, i) => (
-          <Strip key={row.text} row={row} i={i} settled={settled} resolved={i < shown} />
+        {competitors.map((c, i) => (
+          <Pane key={c.name} competitor={c} i={i} shown={fielded} />
         ))}
       </div>
 
@@ -408,36 +445,29 @@ function Stat({ stat, run }: { stat: (typeof stats)[number]; run: boolean }) {
 }
 
 /**
- * A competitor, arriving from depth and later receding as its conclusion
- * comes forward in front of it.
+ * A competitor — the evidence behind the conclusion at the same index, arriving
+ * last and closing the scene.
  *
  * **The flight in is dimensional; the landing is a row.** Each card swings in
  * from -520px on an arc, 190ms after the one before it, and lands on the same
  * top, depth and angle as its neighbours — three cards answering the same three
  * questions should line up like a comparison, which is what they are.
  *
- * It never leaves. It dims, sinks back in z and softens — the same recede
- * treatment the Curve gets — so the card stays legible enough to still read
- * as the claim its Strip is answering.
+ * **It has no receded state, deliberately.** This is the front plane and the
+ * last thing that happens; nothing arrives after it to hand off to. The strips
+ * it lands on are what recede.
  */
 function Pane({
   competitor,
   i,
   shown,
-  receded,
 }: {
   competitor: (typeof competitors)[number];
   i: number;
   shown: boolean;
-  receded: boolean;
 }) {
   return (
-    <div
-      className="ob-vf-pane"
-      style={{ '--i': i } as React.CSSProperties}
-      data-in={shown}
-      data-receded={receded}
-    >
+    <div className="ob-vf-pane" style={{ '--i': i } as React.CSSProperties} data-in={shown}>
       <div className="ob-vf-bob ob-vf-glass" style={{ '--d': 2 } as React.CSSProperties}>
         <span className="ob-vf-pane-head">
           <span className="ob-vf-pane-name">{competitor.name}</span>
@@ -475,9 +505,15 @@ function Pane({
 }
 
 /**
- * A conclusion. Focuses in from blur where the competitor it came from was, and
- * settles into a square stack: one left edge, one width, one depth, shared with
- * the pane row above it because card `i` collapses into strip `i`.
+ * A conclusion. Focuses in from blur and settles into a square stack: one left
+ * edge, one width, one depth, shared with the pane row that arrives after it,
+ * because strip `i` is answered by card `i`.
+ *
+ * It resolves, holds, and then recedes as the competitive field lands in front
+ * of it — dimmed, softened and sunk back in z, the treatment the panes used to
+ * get. Only the three the card row actually covers do that; the first one clears
+ * the row entirely, so it stays sharp and holds its crossing over the callout.
+ * See `FIRST_STRIP_UNDER_FIELD`.
  *
  * The top strip crosses the callout, which is the one overlap in the scene —
  * glass over a lit surface rather than over bare canvas, and the only place the
@@ -494,11 +530,13 @@ function Strip({
   row,
   i,
   settled,
+  receded,
   resolved,
 }: {
   row: ValidateRow;
   i: number;
   settled: boolean;
+  receded: boolean;
   resolved: boolean;
 }) {
   return (
@@ -506,6 +544,7 @@ function Strip({
       className="ob-vf-strip"
       style={{ '--i': i } as React.CSSProperties}
       data-in={settled}
+      data-receded={receded}
       data-state={resolved ? row.state : undefined}
     >
       <div className="ob-vf-bob ob-vf-glass" style={{ '--d': 5 } as React.CSSProperties}>
