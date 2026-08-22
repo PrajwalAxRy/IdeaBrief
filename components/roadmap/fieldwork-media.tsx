@@ -3,9 +3,9 @@
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
 
 export interface FieldworkAsset {
-  mp4: string;
-  webm: string;
   poster: string;
+  mp4?: string;
+  webm?: string;
 }
 
 /**
@@ -24,8 +24,9 @@ export interface FieldworkAsset {
  */
 export function FieldworkMedia({ asset, alt }: { asset: FieldworkAsset; alt: string }) {
   const reduced = useReducedMotion();
+  const hasVideo = Boolean(asset.mp4 && asset.webm);
 
-  if (reduced) {
+  if (reduced || !hasVideo) {
     return <img className="ob-fieldwork-media" src={asset.poster} alt={alt} />;
   }
 
