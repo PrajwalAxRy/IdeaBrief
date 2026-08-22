@@ -5029,6 +5029,318 @@ every route, the two intentional 404 document statuses excepted.
 
 ---
 
+### C2 — 2026-08-22 — Capture: the Define brief on the landing Pillars
+
+Not a phase — the first item from Batch C of
+[`higgsfield_generation_queue.md`](higgsfield_generation_queue.md), unblocked by
+A0–A15 being `DONE`. **Zero generation credits: this is a recording of the real
+app, not a generated asset.** Pillar 01's static `BriefFragment` now upgrades to
+a 4.4s clip of `/r/sms-rebooking-4f2a/define` in motion.
+
+**New:** `components/landing/fragment-capture.tsx`,
+`public/media/capture/brief.{mp4,webm}`. **Changed:**
+`components/landing/pillars.tsx`, `styles/obsidian.css`.
+
+**No fourteenth `'use client'`.** `FragmentCapture` carries no directive —
+`Pillars` already has one, so everything it imports is in the client graph and
+the hooks work without spending a name from the allowlist.
+
+**Three things the queue's C2 card got wrong, all now corrected there** (PC8,
+PC9, PC10):
+
+1. **The interaction it described does not exist.** `answeredCount` resolves
+   against the *base fixture statuses*, not `revealed`, and the fixture ships
+   exactly 9 filled / 3 unknown / 0 pending — so `9 of 12 answered · 3 unknown`
+   is on screen from first paint and never moves. `I don't know` on a filled
+   field moves the count **down**, to `8 of 12 answered · 4 unknown`. That is
+   what shipped, and it is the better claim: the number falling because someone
+   admitted ignorance is the product's whole thesis in one frame.
+2. **A 1440 capture cannot be drawn at fragment width.** The Define aside is a
+   fixed 440px column, so 1440 yields 440 real pixels and any wider draw is an
+   upscale, which the capture rules forbid. Recording at `zoom:1.5` on a
+   2160×1350 viewport yields 660 and makes the draw a downscale. **Zoom 2 at
+   2880×1800 silently fails** — Chromium's screencast can't keep up and
+   stretches the timebase ~10× (2501 frames for a 10s session), so extracted
+   frames show states that never existed. Verify frame count against wall clock
+   before trusting any capture.
+3. **Fragment width was the wrong target anyway.** Drawn at 624 the app's 12px
+   labels render ~17px and it reads as a zoomed screenshot. Drawn at its true
+   440 it sits in register, and the box lands at 440×376 — within a pixel of
+   pillar 02's 375.
+
+**Two traps for anyone recording another one.** `100vh` doubles under `zoom`, so
+the document overflowed and `composerRef.focus()` scrolled the whole page
+mid-take; the height pins in C2's card fix it. And the seed is **load-bearing,
+not a shortcut** — with `revealed: []` the frame would read *"9 of 12 answered"*
+above twelve empty hairlines, contradicting itself on screen.
+
+**It does not loop.** The end state *is* the argument, so looping would snap the
+counter back to 9 and read as the number wobbling. It plays once on
+`IntersectionObserver` and rests on its final frame. The fallback is the
+code-drawn `Fragment` — never a poster still, which is the one thing the media
+rules forbid outright — and under reduced motion no `<video>` is mounted at all.
+
+**Standing obligation:** a capture is a photograph of one fixture state, and
+this product is *about* its numbers matching. **Re-record whenever
+`lib/fixtures/` changes, or pull the asset.**
+
+**Toolchain:** `npx tsc --noEmit` · `npm run lint` (my files clean; six
+pre-existing format offenders left untouched) · `npm test` **166/166** ·
+`npm run build` · verified at 1440 **and** 1280: box 440×376, intrinsic 660×564,
+`upscaled: false`, `loop: false`, WebM preferred over MP4; reduced motion →
+**0 `<video>` elements**; with the asset blocked entirely the box stays reserved
+and the fragment stays at full opacity — no layout shift.
+
+**Superseded the same day — see the Idea Session entry below.** The capture was
+reverted and `public/media/capture/` deleted. Everything above stands as the
+record of how it was made, and PC9's timebase warning outlives it.
+
+---
+
+### Idea Session — 2026-08-22 — Pillar 01 as a coded interaction, reverting C2
+
+Not a phase. Executes [`idea_session_build_plan.md`](idea_session_build_plan.md),
+which **reverts the C2 capture logged above** and replaces it with a code-drawn
+looping conversation.
+
+**New:** `components/landing/idea-session.tsx`,
+`tests/unit/session-script.test.ts`. **Changed:** `lib/content/landing.ts`
+(`SESSION`, `SESSION_SCRIPT`, `sessionStepMs`, `sessionTotalMs`),
+`components/landing/pillars.tsx`, `styles/obsidian.css`,
+`higgsfield_generation_queue.md`. **Deleted:**
+`components/landing/fragment-capture.tsx`, `public/media/capture/brief.{mp4,webm}`,
+the `.ob-frag-capture*` recipes.
+
+**Why the capture went, and it was not the recording's fault.** It met every
+value in its own card. Three things only became visible once it was on screen:
+
+1. **It told the wrong story.** Pillar 01 and section 03 (`CofounderChat`) are
+   one continuous narrative — the *fitness* idea, lapsed lifters. The only
+   Define surface available to capture is the *dental* fixture
+   (`sms-rebooking-4f2a`), so the capture dropped an unrelated second idea into
+   the middle of that arc. **This is the one worth remembering**: a capture
+   ships the fixture's narrative, and the fixture was chosen for the app, not
+   for the section.
+2. **Geometry stopped being a design decision.** The Define aside is a fixed
+   440px column, so size, zoom and duration were all compromises forced by the
+   source — PC9 and PC10 are symptoms of that, not independent findings.
+3. **The frame couldn't hold the argument.** `I don't know` sits in the composer
+   at the bottom-left; any crop holding both it and the brief panel is ≥1240px
+   wide, which renders body text at ~9px. The cause ended up off-screen.
+
+Drawn in code all three dissolve, and it is the repo's own default. The queue's
+Batch C is rewritten accordingly: C2 `SUPERSEDED`, C1 and C3 kept but re-aimed
+at coded interactions, with C1 noted as the one surface where a capture may
+still argue for itself (its claim *is* duration, and it is full-width).
+
+**Blue's fourth job, written down on purpose.** The Investor lens box is blue
+and is not a primary action, a verification, or a live state. That is a
+deliberate owner decision taken after the conflict with rule 6 was raised, and
+it is recorded as a *named job* — **an outside lens on the idea** — in the
+comment above `.ob-session-lens`, precisely so a later reader deletes it
+knowingly or not at all. The constraint that survives: on `/r/[slug]/validate`,
+blue-plus-tick means verified, and this must never be mistaken for it. Measured
+side by side — lens: `rgba(45,127,249,0.12)` fill, 2px accent rule on the **left
+edge only**, no icon, `0 4px 4px 0` radius. `.ob-chip-verified`: transparent
+fill, 1px `--ob-hairline-accent` border **all round**, a `✓`, 4px radius, 10px
+uppercase mono. No new token; `styles/tokens.css` is untouched.
+
+**The fixed-height scrolling transcript is the whole trick.** The script is ~3×
+the card's height, so the viewport is fixed and content scrolls up as steps
+land. Card height is therefore constant *by construction* rather than by
+reserving space — measured 374.8px at every one of 46 samples across a full
+18.6s cycle, width 624 throughout.
+
+**Two implementation notes worth keeping.** Every step stays mounted once it is
+reachable and is told `active={false}` when it finishes, rather than being
+swapped from a "playing" slot into a "completed" list — otherwise the per-item
+entrance animations re-fire the instant a step completes. And the transcript is
+**bottom-anchored** (`justify-content: flex-end` + `min-height: 100%`):
+top-aligned, the first two seconds of every pass showed one line above ~190px of
+nothing, and pillar 01 read underfilled against 02's dense evidence rows.
+
+**Two deviations from the plan, both in §3's pre-roll, both deliberate.** The
+plan lists a single opening line; the shipped pre-roll is **two turns**, and the
+second is longer. Both are `CHAT_SCRIPT` **verbatim** (its turns 3 and 4, the
+second elided only at the front, `…` standing in for `Good — `), so no new copy
+was written and the continuity the plan is protecting is strengthened, not
+weakened. It buys two things: the card is 67% full at rest instead of 33%, and
+turn 1 — *"honestly not sure what to build first"* — now answers a question
+that is actually on screen (*"what does the first version actually do for them
+in week one?"*) instead of arriving unprompted. The plan's `**Groundwork** ·`
+prefix on that line is read as its speaker notation, consistent with how every
+other block in §3 is labelled, and is not rendered — one attributed bubble among
+seven unattributed ones would read as a bug.
+
+**Timing is derived, not typed in.** `sessionStepMs` sums `text.length ×
+msPerChar` (15 AI / 24 user, `CofounderChat`'s tuned values) plus holds;
+`sessionTotalMs` = **13,598ms**, mirroring `runEventsTotalMs` so the timeline is
+assertable from node. 14s rather than the 10s floor because at 10s the three
+options arrive faster than they can be read.
+
+**Deliberately not done, per plan §8:** the real `/r/[slug]/define` is unchanged,
+so this previews a stage that does not exist yet — it still has a
+`DontKnowButton` and a `BriefProgress` counter. Accepted debt, owner's call.
+Pillar 01's `proof` line still says *"Ends with a written brief on screen"*,
+which is true of the product but no longer what the picture shows; left pending
+a call from the owner.
+
+**Toolchain:** `npx tsc --noEmit` · `npm test` **181/181** · `npm run build` ·
+`npx biome check` on my five files **clean** (repo-wide count went 204 → 199;
+the pre-existing offenders are far more than the six the plan names, and were
+left untouched). Verified with Playwright against `next build && next start` at
+**1440 and 1280**: cards 624×375 / 624×375 / 624×362 — pillar 01 now matches 02
+exactly; **one distinct height and one width across a full cycle**; loop resets
+(block count 2→9→2) and **stops advancing when scrolled out of view** (8→8→8
+over 7s); reduced motion → 9 blocks settled, `finish` present, transcript pinned
+to the end, `scroll-behavior: auto`, **0 carets**, unchanged after 16s; no
+horizontal overflow; **0 console errors**.
+
+**One trap, and it cost real time.** A `next start` whose port was already held
+by an earlier server fails with `EADDRINUSE` **into a log file you are not
+reading**, and the browser keeps being served the *previous* build. The symptom
+is a stylesheet rule that is provably in `.next/static/chunks/*.css` and
+provably absent from `getComputedStyle` — which reads exactly like
+`references/pitfalls.md` §1 and is not. Diagnostic: compare the chunk filenames
+the page actually requests against the files on disk. If the page names a chunk
+that does not exist, it is a stale server, not a cascade bug.
+
+---
+
+### Idea Session — 2026-08-22 — Replay instead of loop, and a closing press
+
+Owner change, same day, on top of the entry above. Two asks: **a replay button
+instead of the loop**, and **an ending where a pointer comes in and clicks
+`Start the research`**. `idea_session_build_plan.md` §2's `Motion` row and §4's
+timeline are amended in place rather than left to disagree with the code.
+
+**Changed:** `lib/content/landing.ts` (`SESSION.replayLabel`,
+`SESSION_POINTER_MS`, `sessionPointerTotalMs`, finish `holdMs` 3,200 → 1,200),
+`components/landing/idea-session.tsx`, `styles/obsidian.css`,
+`tests/unit/session-script.test.ts`.
+
+**The loop is gone and that is a better card.** Looping made pillar 01 the
+loudest thing on a page already carrying two continuous motion sources
+(`Verification`'s draw-on rule, `CofounderChat`'s typing), which is what D17
+caps. It also undid the new ending every 13 seconds — a card that presses its
+own CTA and then wipes it reads as indecision, not as an ending. It now plays
+once on scroll-in, rests, and `Replay` in the card bar is the only way back. It
+still pauses when scrolled out, so leaving mid-run and coming back resumes
+rather than skipping to a finished card.
+
+**The closing gesture is drawn, not dispatched.** The CTA is a `<span>` with no
+handler — it always was, because a focusable control that does nothing is worse
+than a picture of one — so the press is a `data-pressed` attribute driving a dip
+plus one expanding ring, and the pointer is a `MousePointer2` glyph translated
+across the card. Nothing is clicked. That is consistent: the button is drawn, so
+the press is drawn.
+
+**`travel` is the second sanctioned exception to the motion binary,
+allowlisted by name in `styles/obsidian.css` beside `.ob-caret`.** 760ms sits in
+the dead zone between structural (150–320ms) and ambient (20–50s). It belongs
+there for the same reason the caret's 1s blink does: it is not a transition, it
+is a *depiction of a real object*, and a hand does not move a pointer 130px in
+320ms — at `--ob-base` it reads as a glitch. The press (340ms) and the ring
+(`--ob-base`) need no exception and got none.
+
+> **Superseded by the tuning pass below.** The owner slowed the gesture and
+> enlarged the ripple the same day; the exception now covers every duration in
+> it, and the numbers in this entry are the pre-tuning ones.
+
+**Three things measurement caught that a screenshot would not have:**
+
+1. **The ring was invisible while measuring perfectly.** First pass used
+   `--ob-accent-ring` (30% alpha) at `inset: -1px` — semantically the right
+   token, named "pulse ring on a live dot". On screen it was nothing: a 0.8px
+   rendered border at 30% starting *exactly on top of* the button's own accent
+   border, fully faded before it cleared the edge. Solid `--ob-accent` at
+   `inset: -3px` reads. **`getComputedStyle` said the animation was running the
+   whole time.**
+2. **The replay button silently grew the card by 4px.** `.ob-btn` is declared
+   after `.ob-meta` at equal specificity, so it wins every shared property — the
+   label rendered 14px sans, sentence case, next to a 12px uppercase mono
+   `DRAFT`, and its inherited 1.6 line-height made a 19px line inside a 17px
+   bar. Pillar 01's header went to 44px against 02 and 03's 40px. Fixed by
+   re-declaring the meta layer in `.ob-session-replay` (later still) and pinning
+   `line-height: 1`; the padding survives only as hit area, cancelled in layout
+   by an equal negative margin.
+3. **The focus ring was being clipped.** `.ob-btn:focus-visible` draws a 4px
+   box-shadow spread and `.ob-frag` clips to the card, so at `padding-block:
+   10px` the ring's top and bottom arcs were cut. 7px puts the button box at
+   28px with the ring landing 2px inside the bar, hit area still 28–30px.
+
+**Reduced motion drops both new pieces entirely** — no pointer, no replay
+control (a button promising motion the visitor asked not to have). §16 carries a
+comment saying so, because an absent rule there is otherwise indistinguishable
+from a forgotten one.
+
+`sessionTotalMs` is now **13,338ms** and includes the pointer beat, so the
+number still means "one full pass". *(14,528ms after the tuning pass below.)*
+
+**Toolchain:** `npx tsc --noEmit` · `npm test` **183/183** · `npm run build` ·
+biome clean on my files. Verified at **1440 and 1280**: bars **40/40/40** across
+all three pillars, cards 624×374 / 624×374 / 624×361; **one distinct height and
+one width across the whole run, pointer beat included**; phase order measured
+`travel → press → done` at 743ms / 332ms against the 760/340 constants; rests at
+9 blocks and **does not restart after 17s**; `Replay` drops it to 3 blocks and
+replays; keyboard-reachable with `:focus-visible` matching and `transition:
+none`; reduced motion → 0 pointers, 0 replay buttons, 0 carets, 9 blocks pinned
+to the end; **0 console errors**.
+
+---
+
+### Idea Session — 2026-08-22 — Slower gesture, bigger ripple
+
+Owner tuning pass on the entry above: *"make the motion slower and increase the
+ripple effect."* No Playwright — the owner verifies this one by eye.
+
+| | Before | After |
+|---|---|---|
+| Pointer glide | 760ms | **1,150ms** |
+| Cursor click nudge | 220ms | **320ms** |
+| Button squash | 320ms | **520ms** |
+| Rings | 320ms, stagger 120ms | **620ms, stagger 180ms** |
+| Ring reach | 18px | **19px** (the ceiling — see below) |
+| Inner ripple | — | **680ms, crosses the whole button face** |
+| `press` window | 460ms | **880ms** |
+| `linger` | 640ms | **900ms** |
+| `sessionTotalMs` | 13,338ms | **14,528ms** |
+
+**The size had to come from inside the button, because the rings cannot grow.**
+They are capped at 19px by geometry, not taste: the CTA sits 20px from
+`.ob-session-scroll`'s padding box, which is where the clip happens, so a larger
+concentric ring loses its left arc. `.ob-session-cta-ripple` spreads *within* the
+pill instead — clipped by the thing it is filling, so it has no ceiling and
+crosses all 152px. It starts at 42% / 55%, the same contact point `IdeaSession`
+measures the pointer's target with, so it reads as coming from the click rather
+than from the button. `--ob-on-accent` is the token; the softness is `opacity`
+on the element, so no colour value is introduced.
+
+Centring it needed no magic number: `width: 100%` + `aspect-ratio: 1` makes the
+circle as wide and tall as the button's width, and percentage margins resolve
+against the containing block's **width on both axes**, so `margin: -50% 0 0 -50%`
+lands it on the contact point.
+
+**The motion-binary exception is now explicitly the whole gesture, not just
+`travel`.** Every duration in it — glide, squash, rings, ripple — sits in the
+dead zone. That is a real widening of a standing rule and it is written down as
+such, in the block comment above `.ob-session-pointer` and in
+`SESSION_POINTER_MS`'s doc comment, so a later reader finds the decision instead
+of inferring a mistake. The justification is unchanged and still narrow: these
+depict a physical event, and physical events at this scale do not resolve in
+320ms. **The rule still binds everywhere else on the surface**, which both
+comments say out loud.
+
+`press` is still a window rather than an animation, and the test that guards it
+now asserts the new floor: it must outlast the second ring (180ms stagger +
+620ms travel = 800ms) or the ripple is cut off mid-spread.
+
+**Toolchain:** `npx tsc --noEmit` clean · `npm test` **199/199** · `npm run
+build` clean · biome clean across my line range. No browser verification, by
+request.
+
+---
+
 ## Appendix — the media plan files
 
 Five files, all at repo root, all following the format established by
