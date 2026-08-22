@@ -469,8 +469,8 @@ export const sessionTotalMs =
 
 /**
  * Pillar 02's preview: Validate as a **market-analysis panel assembling
- * itself** — a revenue model, then the competitive field, then the field
- * collapsing into checked assumptions.
+ * itself** — a revenue model, then the assumptions it rests on being checked
+ * one by one, then the competitive field landing in front of them.
  *
  * **This block is the one deliberate exception to `executive_summary.md` in the
  * whole repository, and it is scoped to this card.** The product ships no
@@ -492,22 +492,27 @@ export const sessionTotalMs =
  *   no real company.
  */
 
-/** Stage durations. The card plays this once on scroll-in, then rests. */
+/** Stage durations. The card plays this once on scroll-in, then rests.
+    Played in the order `wake → model → verify → field → rest`; that order lives
+    in `STAGES` in the component, not in this object's key order. */
 export const VALIDATE_STAGE_MS = {
   /** The lights come up on an empty volume, before anything is in it. */
   wake: 700,
   /** Line draws, cone opens, the callout and three figures count up. */
   model: 3900,
-  /** Chart recedes; three competitors swing in on an arc and are read.
-      4600, not 3300: each pane now carries three drill-down metrics, and at
-      3300 the last one had barely landed before it began dissolving. */
-  field: 4600,
-  /** Cards collapse into rows, then each row resolves in turn. */
+  /** Chart recedes; the assumptions land and each one resolves in turn. */
   verify: 3900,
+  /** The conclusions recede; three competitors swing in on an arc, in front of
+      everything, and close the scene.
+      4600, not 3300: each pane carries three drill-down metrics, and at 3300 the
+      last one had barely landed before the stage ended. */
+  field: 4600,
 } as const;
 
-/** Inside the verify stage: the collapse, then one row resolving per beat. */
-export const VALIDATE_VERIFY_MS = { collapse: 1000, row: 640 } as const;
+/** Inside the verify stage: the settle after the stack lands, then one row
+    resolving per beat. Was `collapse` when the competitive field ran first and
+    its cards folded into these rows; nothing collapses into them now. */
+export const VALIDATE_VERIFY_MS = { settle: 1000, row: 640 } as const;
 
 export type ValidateRow = {
   /** Evidence id, or an em-dash pair where there is nothing to cite. */
@@ -546,9 +551,11 @@ export const VALIDATE_SESSION = {
   stages: {
     wake: 'Market model',
     model: 'Market model',
-    field: 'Competitive field',
     verify: 'Assumptions',
-    rest: 'Assumptions',
+    field: 'Competitive field',
+    /* Only ever shown if `done` is somehow false at rest; the caption swaps to
+       `bar.done` there. Kept honest anyway. */
+    rest: 'Competitive field',
   },
   chart: {
     label: 'Projected revenue',
@@ -570,7 +577,8 @@ export const VALIDATE_SESSION = {
     { label: 'CAC', prefix: '$', value: 310, decimals: 0, suffix: '', ms: 1080 },
     { label: 'Payback', prefix: '', value: 4.1, decimals: 1, suffix: ' mo', ms: 1260 },
   ],
-  /** Invented. Index-aligned with `rows` — card `i` collapses into row `i`. */
+  /** Invented. Index-aligned with `rows` — card `i` is the evidence behind
+      row `i`, and lands in front of it. */
   competitors: [
     {
       name: 'Northline',

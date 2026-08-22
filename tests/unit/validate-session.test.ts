@@ -32,15 +32,17 @@ describe('validate session — timing', () => {
     expect(VALIDATE_STAGE_MS.wake).toBeLessThan(VALIDATE_STAGE_MS.model);
   });
 
-  it('fits the collapse and every row inside the verify stage', () => {
+  it('fits the settle and every row inside the verify stage', () => {
     /* The rows resolve one at a time INSIDE `verify`. If the stage ends first
-       the card rests mid-sequence, which is the one state it must never hold. */
-    const needed = VALIDATE_VERIFY_MS.collapse + (rows.length - 1) * VALIDATE_VERIFY_MS.row;
+       the card rests mid-sequence, which is the one state it must never hold —
+       and `verify` now runs BEFORE `field`, so an overrun would be cut off by
+       the competitors landing rather than by the scene coming to rest. */
+    const needed = VALIDATE_VERIFY_MS.settle + (rows.length - 1) * VALIDATE_VERIFY_MS.row;
     expect(needed).toBeLessThan(VALIDATE_STAGE_MS.verify);
   });
 
-  it('lets the collapse land before the first row resolves', () => {
-    expect(VALIDATE_VERIFY_MS.collapse).toBeGreaterThan(VALIDATE_VERIFY_MS.row);
+  it('lets the stack settle before the first row resolves', () => {
+    expect(VALIDATE_VERIFY_MS.settle).toBeGreaterThan(VALIDATE_VERIFY_MS.row);
   });
 });
 
