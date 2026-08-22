@@ -13,11 +13,11 @@ still. **The exception is Batch 2** — the Run Console cold start has no still 
 never had one, so it cannot be reached by an i2v call. Read that batch before
 assuming everything is covered.
 
-**Two open items are not generations at all:** Batch 0 (`app/favicon.ico` is
-still the Next.js default) and Batch 1's swap-in (three approved fieldwork stills
-sit in `public/media/roadmap/` while `ASSETS` is `{}`, so the page still renders
-three `MediaSlot`s). Both are code, both are free, and both are worth more than
-anything below Gate B.
+**No open code tasks remain above Gate B.** Batch 0 (app mark / favicon) and Batch 1's
+still swap-in both shipped on 2026-08-22. Everything left is optional paid
+image-to-video, Batch C, or the blocked Batch 2 decision. **Batch C is no longer
+a capture batch by default** — C2 shipped as a capture, was reverted, and
+re-shipped as a coded interaction the same day; see that batch.
 
 ### Codebase truth overrides stale plan-file paths
 
@@ -43,28 +43,29 @@ paths in them predate A15. Use these current facts:
 
 **The port is finished.** A0–A15 all read `DONE`, `styles/components.css` is
 deleted, no Deep Canopy remains, and all five OG cards ship. The baseline is not
-an unfinished site — **it is a finished, coherent site with placeholder-quality
-media in two specific places.** That caps what generation can add, and the cap is
-lower than it looks.
+an unfinished site — **it is a finished, coherent site with one optional cold-start
+gap (Batch 2) and optional motion layers everywhere else.** That caps what
+generation can add, and the cap is lower than it looks.
 
 **Honest estimate: even the legacy all-15-clip scope moves overall perceived
-quality by roughly 5–10%, and about 80% of that sits in batches 1 and 3.**
+quality by roughly 5–10%, and most of the remaining upside sits in optional Batch 1
+and Batch 3 motion.**
 
 | Order | Batch | Briefed clips / shipping cap | Gens | What it's actually worth |
 |---|---|---|---|---|
-| **0** | **App mark / favicon** | — | **0** | Highest quality-per-effort item in the backlog. Not a generation. |
-| **C** | **Captures of the real app** | 1–3 | **0** | Planning may run in parallel; final capture waits for frozen surfaces and fixtures. C1 is on hold. |
-| **1** | Fieldwork band | 3 | **≤7 video calls** | **The one real gap left.** Three approved stills exist but `ASSETS` is still `{}`, so three `MediaSlot`s render instead. Wiring them costs nothing. |
+| **0** | **App mark / favicon — SHIPPED** | — | **0** | Branded SVG, 16/32px ICO, 180px Apple icon and 512px app icon shipped 2026-08-22. |
+| **C** | **Captures of the real app** | 1–3 | **0** | **C2 came back as a coded interaction, not a capture — read Batch C before scheduling C1 or C3.** Planning may run in parallel; any final capture waits for frozen surfaces and fixtures. C1 is on hold. |
+| **1** | Fieldwork band — **stills SHIPPED** | 3 | **≤7 video calls** | Three WebPs wired 2026-08-22. Optional i2v only; stills alone capture most of the value. |
 | **2** | Console cold start | 1 | **BLOCKED** | No source still exists and none is queued — see the batch. Decide it before budgeting it. |
 | **3** | Hero collage | 5 / **2** | **≤5 video calls** | The local stills are retained; motion is an optional second pass. |
 | — | **↓ GATE B ↓** | | | *Stay at or below 15 paid calls; this buys essentially all available gain.* |
 
-### Why batch 1 outranks batch 3
+### Why batch 1 motion still outranks batch 3
 
-Three labelled `MediaSlot`s sit across the roadmap's structural hinge. To someone
-in on the convention they read as intentional; to everyone else they read as
-*assets pending*. Filling them is a larger perceived jump than improving
-something already hidden under a 62% scrim.
+The three fieldwork stills shipped on 2026-08-22. Optional image-to-video on
+that band is still the largest visible motion upgrade left — the hinge between
+`01 OPEN QUESTIONS` and `02 BUILD ROADMAP` is now photography, and subtle motion
+there reads as editorial polish rather than *assets pending*.
 
 ### Why the hero collage is worth doing anyway — and it isn't the pixels
 
@@ -88,23 +89,24 @@ below the line rather than merely last.
 
 ## Index — remaining work, in execution order
 
-**Queue update — 2026-08-21:** standalone stills are complete or retained
-locally and are no longer generation tasks. This includes the three fieldwork
-stills, the five local hero stills, and the standalone stills for the ambient
-and empty-state surfaces. The detailed entries below remain only as optional
-image-to-video references; use the existing local still as the source frame
-and do not regenerate it.
+**Queue update — 2026-08-22:** Batch 0 (favicon) and Batch 1 still swap-in
+shipped. Standalone stills are complete or retained locally and are no longer
+generation tasks. This includes the three fieldwork stills (now wired on
+`/r/[slug]/roadmap`), the five local hero stills, and the standalone stills for
+the ambient and empty-state surfaces. The detailed entries below remain only as
+optional image-to-video references; use the existing local still as the source
+frame and do not regenerate it.
 
 | # | Asset | Where it lives on the site | Deliver to | Budget |
 |---|---|---|---|---|
-| **0** | **App mark / favicon** | Every tab and page | `app/favicon.ico` · `app/icon.svg` · `app/apple-icon.png` · `public/icon-512.png` | B0 |
-| **C1 · HOLD** | Capture — Run Console stream | `/` — **new section; design approval required** | `public/media/capture/console.{mp4,webm}` | BC |
-| **C2 · SCRIPT** | Capture — brief + `I don't know` | `/` Pillars, replaces a static `Fragment` | `public/media/capture/brief.{mp4,webm}` | BC |
-| **C3 · SCRIPT** | Capture — roadmap card interactions | `/` Pillars, replaces a static `Fragment` | `public/media/capture/roadmap-card.{mp4,webm}` | BC |
-| **1 · SWAP** | Fieldwork band — wire the three existing stills | `/r/[slug]/roadmap` band | `ASSETS` in `components/roadmap/fieldwork-band.tsx` | **0** |
+| **0 · SHIPPED** | **App mark / favicon** | Every tab and page | `app/favicon.ico` · `app/icon.svg` · `app/apple-icon.png` · `public/icon-512.png` | B0 |
+| **C1 · HOLD** | Run Console stream — **coded interaction**, or a capture if it earns it | `/` — **new section; design approval required** | `components/landing/` | BC |
+| **C2 · SUPERSEDED** | ~~Capture — brief + `I don't know`~~ → shipped as a **coded interaction** instead | `/` Pillars | `components/landing/idea-session.tsx` | **0** |
+| **C3 · SCRIPT** | Roadmap card interactions — **coded interaction** | `/` Pillars, replaces a static `Fragment` | `components/landing/` | BC |
+| **1 · SHIPPED** | Fieldwork band — three stills wired | `/r/[slug]/roadmap` band | `ASSETS` in `components/roadmap/fieldwork-band.tsx` | **0** |
+| **1 · i2v** | Fieldwork band — optional motion (3 clips) | same | `public/media/roadmap/{conversation,expo,front-desk}.{mp4,webm}` | **≤7** |
 | **2 · BLOCKED** | Console cold start — no still exists | `/r/[slug]/validate` Mode A | undecided; see Batch 2 | — |
-| — | **Integrated stills** | `backdrop-field` · `app/not-found` · `hero/`×5 · `roadmap/backdrop` · `sources/field` · `sources/zero-results` · `validate/report-field` | Shipped; no generation | — |
-| — | **Generated, not yet wired** | `roadmap/{conversation,expo,front-desk}.webp` | Blocked only on the row above | — |
+| — | **Integrated stills** | `backdrop-field` · `app/not-found` · `hero/`×5 · `roadmap/{backdrop,conversation,expo,front-desk}` · `sources/field` · `sources/zero-results` · `validate/report-field` | Shipped; no generation | — |
 
 ### Hard call budgets
 
@@ -132,13 +134,13 @@ is optional image-to-video only: use the stills already in `public/media/` and
 stay within the reduced caps above. Batch C is outside both counts because it
 costs no generation credits.
 
-**The stills-only pass is already the shipped state and cost zero Higgsfield
-calls.** It is not code-free, and the fieldwork row below is the part still
-outstanding:
+**The stills-only pass is the shipped state and cost zero Higgsfield calls.**
+Batch 1 still wiring shipped 2026-08-22. Remaining fieldwork work is optional
+video only:
 
 | Family | Still-only implementation | Video-only addition |
 |---|---|---|
-| Fieldwork | **OUTSTANDING** — make `mp4`/`webm` optional on `FieldworkAsset`, fill `ASSETS`, render WebP | Conditional player, offscreen pause and pause control |
+| Fieldwork | **DONE** — `mp4`/`webm` optional on `FieldworkAsset`; `ASSETS` filled; WebP renders | Conditional player, offscreen pause and pause control |
 | Console cold start | DONE — `RunConsole` keeps the CSS backdrop; no still exists | Transient non-looping player and cold-state cross-fade |
 | Hero | DONE — local WebP cards replace Unsplash and keep parallax | Optional player on at most two cards plus pause control |
 | Report / ambient / empty states | DONE — graded WebP mounted by `AppBackdrop` and the explorer | Conditional player, pause control and state ownership below |
@@ -533,27 +535,29 @@ kind. Every prompt below ships corrected; here is the full diff.
 | **PC1** | 4a, 5b, 5c | `Matte black background.` | `The haze fills the frame edge to edge and falls away to black with no visible border.` | These three are **grounds, not subjects**. "Background" instructs the model to place the haze *on* something, producing a visible edge. The report field (4b) is handled separately as a uniform macro texture with no vignette. |
 | **PC2** | 4a, 5b, 5c | `shallow depth of field` + generated `cool-blue bloom` | dropped; neutral monochrome field | Volumetric haze has no subject plane to focus on, and a generator cannot hold the product's exact accent hue across three clips. CSS supplies the controlled accent wash. Asking for shallow DoF invites an invented sharp object. |
 | **PC3** | 3.3, 2-`reader`, 5a-`archive`, 5a-`drawer` | constraint stated in prose only | constraint moved **into** the prompt | "Empty central 40%", "the spool must be out of focus", and "left 60% featureless" are the accept/reject criteria. A constraint the model never sees cannot be met, and these are the ones that decide whether the asset is usable at all. |
-| **PC4** | 3.1, 3.2, 3.3, 4a, 5b, 5c | `Slow drift of the pen` · `a shift of weight` · `Camera pushes in very slowly` · `moving/drifting haze` | dropped from the **still** prompt; carried by the i2v pass | The workflow is still-first. Motion words in a still prompt only bias composition — they can't produce motion, and they nudge the model toward a blurred frame. |
-| **PC5** | 1.1, 1.3, 3.1, 3.2, 3.3, 3.5 | `No text` | `No legible text` | Each of these subjects **contains writing** — notebooks, printed notes, sticky notes, an appointment book or a monitor texture. A hard `No text` fights the subject and the model resolves it as mush or drops the subject. **Illegible is the goal; absent is not.** Strict `No text` is kept everywhere the subject has no writing in it. |
+| **PC4** | 3.1, 3.2, 3.3, 4a, 5b, 5c | `Slow drift of the pen` · `a shift of weight` · `Camera pushes in very slowly` · `moving/drifting haze` | dropped from the **still** prompt; carried by the i2v pass | The workflow is still-first. Motion words in a still prompt only bias composition — they can't produce motion, and they nudge the model toward a blurred frame. || **PC5** | 1.1, 1.3, 3.1, 3.2, 3.3, 3.5 | `No text` | `No legible text` | Each of these subjects **contains writing** — notebooks, printed notes, sticky notes, an appointment book or a monitor texture. A hard `No text` fights the subject and the model resolves it as mush or drops the subject. **Illegible is the goal; absent is not.** Strict `No text` is kept everywhere the subject has no writing in it. |
 | **PC6** | 3.5 | `Dense text and data on a monitor` | `Dense illegible text-like texture on a monitor` | The same conflict at the subject end. The brief's own intent is *"so it reads as texture not content"* — this says it in the words the model acts on. |
 | **PC7** | 1.1, 1.2, 3.4, 4c | generic `single hard key light from one side` | each subject's specific practical light wins | The back-office fluorescent, expo's overhead pools, laptop's screen glow and invalid-run lamp each conflict with the generic side key. Keeping both asks the model to solve two lighting diagrams. The corrected prompts below contain one source each. |
+| **PC8 · HISTORICAL** | **C2 (reverted)** | `I don't know` flipping `9 of 12 answered · 3 unknown` | the counter flipping **from** `9 of 12 answered · 3 unknown → open questions` **to** `8 of 12 answered · 4 unknown → open questions` | The card described an interaction the app does not have. `answeredCount` (`lib/brief-state.ts:165`) resolves against the **base fixture statuses**, not `revealed`, and `lib/fixtures/brief.ts` ships exactly 9 filled / 3 unknown / 0 pending — so `9 of 12 · 3 unknown` is on screen from first paint and **never moves**. Pressing `I don't know` on a filled field moves the count **down**. The card also dropped the real string's `→ open questions` suffix. Making the counter track `revealed` instead would be a **product decision, not a media task**, and was out of scope for a capture. **Kept although C2 was reverted:** the finding is about the app, not the recording, and it is still true — the Define counter never moves on its own. Anyone briefing a Define surface, coded or captured, needs it. (The shipped `IdeaSession` shows no counter at all, by decision.) |
+| **PC9 · STANDING** | **any capture** | *(unstated)* — capture at 1440×900 | capture at **2160×1350 with `html{zoom:1.5}`**, cropped 660×564, drawn at 440 CSS px | The Define aside is a fixed 440px column (`--define-aside`), so a 1440 capture yields only 440 real pixels and drawing it at fragment width upscales it — which `How to capture` forbids. Recording zoomed makes the draw a downscale instead. **2880×1800 (zoom 2) does not work**: Chromium's screencast cannot keep up and stretches the timebase ~10× — 2501 frames for a 10-second session — so the recording desynchronises from reality and frames show states that never existed. 2160×1350 measured 270 frames against 11.7s wall clock, which is correct. **This one outlives C2 and is not historical.** The timebase stretch is silent — the file plays, the frames look plausible, and only a frame-count-against-wall-clock check catches it. **Anyone attempting any capture must verify frame count against wall clock before trusting the take.** |
+| **PC10 · HISTORICAL** | **C2 (reverted)** | *(unstated)* — draw the capture at the 624px fragment width | draw it at **440px**, its true app scale | A 440px app column stretched to 624px magnifies its 12px labels to ~17px, so the fragment reads as a zoomed screenshot rather than a UI at rest, out of register with the code-drawn fragments beside it. At 440 the box is 440×376 — within a pixel of pillar 02's 375px height. **Kept as the worked example of reason 2** in "Why C2 came back as code": a capture cannot be sized to the slot, so the slot ends up sized to the capture. The coded replacement is simply 624×375, because code has no intrinsic scale to preserve. |
 
 ---
 
-## Batch 0 — App mark / favicon `[DO THIS FIRST · ZERO GENERATIONS]`
+## Batch 0 — App mark / favicon `[SHIPPED 2026-08-22 · ZERO GENERATIONS]`
 
 **Not a generation, and the highest quality-per-effort item in the media
-backlog.** Complete it before opening a generation tool.
+backlog.** Completed before opening a generation tool.
 
-**Currently:** `app/favicon.ico` is the inherited Next.js default. No branded
-`app/icon.*` exists. Every tab, bookmark, history entry and shared tab therefore
-shows the framework's icon.
+**Shipped:** the inherited Next.js favicon was replaced. The branded
+`app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png` and
+`public/icon-512.png` now use the same resting Groundwork glyph.
 
-**Brief:** the `Mark()` glyph from `components/landing/site-nav.tsx` standing
+**Brief:** the `LogoMark` glyph from `components/layout/logomark.tsx` standing
 alone — an outlined square with a filled lower-left corner stone, a surveyed
 plot with one corner set. Chalk on near-black, on a 32-unit viewBox with the
 glyph at 24 and 4 units of padding all round. Stroke weight is 1 unit at 32.
-Use the resting state, not the nav's 90° hover rotation.
+The shipped icon uses the resting state, not the nav's 90° hover rotation.
 
 **Deliver to:** a branded multi-size `app/favicon.ico` (16 and 32px),
 `app/icon.svg`, `app/apple-icon.png` (180px), and `public/icon-512.png`.
@@ -571,12 +575,31 @@ icon scale.
 
 ---
 
-## Batch C — Captures of the real app `[ZERO GENERATIONS · newly unblocked]`
+## Batch C — Product surfaces in motion `[ZERO GENERATIONS]`
 
 **Not a Higgsfield batch.** Lettered rather than numbered because it is a
-different operation with a different tool. Planning can run in parallel, but
-final recording waits until the relevant surface, fixtures and media swaps are
-frozen. **It costs no generation credits.**
+different operation with a different tool. **It costs no generation credits
+either way.**
+
+**Read "Why C2 came back as code" below before scheduling C1 or C3.** This batch
+was written as *captures of the real app*, and C2 shipped that way on
+2026-08-22 and was reverted the same day. The default for a pillar slot is now a
+**coded interaction**; a capture has to argue for itself against three specific
+failures, and only C1 plausibly can. Where a capture is still the answer,
+planning can run in parallel but final recording waits until the relevant
+surface, fixtures and media swaps are frozen.
+
+**Pillar 02 went the same way on 2026-08-22, without ever entering this queue.**
+Its static evidence `Fragment` was replaced by `ValidateSession`
+(`components/landing/validate-session.tsx`) — a coded interaction: a revenue
+model drawing itself, three competitors swinging in on a 3D arc, and those same
+three elements collapsing into assumption rows that resolve one at a time. A
+capture was ruled out up front for the reason that decides every card in this
+batch: **small text**. Video generators cannot render `EV_04` or `TAM $2.4B`
+legibly, codecs turn 1px hairlines to mush, and near-black gradients band.
+`higgsfieldPlan.md` §3 has been updated to match. Two of the three pillars are
+now coded interactions; only pillar 03 (C3) is still static, and it is already
+scripted as a coded interaction too. **No pillar slot is a capture candidate.**
 
 ### Why this exists, and why now
 
@@ -622,11 +645,11 @@ the live thing cannot be — which means the landing page.
 
 ### Candidates, ranked
 
-| | Capture | Where it would go | Note |
+| | Interaction | Where it would go | Note |
 |---|---|---|---|
-| **C1 · HOLD** | Run Console, one honest 10–14s excerpt — queries resolving, findings landing, discard count climbing | `/` — a new section | Requires landing-section design approval; label it as an excerpt and do not speed-ramp it. |
-| **C2** | Brief filling in, then `I don't know` flipping `9 of 12 answered · 3 unknown`, 6–10s | `/` Pillars, replacing the static `Fragment` | The product's most persuasive interaction. |
-| **C3** | Roadmap card — accordion opening, `DependencyChip` pulse, `Copied` label swap, 6–10s | `/` Pillars | Named verbatim by `_roadmap.md` §3. |
+| **C1 · HOLD** | Run Console, one honest 10–14s excerpt — queries resolving, findings landing, discard count climbing | `/` — a new section | Requires landing-section design approval. **The one surface where a real capture may still argue for itself** — see below. If captured, label it an excerpt and do not speed-ramp it. |
+| **C2 · SUPERSEDED 2026-08-22** | ~~`Product` settling in, then `I don't know` flipping the counter down to `8 of 12 answered · 4 unknown`~~ | `/` Pillars | **Shipped, reverted, and re-shipped as a coded interaction the same day** — `IdeaSession`. Read "Why C2 came back as code" below before attempting C1 or C3 as a capture. |
+| **C3 · SCRIPT** | Roadmap card — accordion opening, `DependencyChip` pulse, `Copied` label swap, 6–10s | `/` Pillars | Named verbatim by `_roadmap.md` §3. **Approach changed to a coded interaction** — same three reasons as C2. Still in the queue; only the method changed. |
 
 **C1 is a new landing section, not an asset swap — treat it as a design change,
 not a media task.** `/` currently runs Hero → `DimensionMarquee` → `Pillars` →
@@ -637,6 +660,47 @@ displaces, not just a file.** Do not ship it as "one more section."
 
 C2 and C3 are cheaper and safer: they replace a static `Fragment` in a slot that
 already exists, with no layout change.
+
+### Why C2 came back as code `[2026-08-22 — read this before C1 or C3]`
+
+**C2 shipped as a capture and was reverted the same day.** Not because the
+capture was badly made — it met every value in its own card — but because three
+problems only became visible once it was on screen, and all three are properties
+of *capturing a fixed-width app surface into a fixed-width slot*, not of that
+one recording. **Assume they apply to C3, and largely to C1.**
+
+1. **A capture ships the fixture's narrative, not the section's.** Pillar 01 and
+   section 03 (`CofounderChat`) are one continuous story — the *fitness* idea,
+   lapsed lifters, `CHAT_SCRIPT` into `FRAGMENT_CONVERSATION`. The only Define
+   surface that exists to capture is the *dental* run (`sms-rebooking-4f2a`), so
+   the capture dropped an unrelated second idea into the middle of that arc.
+   Nothing about the recording was wrong; the source was. **C3 has the same
+   problem** — the roadmap fixture is dental too, and pillar 03 sits in the same
+   arc.
+2. **Geometry stops being a design decision and becomes a constraint.** The
+   Define aside is a fixed 440px column (`--define-aside`), so size,
+   magnification, zoom level and duration were all compromises forced by the
+   source. PC9 and PC10 are both symptoms of this, not independent findings.
+3. **The frame cannot always hold the argument.** `I don't know` sits in the
+   composer at the bottom-left; any crop containing both it and the brief panel
+   is ≥1240px wide, which renders body text at ~9px. The cause ended up
+   off-screen and the pillar's own copy had to carry it.
+
+Drawn in code all three dissolve, and it is the repo's own default: *"Product
+surfaces are drawn in code as real UI fragments — never screenshots, never
+stock."* The replacement, `components/landing/idea-session.tsx`, is a ~14s
+looping conversation at exactly 624×375, in rhythm with pillars 02 and 03,
+narratively continuous with section 03, with a genuine reduced-motion end state
+and zero bytes of media.
+
+**C1 is the one surface where a capture may still argue for itself.** The Run
+Console's claim *is* duration and accumulation — queries resolving, findings
+landing, the discard count climbing over 45 seconds — and it is a full-width
+surface, so reason 2 does not bite. Reason 1 still does: it would be the dental
+run on a page telling a fitness story. Settle that before recording anything.
+Note the hard exception in "The distinction that makes this legal" still stands
+either way: never replace the *live* Run Console on `/r/[slug]/validate` with a
+recording of itself.
 
 ### Capture-script gate
 
@@ -652,9 +716,34 @@ No final recording starts until its card contains all of these values:
 | Finish | Exact final state and hold duration |
 | Delivery | Duration, FPS, codec budget and code-drawn fallback |
 
-C1 remains `HOLD` until the new section is approved. C2 and C3 remain
-`SCRIPT` until their cards are filled and replayed twice with identical bounds
-and state. A filename and a general interaction description are not a script.
+C1 remains `HOLD` until the new section is approved. C3 remains `SCRIPT` until
+its card is filled and replayed twice with identical bounds and state. A
+filename and a general interaction description are not a script.
+
+### C2's filled card `[HISTORICAL — the capture this describes was reverted 2026-08-22]`
+
+**Kept, not deleted.** The interaction it describes is no longer on the site —
+see "Why C2 came back as code" above — but this is the only worked example of a
+filled capture-script card in the repo, and every row in it is a real value that
+had to be discovered. **If C1 or C3 is ever recorded, fill a card that looks
+like this one.** The `Viewport`, `Layout pin` and `Crop` rows in particular are
+the ones that cost the most to find.
+
+| Field | Value |
+|---|---|
+| Source route | `http://localhost:<port>/r/sms-rebooking-4f2a/define`, served by `next build && next start` — **not `next dev`**, whose Strict Mode double-invokes the mount effect that seeds the first turn |
+| Freeze point | `5f03394` + the working tree of 2026-08-22; `lib/fixtures/brief.ts` at 9 filled / 3 unknown / 0 pending |
+| State setup | `addInitScript` clears every `sv.*` key, then writes `sv.brief.sms-rebooking-4f2a` = `{v:1, revealed:[all 12 except product and customer], unknown:[], edited:[], values:{}, approvedAt:null}` |
+| Viewport | 2160×1350, `deviceScaleFactor:1`, `reducedMotion:'no-preference'`, `html{zoom:1.5}` applied **after** `goto` |
+| Layout pin | `html,body{height:900px}`, `.ob-app{height:900px}`, `main.ob-app-main[data-chrome='surface']{height:calc(900px - var(--ob-header-h))}` — without this, `100vh` doubles under zoom, the document overflows, and `composerRef.focus()` scrolls the whole page mid-take |
+| Hygiene | scrollbars and cursor suppressed; mouse parked outside the crop after the click |
+| Crop | measured at runtime — `x 1500, y 134, 660×564`, from `.ob-define-aside` and `.ob-brief-progress` rects |
+| Timeline | settle starts 5.71s · `Product` filled 6.60s · click 7.88s · end 9.81s (wall clock) |
+| Trim | in 5.0s, out 9.4s of the recording — **an in-point choice, not an edit**; no cut within the take, no speed ramp, no reordering |
+| Finish | `8 of 12 answered · 4 unknown → open questions`, `Product` = `unknown → OPEN QUESTION`, held ~1.4s |
+| Delivery | 4.40s · 25fps · 660×564 · H.264 175KB + VP9 107KB · **no audio track** · `public/media/capture/brief.{mp4,webm}` |
+| Drawn at | 440 CSS px — a downscale from 660. Never looped; plays once on `IntersectionObserver`, rests on the final frame |
+| Fallback | the code-drawn `Fragment`, never a poster still; under reduced motion **no `<video>` is mounted at all** |
 
 ### How to capture
 
@@ -692,17 +781,16 @@ and the encoded file contains no audio track.
 
 ---
 
-## Batch 1 — Fieldwork band, 3 clips `[HIGH · start here]`
+## Batch 1 — Fieldwork band, 3 clips `[STILLS SHIPPED 2026-08-22 · optional i2v]`
 
-**Why first among the paid work:** three labelled `MediaSlot`s currently sit
-across the roadmap's structural hinge, between `01 OPEN QUESTIONS` and
-`02 BUILD ROADMAP`. They are correctly sized, hairline-framed and carry their
-briefs on screen — the correct shipped state, not a gap. But three empty frames
-in a row read as *assets pending* to anyone not in on the convention, and filling
-them converts a placeholder band into the page's editorial moment. **This is the
-largest visible before/after available.**
+**Stills shipped 2026-08-22.** The three approved WebPs at
+`public/media/roadmap/{conversation,expo,front-desk}.webp` are wired in
+`ASSETS` and render through `FieldworkMedia`. The band is now the page's
+editorial hinge — photography where the web declined to answer.
 
-It is also the only place photography is honestly on-subject anywhere in the app.
+**Remaining work in this batch is optional image-to-video only.** Composite the
+band at 1440px and 1280px before authorizing motion. Stills alone capture most
+of this batch's value.
 
 **What the band has to say:** *the answers to these six questions are not online,
 and getting them means an awkward conversation with a stranger.* Not
@@ -714,12 +802,8 @@ conference room, no laptop hero shot, no whiteboard, no sticky notes.** The
 whiteboard is the landing page's vocabulary (batch 3, `centre`) and reusing it
 here makes the two surfaces look like the same page.
 
-**This is the only place in the build where an approved asset is sitting unused.**
-All three stills exist at
-`public/media/roadmap/{conversation,expo,front-desk}.webp` and none of them is on
-screen, because `ASSETS` in `components/roadmap/fieldwork-band.tsx` is still `{}`.
-Do not regenerate them; wire them, then composite the band before authorizing any
-optional video.
+It is the only place photography is honestly on-subject anywhere in the app. Do
+not regenerate the shipped stills; authorize optional video only after compositing.
 
 ### 1.1 `conversation` — caption `01 · 8–10 CONVERSATIONS`
 
@@ -777,22 +861,23 @@ displays.
 
 **Deliver to:** `public/media/roadmap/{conversation,expo,front-desk}.{mp4,webm,webp}`
 
-**Swap-in:** fill the `ASSETS` record at `components/roadmap/fieldwork-band.tsx:6`
-— currently `{}`. A partially-filled record is legal, so the three can land one
-at a time; a panel with no entry keeps its `MediaSlot`. Nothing else changes.
-Re-measure `.ob-fieldwork-grid` height before and after: identical, because the
-frame's `aspect-ratio` owns it in both branches.
+**Swap-in — shipped 2026-08-22.** `ASSETS` in
+`components/roadmap/fieldwork-band.tsx` carries poster-only entries for all three
+panels. Add `mp4`/`webm` to a panel's record when optional video lands; until
+then `FieldworkMedia` renders the WebP. Re-measure `.ob-fieldwork-grid` height
+before and after any video swap: identical, because the frame's `aspect-ratio`
+owns it in both branches.
 
-**If only the stills land, ship them as stills** — `FieldworkMedia` needs a
-poster either way, and stills alone capture most of this batch's value.
+**If only the stills land, ship them as stills** — done. Optional video is a
+second pass.
 
 ---
 
 # GATE A — after Batch 1 stills, before more photography or any loop
 
-Composite the three fieldwork stills at 1440px and 1280px. If they do not make
-the roadmap feel materially more finished, stop Batch 1 motion, Batch 3 and all
-below-line generation. More of the same bet will not rescue it.
+**Passed 2026-08-22** — three fieldwork stills composite at 1440px and 1280px.
+If optional motion does not feel worth it after review, stop Batch 1 i2v, Batch 3
+and all below-line generation. More of the same bet will not rescue it.
 
 Batch 2 is independently permitted because it addresses cold-start behavior,
 not photographic polish. Its generated media must remain visible for at most
@@ -993,9 +1078,9 @@ optional image-to-video work using those approved local source frames.
 Everything below is optional: **4b has implementation downside; 5a is a
 judgement call; 5b and 5c are default no.**
 
-**Two things above this line are still open and neither is a still:** Batch 0
-(the favicon is still the Next.js default) and Batch 1's `ASSETS` wiring. Neither
-blocks Batch 4, but both are cheaper and worth more than anything below it.
+**Batch 0 and Batch 1 still wiring both shipped on 2026-08-22.** Nothing above
+Gate B blocks Batch 4; the next decision is whether optional i2v on batches 1–3
+is still worth the caps below.
 
 ---
 

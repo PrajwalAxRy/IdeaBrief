@@ -113,21 +113,34 @@ current one is deliberately almost invisible.
 
 ## 3. Pillar visuals — 3 loops `[MEDIUM]`
 
-**Lives in:** `components/landing/fragments.tsx`, rendered inside
+**Lives in:** `components/landing/idea-session.tsx` (01),
+`components/landing/validate-session.tsx` (02) and
+`components/landing/fragments.tsx` (03), rendered inside
 `components/landing/pillars.tsx`.
-**Currently:** real, code-drawn product UI — an idea brief with two fields
-visibly marked `unknown`, an evidence stream with three `VERIFIED` chips and one
-`DISCARDED`, and an open question with its interview script written out.
+**Currently:** real, code-drawn product UI. **Pillars 01 and 02 are animated
+DOM sessions** — 01 types out an ideating conversation and closes on a pointer
+pressing `Start the research`; 02 assembles a market-analysis panel, drops it to
+a sparkline, swings three competitors in on a 3D arc and collapses them into
+assumption rows that resolve one at a time. Both play once on scroll-in and rest,
+with a `Replay` control in the card bar. Pillar 03 is still static: one open
+question with its interview script written out.
 
 **These are deliberately not stock images and should not be replaced with any.**
-They are accurate depictions of the product's actual output, which is a stronger
-argument than any photograph.
 
-**The upgrade, if wanted:** screen-recording-style loops of these same surfaces
-*in motion* — fields filling in, evidence rows landing one at a time, chips
-resolving from grey to blue. That is a screen recording of the real app once the
-run pages are built, not a generated asset. **HiggsField is the wrong tool for
-this one; noted here so it isn't mistaken for a gap.**
+**The motion upgrade this section used to defer is DONE, and it was not a
+recording.** The plan here read: *"screen-recording-style loops of these same
+surfaces in motion … that is a screen recording of the real app once the run
+pages are built, not a generated asset."* Both 01 and 02 were instead built as
+live DOM, and that is now the settled answer for this section — see the reasoning
+in `idea-session.tsx`'s header (a real capture shipped here briefly and was
+reverted) and `validate-session.tsx`'s. **Do not re-open either as a capture, and
+do not count them in Batch C.** Pillar 03 remains a candidate if anyone wants a
+third animated card, on the same terms: DOM, not video.
+
+**HiggsField was and remains the wrong tool for all three.** Small text is the
+decisive reason — these cards are dense with 10px mono labels (`EV_04`, `TAM
+$2.4B`, `VERIFIED`) that no video generator renders legibly — followed by 1px
+hairlines, which codecs turn to mush, and near-black gradients, which they band.
 
 If a generated asset is wanted anyway, the only honest slot is a small
 atmospheric strip *beside* each fragment — not replacing it.
