@@ -179,4 +179,10 @@
      text through the one in front). Only real opacity hides it. Applied as a
      narrow edge ramp, never to a whole pane — see `.ob-vf-strip .ob-vf-glass`. */
   --ob-glass-veil: rgba(10, 10, 11, 0.78);
+  /* The front plane's density. Lighter than the veil because it is not trying to
+     hide anything outright — the objects behind these panes are defocused at
+     source (see `.ob-vf-strip[data-behind]`), so this only has to say "there is
+     a surface here". Past roughly 0.6 the bloom stops reading through the pane
+     and it becomes a solid panel rather than glass. */
+  --ob-glass-tint: rgba(10, 10, 11, 0.42);
 }

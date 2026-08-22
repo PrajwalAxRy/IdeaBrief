@@ -65,11 +65,11 @@ type Stage = (typeof STAGES)[number];
 /**
  * The first strip the competitive field actually lands on.
  *
- * A strip recedes because something arrives in front of it — so a strip nothing
- * arrives in front of has no reason to. The card row sits at y 240; the stack
+ * A strip goes out of focus because something is in front of it — so a strip
+ * with nothing in front of it stays sharp. The card row sits at y 240; the stack
  * runs `180 + i * 64` at 46px tall, which puts strip 0 at 180–226, clear of it,
- * and every strip after that underneath it. So strip 0 keeps its full strength
- * and its crossing over the callout, and the rest hand off.
+ * and every strip after that underneath it. So strip 0 keeps its focus and its
+ * crossing over the callout, and the rest sit behind glass.
  *
  * Both numbers live in `.ob-vf-strip` and `.ob-vf-pane`. Move either and this
  * has to be re-derived — it is a fact about the geometry, not a preference.
@@ -144,10 +144,11 @@ export function ValidateSession() {
   const lit = at >= 1;
   /* The curve sinks back the moment a plane arrives in front of it. */
   const receded = at >= 2;
-  /* Conclusions land at `verify` and recede again when the field lands on them,
-     which is the same hand-off gesture, pointed the other way. */
+  /* Conclusions land at `verify`. They do not leave or dim when the field lands
+     on them — the ones it covers simply go out of focus, because that is what
+     being behind a pane of glass looks like. */
   const settled = at >= 2;
-  const stripsReceded = at >= 3;
+  const stripsBehind = at >= 3;
   /* The competitors are the LAST plane and the final state — they arrive at
      `field`, in front of everything, and never recede. */
   const fielded = at >= 3;
@@ -254,7 +255,7 @@ export function ValidateSession() {
             row={row}
             i={i}
             settled={settled}
-            receded={stripsReceded && i >= FIRST_STRIP_UNDER_FIELD}
+            behind={stripsBehind && i >= FIRST_STRIP_UNDER_FIELD}
             resolved={i < shown}
           />
         ))}
@@ -509,11 +510,12 @@ function Pane({
  * edge, one width, one depth, shared with the pane row that arrives after it,
  * because strip `i` is answered by card `i`.
  *
- * It resolves, holds, and then recedes as the competitive field lands in front
- * of it — dimmed, softened and sunk back in z, the treatment the panes used to
- * get. Only the three the card row actually covers do that; the first one clears
- * the row entirely, so it stays sharp and holds its crossing over the callout.
- * See `FIRST_STRIP_UNDER_FIELD`.
+ * It resolves, holds, and then goes OUT OF FOCUS as the competitive field lands
+ * in front of it. Not dimmed, not moved, not shrunk — a resolved conclusion that
+ * fades reads as switched off, and none of these are. Only the three the card
+ * row actually covers defocus; the first one clears the row entirely, so it
+ * stays sharp and holds its crossing over the callout. See
+ * `FIRST_STRIP_UNDER_FIELD`.
  *
  * The top strip crosses the callout, which is the one overlap in the scene —
  * glass over a lit surface rather than over bare canvas, and the only place the
@@ -530,13 +532,13 @@ function Strip({
   row,
   i,
   settled,
-  receded,
+  behind,
   resolved,
 }: {
   row: ValidateRow;
   i: number;
   settled: boolean;
-  receded: boolean;
+  behind: boolean;
   resolved: boolean;
 }) {
   return (
@@ -544,7 +546,7 @@ function Strip({
       className="ob-vf-strip"
       style={{ '--i': i } as React.CSSProperties}
       data-in={settled}
-      data-receded={receded}
+      data-behind={behind}
       data-state={resolved ? row.state : undefined}
     >
       <div className="ob-vf-bob ob-vf-glass" style={{ '--d': 5 } as React.CSSProperties}>

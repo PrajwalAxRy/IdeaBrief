@@ -1950,6 +1950,18 @@ body::before {
   align-items: flex-start;
   padding: 12px 14px 13px;
   gap: 3px;
+  /* Denser and more frosted than the rest of the scene, because this row is the
+     front plane and has to read as a surface with things behind it. 24px rather
+     than the recipe's 15: three panes at this radius is affordable, and the
+     extra frost is what makes the bloom read as light seen THROUGH glass.
+
+     The tint does the occluding. It cannot be much heavier — see
+     `--ob-glass-tint` — and it does not need to be, because what sits behind
+     these panes is already defocused. */
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+  background: linear-gradient(var(--ob-glass-tint), var(--ob-glass-tint)),
+    linear-gradient(142deg, var(--ob-glass-hi), var(--ob-glass-lo));
   /* Measured against the content, not chosen. `.ob-vf-glass` clips, so a pane
      one line too short silently eats its own last row — at 180 Northline lost
      its gap line and Palisade lost `Switching` entirely, with no warning. The
@@ -2092,22 +2104,28 @@ body::before {
   transform: translate3d(0, 0, 0);
 }
 
-/* Recedes rather than leaving, once the competitive field lands on top of it:
-   dims, softens and sinks back in z, but never drops to zero — the conclusion is
-   still there, behind the evidence for it. Only the strips the card row actually
-   covers get this; the first one clears the row and keeps its full strength and
-   its crossing over the callout. The component decides which, from geometry —
-   see `FIRST_STRIP_UNDER_FIELD`.
+/* A strip that ends up BEHIND the competitive field goes out of focus — and
+   nothing else. It does not dim to 0.4, does not sink in z and does not shrink;
+   those together read as "switched off", which is the one thing a resolved
+   conclusion must never read as. Blur alone reads as depth of field, which is
+   what being behind a pane of glass actually looks like.
 
-   -150px, not the -340px the panes used to recede by. These are 524px wide, and
-   at perspective 1300 a -340 sink takes ~140px off that width; the stack visibly
-   shrank into the middle of the scene instead of sinking. -150 reads as depth
-   and costs ~54px. Must stay AFTER the `[data-in]` rule — equal specificity,
-   and both are true at once. */
-.ob-vf-strip[data-receded="true"] {
-  opacity: 0.4;
-  filter: blur(3px);
-  transform: translate3d(0, -10px, -150px);
+   **This is here because `backdrop-filter` cannot do it.** The honest version is
+   the card in front frosting its own backdrop, but Chrome will not sample these
+   siblings into a pane's backdrop at any radius — verified against blur(26px),
+   against removing the strips' own `backdrop-filter`, against removing their
+   transform, and against stopping their drift. The strips stayed sharp through
+   all four. So the defocus is applied at source instead.
+
+   Only the strips the card row actually covers get it; the first one clears the
+   row and stays sharp, because nothing is in front of it to be behind. The
+   component decides which, from geometry — see `FIRST_STRIP_UNDER_FIELD`.
+
+   Must stay AFTER the `[data-in]` rule: equal specificity, and both are true at
+   once. */
+.ob-vf-strip[data-behind="true"] {
+  opacity: 0.9;
+  filter: blur(4px);
   transition-delay: calc(var(--i) * 150ms);
 }
 
