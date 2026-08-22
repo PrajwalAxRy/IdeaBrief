@@ -3,7 +3,11 @@ import { ROADMAP } from '@/lib/content/app';
 import { type FieldworkAsset, FieldworkMedia } from './fieldwork-media';
 
 /** Set per panel once an asset lands; `MediaSlot` renders until then. */
-const ASSETS: Partial<Record<string, FieldworkAsset>> = {};
+const ASSETS: Partial<Record<string, FieldworkAsset>> = {
+  conversation: { poster: '/media/roadmap/conversation.webp' },
+  expo: { poster: '/media/roadmap/expo.webp' },
+  'front-desk': { poster: '/media/roadmap/front-desk.webp' },
+};
 
 /**
  * The page's hinge, and **the one place photography is honest on the app side**
