@@ -152,37 +152,44 @@
   --ob-glass-lo: rgba(255, 255, 255, 0.022);
   --ob-glass-edge: rgba(255, 255, 255, 0.11);
   --ob-glass-edge-lit: rgba(255, 255, 255, 0.2);
+  /* **One glass surface for the whole scene.** A brighter `front` variant was
+     tried for the strips and the competitor cards — 0.24/0.11 with a 0.26 edge —
+     to separate them from the callout. It read as milk rather than as glass, and
+     it dragged a whole second problem behind it: at that lightness `--ob-muted`
+     falls to 2.8:1 and `--ob-dim` to 1.43:1, so the metadata layer needed its own
+     remapped greys just to stay legible. Every object in the volume uses the four
+     values above. Depth comes from position, frost and occlusion, not lightness. */
   --ob-glass-sheen: rgba(255, 255, 255, 0.16);
   --ob-glass-cast: rgba(0, 0, 0, 0.55);
-  /* Measured down from 0.44/0.30/0.09, which produced a solid blue field rather
-     than a dark volume with lights in it — every dim grey in the scene went
-     illegible against its own backdrop. The scene has to read mostly BLACK,
-     with the light doing just enough to give the glass something to refract. */
-  --ob-bloom-accent: rgba(45, 127, 249, 0.17);
-  --ob-bloom-violet: rgba(74, 92, 219, 0.13);
-  --ob-bloom-pale: rgba(214, 226, 255, 0.05);
+  /* Measured down TWICE. First from 0.44/0.30/0.09, which produced a solid blue
+     field rather than a dark volume with lights in it — every dim grey in the
+     scene went illegible against its own backdrop. Then from 0.17/0.13/0.05,
+     which still read as a coloured wash rather than as frosted glass.
+
+     There is a floor as well as a ceiling: taken another third down the scene
+     goes flat grey, the panes lose the lit backdrop they refract, and the glass
+     treatment collapses into slightly-lighter rectangles. The scene has to read
+     mostly BLACK, with the light doing just enough and no more. */
+  --ob-bloom-accent: rgba(45, 127, 249, 0.12);
+  --ob-bloom-violet: rgba(74, 92, 219, 0.075);
+  --ob-bloom-pale: rgba(214, 226, 255, 0.045);
   /* Stronger than the three above, and allowed to be only because it is AIMED:
      one small pool behind the single place two glass panes cross, lit only once
-     they are crossing. The three above wash a whole scene, which is why they had
-     to come down to 0.17; this one is read through two stacked panes that each
+     they are crossing. The three above wash a whole scene, which is why they sit
+     as low as they do; this one is read through two stacked panes that each
      attenuate it, and it never sits behind body text on its own. */
-  --ob-bloom-focus: rgba(45, 127, 249, 0.22);
-  /* Light pooled INSIDE a glass pane rather than behind it — the callout's
-     lower band, which a conclusion strip crosses. Stronger than the ambient
-     blooms for the same reason as `--ob-bloom-focus`: it is small, it is bounded
-     by one pane, and it pools where that pane has no text on it. */
+  --ob-bloom-focus: rgba(45, 127, 249, 0.15);
   /* Where one glass pane crosses in front of another, the front one has to
      actually OCCLUDE — and `backdrop-filter` cannot do that job here. Chrome
      does not sample an element that itself carries a `backdrop-filter` into
      another element's backdrop, so two stacked glass panes never blur each
      other at any radius (40px was tried; the pane behind still read as sharp
      text through the one in front). Only real opacity hides it. Applied as a
-     narrow edge ramp, never to a whole pane — see `.ob-vf-strip .ob-vf-glass`. */
-  --ob-glass-veil: rgba(10, 10, 11, 0.78);
-  /* The front plane's density. Lighter than the veil because it is not trying to
-     hide anything outright — the objects behind these panes are defocused at
-     source (see `.ob-vf-strip[data-behind]`), so this only has to say "there is
-     a surface here". Past roughly 0.6 the bloom stops reading through the pane
-     and it becomes a solid panel rather than glass. */
-  --ob-glass-tint: rgba(10, 10, 11, 0.42);
+     narrow edge ramp, never to a whole pane — see `.ob-vf-strip .ob-vf-glass`.
+
+     Coupled to the blooms above: they light the pane being covered, so taking
+     them DOWN raised that pane's text contrast against this ramp and let
+     `Payback` ghost through it again. 0.78 held at the old bloom levels, 0.84
+     holds at these. Re-check it if the blooms move. */
+  --ob-glass-veil: rgba(10, 10, 11, 0.84);
 }

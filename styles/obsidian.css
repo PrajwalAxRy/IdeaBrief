@@ -1666,9 +1666,14 @@ body::before {
   background: linear-gradient(142deg, var(--ob-glass-hi), var(--ob-glass-lo));
   /* 15px, not 40. Every one of these recomputes against a backdrop that is
      itself animating, so the radius is a frame-budget decision as much as a
-     visual one. `saturate` is what stops the blue behind it going to mud. */
-  -webkit-backdrop-filter: blur(15px) saturate(150%);
-  backdrop-filter: blur(15px) saturate(150%);
+     visual one.
+
+     `saturate` stops the blue behind the pane going to mud, and it is also the
+     single biggest lever on how COLOURED the scene reads: it multiplies the
+     bloom rather than adding to it, so 150% made frosted glass look like tinted
+     glass. 120% keeps the hue without the wash. */
+  -webkit-backdrop-filter: blur(15px) saturate(120%);
+  backdrop-filter: blur(15px) saturate(120%);
   /* The system ships one shadow. This scene ships a second kind — a cast, which
      is what makes a pane read as floating in front of the light rather than
      printed on it — plus the inset top edge every real glass surface has. */
@@ -1950,18 +1955,17 @@ body::before {
   align-items: flex-start;
   padding: 12px 14px 13px;
   gap: 3px;
-  /* Denser and more frosted than the rest of the scene, because this row is the
-     front plane and has to read as a surface with things behind it. 24px rather
-     than the recipe's 15: three panes at this radius is affordable, and the
-     extra frost is what makes the bloom read as light seen THROUGH glass.
+  /* The ONLY thing separating the front plane from the rest of the volume: more
+     frost, 24px against the recipe's 15. Same surface colour, same edge, same
+     sheen — a dark tint was tried here and so was a milkier gradient, and both
+     made this row a different material rather than the same glass nearer the
+     light. Three panes at this radius is affordable, and the extra frost is what
+     makes the bloom read as light seen THROUGH glass.
 
-     The tint does the occluding. It cannot be much heavier — see
-     `--ob-glass-tint` — and it does not need to be, because what sits behind
-     these panes is already defocused. */
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
-  background: linear-gradient(var(--ob-glass-tint), var(--ob-glass-tint)),
-    linear-gradient(142deg, var(--ob-glass-hi), var(--ob-glass-lo));
+     It carries no occlusion of its own, which is fine: what sits behind it is
+     already defocused at source (`.ob-vf-strip[data-behind]`). */
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  backdrop-filter: blur(24px) saturate(120%);
   /* Measured against the content, not chosen. `.ob-vf-glass` clips, so a pane
      one line too short silently eats its own last row — at 180 Northline lost
      its gap line and Palisade lost `Switching` entirely, with no warning. The
@@ -2104,11 +2108,12 @@ body::before {
   transform: translate3d(0, 0, 0);
 }
 
-/* A strip that ends up BEHIND the competitive field goes out of focus — and
-   nothing else. It does not dim to 0.4, does not sink in z and does not shrink;
-   those together read as "switched off", which is the one thing a resolved
-   conclusion must never read as. Blur alone reads as depth of field, which is
-   what being behind a pane of glass actually looks like.
+/* A strip that ends up BEHIND the competitive field goes out of focus and drops
+   back in brightness. What it does NOT do is move: no sink in z, no shrink. That
+   combination was tried and it read as "switched off" rather than as behind
+   something, because an object that recedes AND dims AND shrinks has left the
+   scene. Held in place at full size, the same dim reads as depth of field —
+   which is what being behind a pane of glass actually looks like.
 
    **This is here because `backdrop-filter` cannot do it.** The honest version is
    the card in front frosting its own backdrop, but Chrome will not sample these
@@ -2124,7 +2129,10 @@ body::before {
    Must stay AFTER the `[data-in]` rule: equal specificity, and both are true at
    once. */
 .ob-vf-strip[data-behind="true"] {
-  opacity: 0.9;
+  /* The dial. 0.9 barely read as behind anything — the blur was doing all the
+     work on its own. Below about 0.35 the claims stop being legible as claims
+     and the row turns into texture. */
+  opacity: 0.55;
   filter: blur(4px);
   transition-delay: calc(var(--i) * 150ms);
 }
@@ -2144,8 +2152,21 @@ body::before {
      a 524px strip, and it starts at 62%, which is past the end of the longest
      claim. So it darkens nothing that carries type, and on the three strips that
      cross nothing it is invisible — they have only canvas behind them. */
+  /* The fill runs left-to-right instead of on the scene's usual 142deg diagonal,
+     and the first third of it is nothing at all: the strip resolves out of bare
+     canvas at its left edge and only becomes a surface where it needs to be one.
+     It has to hold three things and they sit in that order — the tag and the
+     opening of the claim need no backing, the right end has to occlude the
+     callout it crosses, and the `Verified` mark has to sit on something.
+
+     96deg, not 90: a 6deg tilt over a 524x46 strip is invisible as an angle but
+     keeps the fill from reading as a mechanical horizontal wipe against the
+     diagonal every other pane in the scene uses.
+
+     The 1px border still runs the whole way round on purpose. Fading that too
+     costs the strip its shape, and these have to stay readable as cards. */
   background: linear-gradient(90deg, transparent 62%, var(--ob-glass-veil) 78%),
-    linear-gradient(142deg, var(--ob-glass-hi), var(--ob-glass-lo));
+    linear-gradient(96deg, transparent 30%, var(--ob-glass-lo) 58%, var(--ob-glass-hi) 100%);
 }
 
 /* Resolved strips carry a lit edge — the glass equivalent of §12's rule, and

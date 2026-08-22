@@ -359,9 +359,12 @@ function Curve({ lit, receded }: { lit: boolean; receded: boolean }) {
               <stop offset="82%" stopColor="var(--ob-text)" />
               <stop offset="100%" stopColor="var(--ob-accent-bright)" />
             </linearGradient>
+            {/* Toned with the blooms: this wash sits under the whole plot, so it
+                is a large area of accent and it drove a lot of the scene's
+                colour on its own. */}
             <linearGradient id="ob-vf-under" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--ob-accent)" stopOpacity="0.2" />
-              <stop offset="58%" stopColor="var(--ob-accent)" stopOpacity="0.045" />
+              <stop offset="0%" stopColor="var(--ob-accent)" stopOpacity="0.13" />
+              <stop offset="58%" stopColor="var(--ob-accent)" stopOpacity="0.03" />
               <stop offset="100%" stopColor="var(--ob-accent)" stopOpacity="0" />
             </linearGradient>
             <clipPath id="ob-vf-wipe" clipPathUnits="userSpaceOnUse">
