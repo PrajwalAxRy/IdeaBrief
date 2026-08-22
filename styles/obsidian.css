@@ -918,7 +918,7 @@ body::before {
 .ob-bubble-ai {
   margin-right: auto;
   background: transparent;
-  color: var(--ob-muted);
+  color: var(--ob-text);
   border-bottom-left-radius: var(--ob-r-tag);
 }
 
@@ -944,6 +944,1321 @@ body::before {
   to {
     opacity: 0;
   }
+}
+
+/* --- Idea Session — pillar 01's Define preview --------------------------- */
+
+/* The pointer is positioned against the CARD, so the card is the containing
+   block. `.ob-frag`'s own `overflow: hidden` then clips it, which is what lets
+   it enter from off-frame for free. */
+.ob-session-card {
+  position: relative;
+}
+
+/* The replay control lives in the 40px card bar, so it cannot carry `.ob-btn`'s
+   13px block padding — that alone would push the bar to 66px and knock pillar
+   01's header out of register with 02 and 03. Negative margin cancels the
+   padding in layout while keeping a ~33px hit target. */
+.ob-session-replay {
+  /* `.ob-btn` is declared after `.ob-meta` at the same specificity, so it wins
+     every property they share — the label was rendering 14px sans, sentence
+     case, next to a 12px uppercase mono `DRAFT`. Re-declared here (later still)
+     so the control actually joins the metadata layer it sits in. One word, not
+     a sentence, so mono is right. */
+  font-family: var(--ob-font-mono);
+  font-size: var(--ob-meta);
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ob-dim);
+  /* `line-height: 1` is load-bearing, not tidying. `.ob-btn` inherits the body's
+     1.6, which makes a 12px label a 19px line — taller than the 17px meta line
+     beside it, so the bar grows even once the padding is cancelled. Pinned to 1,
+     the bar is driven by `DEFINE` / `DRAFT` exactly as it is on pillars 02 and
+     03, and the padding survives only as hit area (~36px). */
+  line-height: 1;
+  /* 7px, not more. `.ob-btn:focus-visible` draws its ring as a 4px box-shadow
+     spread, and `.ob-frag` clips to the card — at 10px the button's box was
+     36px tall inside a 39px bar and the ring's top and bottom arcs were cut
+     off. At 7px the box is 30px, the ring lands inside the bar, and the hit
+     area is still 30px. */
+  padding-block: 7px;
+  margin-block: -7px;
+}
+
+.ob-session-replay:hover:not(:disabled) {
+  color: var(--ob-text);
+}
+
+/* The transcript is a FIXED-HEIGHT viewport whose content scrolls up as steps
+   land, not a box that grows. The script is roughly 3× the card's height, so
+   this is what lets a ~14s conversation live in 624×500 with the card's box
+   constant at every point in the cycle — no layout shift by construction. */
+.ob-session-scroll {
+  height: 458px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 18px 20px;
+  /* The top edge fades rather than hard-clipping, so the half-scrolled tail of
+     the earlier exchange reads as "you joined this in progress". Same trick as
+     the marquee: --ob-text is the opaque stop, never a colour literal. */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, var(--ob-text) 34px);
+  mask-image: linear-gradient(180deg, transparent 0, var(--ob-text) 34px);
+  scrollbar-width: none;
+}
+
+.ob-session-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Anchored to the BOTTOM, not the top. For the first few seconds the script is
+   shorter than the viewport, and a top-aligned flow would open on one greyed
+   line above 280px of nothing — which reads as an empty card, not as a
+   conversation already in progress. Growing upward, the dead space sits above
+   the transcript where the top mask fades it out, and the moment the content
+   exceeds the box it simply scrolls. */
+.ob-session-flow {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100%;
+  gap: 12px;
+}
+
+/* .ob-bubble's 48ch is tuned for section 03's 900px column. At 624 the same cap
+   leaves an assistant line nearly edge to edge, and a bubble that fills its
+   container stops reading as a conversation. */
+.ob-session-bubble {
+  max-width: 42ch;
+  margin-block: 0;
+}
+
+/* The three shapes. A hairline-separated list, not bullets: this is product UI
+   being depicted, and hairlines are how this system makes a list. */
+.ob-session-options {
+  display: flex;
+  flex-direction: column;
+  margin-right: auto;
+  max-width: 52ch;
+  padding-left: 14px;
+  border-left: 1px solid var(--ob-hairline);
+}
+
+.ob-session-option {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-block: 7px;
+  line-height: 1.5;
+  animation: ob-session-in var(--ob-base) var(--ob-ease) both;
+}
+
+.ob-session-option + .ob-session-option {
+  border-top: 1px solid var(--ob-hairline);
+}
+
+.ob-session-option-letter {
+  flex: none;
+  width: 1ch;
+  font-family: var(--ob-font-mono);
+  font-size: 11px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  color: var(--ob-dim);
+}
+
+.ob-session-option-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ob-session-option-lead {
+  font-size: var(--ob-sm);
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+
+.ob-session-option-rest {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+}
+
+/* --- The Investor lens ---------------------------------------------------
+   BLUE'S FOURTH JOB, and the only one. The system's rule is three — primary
+   action, verification, live/active — and this is a deliberate, owner-approved
+   addition, written down here as a named job so nobody later deletes it as an
+   undocumented mistake. The job is: AN OUTSIDE LENS ON THE IDEA.
+
+   The constraint that survives the exception: on /r/[slug]/validate, blue plus
+   a tick means VERIFIED. This is an unverified opinion and must never be
+   mistaken for one. So it gets a left rule and the 12% wash and nothing else —
+   never --ob-hairline-accent as a full border (that is reserved for a verified
+   object), never the solid --ob-accent fill of .btn-primary, and NEVER a
+   checkmark. No new token: --ob-accent and --ob-accent-wash already exist. */
+.ob-session-lens {
+  margin-right: auto;
+  max-width: 52ch;
+  padding: 12px 14px;
+  border-left: 2px solid var(--ob-accent);
+  border-radius: 0 var(--ob-r-tag) var(--ob-r-tag) 0;
+  background: var(--ob-accent-wash);
+  animation: ob-session-in var(--ob-base) var(--ob-ease) both;
+}
+
+.ob-session-lens-label {
+  display: block;
+  color: var(--ob-accent);
+}
+
+.ob-session-lens-text {
+  margin-top: 6px;
+  font-size: var(--ob-sm);
+  line-height: 1.55;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+
+/* The finish. A nudge, not a gate: it names what is open and lets you past. */
+.ob-session-finish {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ob-hairline);
+  animation: ob-session-in var(--ob-base) var(--ob-ease) both;
+}
+
+.ob-session-finish-head {
+  font-size: 17px;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+
+.ob-session-finish-body {
+  margin-top: 5px;
+  max-width: 52ch;
+  font-size: var(--ob-sm);
+  line-height: 1.55;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+}
+
+.ob-session-finish-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Depicted buttons, rendered as spans — a focusable control that does nothing
+   is worse than a picture of one. No hover/focus states for the same reason. */
+.ob-session-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 15px;
+  border: 1px solid var(--ob-accent);
+  border-radius: var(--ob-r-pill);
+  background: var(--ob-accent);
+  font-size: 13px;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-on-accent);
+  white-space: nowrap;
+}
+
+.ob-session-cta-quiet {
+  border-color: var(--ob-hairline-strong);
+  background: transparent;
+  color: var(--ob-muted);
+}
+
+/* --- The closing gesture: a pointer presses the CTA ----------------------
+   The whole point of the finish is that there IS a next thing to press, and a
+   depicted button nobody ever touches is a picture of a dead end. So the last
+   beat draws someone pressing it.
+
+   Nothing is dispatched — the CTA is a `<span>`, there is no handler, and the
+   press is entirely drawn. That is deliberate: this is a picture of the app, so
+   the gesture is drawn for the same reason the button is.
+
+   **THE WHOLE CLOSING GESTURE IS A SANCTIONED EXCEPTION TO THE MOTION BINARY,
+   ALLOWLISTED BY NAME HERE** — the same exception `.ob-caret` holds, widened by
+   owner decision on 2026-08-22 when the gesture was slowed and the ripple
+   enlarged. Every duration below (glide 1,150ms · squash 520ms · rings 620ms ·
+   ripple 680ms) sits in the dead zone the binary forbids, and that is the
+   point: none of these is a UI transition. They depict a physical event — a
+   hand arriving, a surface taking a press, and the ripple that comes off it —
+   and physical events at this scale do not resolve in 320ms.
+
+   The rule still binds everywhere else on this surface. If you are adding
+   motion and it is not part of this gesture, it is structural (150–320ms) or
+   ambient (20–50s), with nothing in between. */
+.ob-session-pointer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+  color: var(--ob-text);
+  /* A real cursor is a light arrow with a dark keyline, which is what keeps it
+     legible crossing from the dark card onto the accent button. */
+  stroke: var(--ob-canvas);
+  fill: var(--ob-text);
+  transform: translate(var(--ob-ptr-x), var(--ob-ptr-y));
+}
+
+.ob-session-pointer[data-phase="travel"] {
+  animation: ob-session-pointer-in var(--ob-ptr-travel) var(--ob-ease) both;
+}
+
+/* Paused rather than left running, so a card scrolled out mid-approach resumes
+   in step with the JS timer instead of finishing the glide in an empty room. */
+.ob-session-pointer[data-paused] {
+  animation-play-state: paused;
+}
+
+/* The cursor visibly clicks. `0%` and `100%` are left off on purpose so they
+   resolve to the element's own `transform`, which is the only place the measured
+   position lives. */
+.ob-session-pointer[data-phase="press"] {
+  animation: ob-session-pointer-click 320ms ease-in-out;
+}
+
+/* Lifts away once the press has landed. No animation here, so the transition
+   is free to run — an `animation ... both` would pin opacity at 1 forever. */
+.ob-session-pointer[data-phase="done"] {
+  opacity: 0;
+  transition: opacity var(--ob-base) var(--ob-ease);
+}
+
+@keyframes ob-session-pointer-click {
+  40% {
+    transform: translate(var(--ob-ptr-x), var(--ob-ptr-y)) scale(0.84);
+  }
+}
+
+@keyframes ob-session-pointer-in {
+  0% {
+    transform: translate(var(--ob-ptr-from-x), var(--ob-ptr-from-y));
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--ob-ptr-x), var(--ob-ptr-y));
+    opacity: 1;
+  }
+}
+
+/* The button takes the press: a dip, and one ring off the edge. The ring is a
+   BORDER on a pseudo-element, not a `box-shadow` — this system ships exactly
+   one shadow and it is the primary button's hover glow. */
+.ob-session-cta[data-pressed] {
+  /* `ease-in-out` for the same reason the rings are `linear` — this is a squash
+     and release, not a transition arriving. `--ob-ease` reaches each stop almost
+     instantly and the dip/pop reads as two hard steps. */
+  animation: ob-session-press 520ms ease-in-out;
+}
+
+/* Two rings, staggered. `--ob-accent` solid, not `--ob-accent-ring`: the first
+   pass used the ring token (30% alpha) flush at `-1px` and it measured perfectly
+   while being invisible on screen — a 0.8px rendered border at 30%, starting
+   exactly on top of the button's own accent border, fully faded before it
+   cleared the edge.
+
+   **They expand by `inset`, not by `transform: scale`, and that is geometry not
+   taste.** The CTA sits ~20px from the card's left edge inside a scroller that
+   clips both axes, and `scale` grows a ring by a fraction of the button's own
+   152px width — past about 1.25x the left arc is cut off. `inset` grows a fixed
+   number of pixels in every direction, so an 18px ripple needs 18px of headroom
+   instead of 76px, and it reads far larger than the scaled one ever could. */
+.ob-session-cta[data-pressed]::after,
+.ob-session-cta[data-pressed]::before {
+  content: "";
+  position: absolute;
+  border-radius: var(--ob-r-pill);
+  pointer-events: none;
+}
+
+/* **`linear`, not `--ob-ease`, and the difference is the whole effect.**
+   `--ob-ease` is `cubic-bezier(0.16, 1, 0.3, 1)` — a hard ease-out that spends
+   ~90% of its travel in the first third. Right for a UI transition arriving;
+   fatal for a ripple, which it fades to invisible in ~85ms of a 320ms
+   animation. On `linear` with hand-placed stops the ring is legible for its
+   whole life and still decelerates, because the stops do the shaping. The
+   precedent is already here: `.ob-dot`'s pulse is `ease-in-out` and the marquee
+   is `linear` — the system ease is for transitions, not for pulses. */
+.ob-session-cta[data-pressed]::after {
+  border: 2px solid var(--ob-accent);
+  animation: ob-session-ring 620ms linear both;
+}
+
+/* The second ring trails the first by 180ms, so the pair reads as one impact
+   spreading rather than as two outlines. */
+.ob-session-cta[data-pressed]::before {
+  /* `both`, not `forwards` — without a backwards fill the ring has no `inset`
+     during its 90ms delay, collapses to `inset: auto`, and flashes as a 2px dot
+     before it expands. */
+  border: 1px solid var(--ob-accent);
+  animation: ob-session-ring-wide 620ms linear 180ms both;
+}
+
+/* Dip, flash, then a small pop on the way back — the overshoot is what makes it
+   read as a press landing rather than as the button merely shrinking. 1.06 of a
+   152px button is ~4.5px a side against a 10px gap, so it never touches
+   `Keep talking`. */
+@keyframes ob-session-press {
+  0% {
+    transform: scale(1);
+    background-color: var(--ob-accent);
+  }
+  28% {
+    transform: scale(0.88);
+    background-color: var(--ob-accent-bright);
+  }
+  62% {
+    transform: scale(1.08);
+    background-color: var(--ob-accent-bright);
+  }
+  100% {
+    transform: scale(1);
+    background-color: var(--ob-accent);
+  }
+}
+
+/* `-18px` is the ceiling, set by geometry rather than taste: the CTA's left edge
+   sits 20px from the scroller's padding box, which is where the clip happens.
+   Past -20px the left arc is cut. */
+@keyframes ob-session-ring {
+  0% {
+    inset: -2px;
+    opacity: 1;
+  }
+  40% {
+    inset: -11px;
+    opacity: 0.7;
+  }
+  100% {
+    inset: -19px;
+    opacity: 0;
+  }
+}
+
+@keyframes ob-session-ring-wide {
+  0% {
+    inset: -2px;
+    opacity: 0.6;
+  }
+  40% {
+    inset: -10px;
+    opacity: 0.38;
+  }
+  100% {
+    inset: -19px;
+    opacity: 0;
+  }
+}
+
+/* --- The inner ripple ----------------------------------------------------
+   **This is where the size actually comes from, and it exists because the outer
+   rings cannot grow.** They are capped at 19px by geometry, not taste: the CTA
+   sits 20px from `.ob-session-scroll`'s padding box, which is where the clip
+   happens, so anything larger loses its left arc. A ripple that spreads INSIDE
+   the button has no such ceiling — it is clipped by the pill it is filling, so
+   it can cross the whole 152px face.
+
+   It starts at the pointer's contact point (42% / 55%, the same figures
+   `IdeaSession` measures the target with) rather than at the centre, which is
+   what makes it read as coming from the click instead of from the button.
+
+   `--ob-on-accent` is the token; the softness is `opacity` on the element, so
+   no colour value is introduced. */
+.ob-session-cta-ripple {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--ob-r-pill);
+  pointer-events: none;
+}
+
+/* `aspect-ratio: 1` with `width: 100%` makes the circle as wide AND tall as the
+   button's width, and percentage margins resolve against the containing block's
+   WIDTH on both axes — so `-50%` centres it on the contact point without a
+   magic pixel number or a `translate`. */
+.ob-session-cta-ripple-dot {
+  position: absolute;
+  left: 42%;
+  top: 55%;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: -50% 0 0 -50%;
+  border-radius: 50%;
+  background: var(--ob-on-accent);
+  animation: ob-session-ripple 680ms linear both;
+}
+
+@keyframes ob-session-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.55;
+  }
+  55% {
+    opacity: 0.26;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes ob-session-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   11b. Validate Field — pillar 02's floating scene.
+
+   **There is no card here, and that is the point.** The first build of this
+   surface was a bordered panel with a title bar and a footer rule; it was
+   rejected for being a box. Nothing below draws a container. Objects float in
+   a lit volume at different depths, overlap, tilt with the pointer, and drift
+   forever on their own periods.
+
+   Three things this block depends on, none of them decorative:
+
+   1. **`.ob-vf-bloom` is the reason the glass is visible at all.** A
+      translucent pane over `#0A0A0B` is a slightly lighter rectangle and
+      nothing more. The three out-of-focus lights are what `backdrop-filter`
+      has to work with. Removing them does not simplify the scene, it deletes
+      the treatment.
+   2. **State and drift live on different elements.** `.ob-vf-*` wrappers carry
+      the entrance/exit transform; `.ob-vf-bob` inside carries the perpetual
+      float. One element cannot do both — the second `transform` wins and the
+      entrance silently stops happening.
+   3. **No `transform-style: preserve-3d` anywhere.** `backdrop-filter`
+      establishes a containing block and flattens its subtree, so a glass pane
+      inside a preserved-3d parent samples the wrong backdrop. Every pane gets
+      its depth from a single transform against `.ob-vf-volume`'s
+      `perspective`, one level deep, which is the configuration that works.
+
+   Blue is ambient light in this scene as well as a state, which is a real
+   departure from the three-jobs rule — see the token group in tokens.css. The
+   moment it touches an object rather than the air (the curve's live head, a
+   `Verified` mark, a verification sheen) it is back to doing one of the three.
+   ============================================================ */
+
+.ob-vf {
+  position: relative;
+  /* Bleeds past the text column on both sides — a scene that stops exactly
+     where the paragraph above it stops is a box with the border turned off.
+
+     **Asymmetric on purpose.** The left overhang runs into the 96px gap between
+     the pinned heading and this column, which always exists. The right one runs
+     into the page gutter, which does not: at 1280 a symmetric 38px pushed the
+     document 8px wide and put a horizontal scrollbar on the whole page. 16px
+     clears every width this site is read at. */
+  width: calc(100% + 54px);
+  margin-left: -38px;
+  height: 496px;
+  isolation: isolate;
+}
+
+/* --- the light ----------------------------------------------------------- */
+
+.ob-vf-bloom {
+  position: absolute;
+  inset: -14% -6%;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1400ms var(--ob-ease);
+  pointer-events: none;
+}
+
+.ob-vf-bloom[data-lit="true"] {
+  opacity: 1;
+}
+
+.ob-vf-light {
+  position: absolute;
+  border-radius: 50%;
+  /* 78px is not a style choice. Below roughly 60 the lights read as three
+     coloured circles behind glass; above it they read as one lit atmosphere,
+     which is the only way a second hue is defensible in this system. */
+  filter: blur(78px);
+  will-change: transform;
+}
+
+/* Counter-shifted against the pointer, and further than the objects move, so
+   the light sits behind the volume rather than travelling with it. */
+.ob-vf-light-a {
+  left: 46%;
+  top: -10%;
+  width: 38%;
+  height: 50%;
+  background: var(--ob-bloom-accent);
+  transform: translate3d(calc(var(--mx, 0) * -26px), calc(var(--my, 0) * -18px), 0);
+  animation: ob-vf-swim-a 34s ease-in-out infinite alternate;
+}
+
+.ob-vf-light-b {
+  left: 2%;
+  top: 34%;
+  width: 44%;
+  height: 56%;
+  background: var(--ob-bloom-violet);
+  transform: translate3d(calc(var(--mx, 0) * -18px), calc(var(--my, 0) * -12px), 0);
+  animation: ob-vf-swim-b 41s ease-in-out infinite alternate;
+}
+
+.ob-vf-light-c {
+  left: 62%;
+  top: 52%;
+  width: 34%;
+  height: 40%;
+  background: var(--ob-bloom-pale);
+  transform: translate3d(calc(var(--mx, 0) * -12px), calc(var(--my, 0) * -8px), 0);
+  animation: ob-vf-swim-c 29s ease-in-out infinite alternate;
+}
+
+/* The fourth light is aimed, not ambient. It sits behind the one place two
+   panes cross — the first strip through the callout's lower band — so that
+   intersection has a lit surface to refract instead of canvas, and reads as two
+   objects at different depths rather than two rectangles.
+
+   It comes up WITH the strips (`data-focus`), for two reasons: the overlap it
+   lights does not exist until then, and during the competitive field the same
+   pool sits behind three cards of dim grey metadata, which is the exact
+   failure the bloom tokens were measured down to avoid. */
+.ob-vf-light-d {
+  left: 56%;
+  /* Tracks the crossing. Moves whenever `.ob-vf-strip`'s `top` does. */
+  top: 23%;
+  width: 30%;
+  height: 34%;
+  background: var(--ob-bloom-focus);
+  opacity: 0;
+  transition: opacity 1100ms var(--ob-ease);
+  transform: translate3d(calc(var(--mx, 0) * -16px), calc(var(--my, 0) * -10px), 0);
+  animation: ob-vf-swim-d 37s ease-in-out infinite alternate;
+}
+
+.ob-vf-bloom[data-focus="true"] .ob-vf-light-d {
+  opacity: 1;
+}
+
+/* The lights move on `translate`/`scale` only, layered under the pointer
+   transform via the composite property so the two never overwrite each other. */
+@keyframes ob-vf-swim-a {
+  from {
+    translate: 0 0;
+    scale: 1;
+  }
+  to {
+    translate: -7% 9%;
+    scale: 1.16;
+  }
+}
+
+@keyframes ob-vf-swim-b {
+  from {
+    translate: 0 0;
+    scale: 1.1;
+  }
+  to {
+    translate: 11% -8%;
+    scale: 0.94;
+  }
+}
+
+@keyframes ob-vf-swim-c {
+  from {
+    translate: 0 0;
+    scale: 0.96;
+  }
+  to {
+    translate: -9% -11%;
+    scale: 1.2;
+  }
+}
+
+/* Shallower than the other three on both axes. This one is holding a position
+   behind a specific 110x46 intersection, so it drifts enough not to look pinned
+   and not so much that the lit patch wanders off the crossing. */
+@keyframes ob-vf-swim-d {
+  from {
+    translate: 0 0;
+    scale: 1.05;
+  }
+  to {
+    translate: 5% -6%;
+    scale: 0.92;
+  }
+}
+
+/* A fine mesh, radially masked so it never reaches an edge and becomes a grid
+   with a boundary. It is texture for the light to sit on, not a chart axis. */
+.ob-vf-mesh {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at center, var(--ob-grid) 1px, transparent 1px);
+  background-size: 30px 30px;
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 46% 44%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(ellipse 62% 58% at 46% 44%, #000 0%, transparent 78%);
+  opacity: 0.7;
+  transform: translate3d(calc(var(--mx, 0) * -8px), calc(var(--my, 0) * -6px), 0);
+}
+
+/* --- the volume ---------------------------------------------------------- */
+
+.ob-vf-volume {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  perspective: 1300px;
+  /* The whole volume tilts toward the pointer. Small on purpose: past about 6°
+     the glass edges catch and it reads as a gimmick rather than as depth. */
+  transform: rotateY(calc(var(--mx, 0) * 4.5deg)) rotateX(calc(var(--my, 0) * -3.4deg));
+  transition: transform 420ms var(--ob-ease);
+}
+
+/* Perpetual float. `--d` phase-shifts and detunes it, and the unit it detunes is
+   the GROUP, not the object: anything that has to stay aligned with something
+   else shares a `--d` and drifts with it rigidly. The three competitor cards are
+   one group; the callout and the four strips that overlap it are another.
+   Per-object phases pulled an aligned row up to 15px out of true and made the
+   callout/strip overlap breathe between 8 and 26px, which reads as jitter rather
+   than as life. The groups still drift against each other, at full amplitude,
+   which is where the life actually comes from. */
+.ob-vf-bob {
+  display: block;
+  animation: ob-vf-bob 19s ease-in-out infinite alternate;
+  animation-duration: calc(17s + var(--d, 0) * 2.3s);
+  animation-delay: calc(var(--d, 0) * -2.9s);
+}
+
+@keyframes ob-vf-bob {
+  from {
+    translate: 0 0;
+    rotate: -0.35deg;
+  }
+  to {
+    translate: 6px -9px;
+    rotate: 0.4deg;
+  }
+}
+
+/* --- glass --------------------------------------------------------------- */
+
+/* The one surface recipe. Everything that floats and holds text is this. */
+.ob-vf-glass {
+  position: relative;
+  border: 1px solid var(--ob-glass-edge);
+  border-radius: var(--ob-r-lg);
+  background: linear-gradient(142deg, var(--ob-glass-hi), var(--ob-glass-lo));
+  /* 15px, not 40. Every one of these recomputes against a backdrop that is
+     itself animating, so the radius is a frame-budget decision as much as a
+     visual one. `saturate` is what stops the blue behind it going to mud. */
+  -webkit-backdrop-filter: blur(15px) saturate(150%);
+  backdrop-filter: blur(15px) saturate(150%);
+  /* The system ships one shadow. This scene ships a second kind — a cast, which
+     is what makes a pane read as floating in front of the light rather than
+     printed on it — plus the inset top edge every real glass surface has. */
+  box-shadow: 0 22px 46px -26px var(--ob-glass-cast), inset 0 1px 0 var(--ob-glass-sheen);
+  overflow: hidden;
+}
+
+/* `--ob-dim` is calibrated against `--ob-canvas`. A glass pane is lighter than
+   the canvas by construction, so every mono label on one loses most of its
+   contrast — `2019`, `TAM`, `EV_04` were all but invisible on the first pass.
+   The metadata layer steps up one level inside glass, and nowhere else. */
+.ob-vf-glass .ob-meta {
+  color: var(--ob-muted);
+}
+
+/* --- the curve ----------------------------------------------------------- */
+
+.ob-vf-curve {
+  position: absolute;
+  left: 26px;
+  top: 6px;
+  width: 66%;
+  opacity: 0;
+  transform: translate3d(0, 14px, -120px);
+  transition: opacity 900ms var(--ob-ease), transform var(--ob-enter) var(--ob-ease), filter
+    var(--ob-enter) var(--ob-ease);
+}
+
+.ob-vf-curve[data-lit="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* It does not shrink into a corner when the competitors arrive — it sinks back
+   in z, dims and goes soft, becoming part of the light the panes in front of it
+   are refracting. That is the whole reason the scene gets to keep it. */
+.ob-vf-curve[data-receded="true"] {
+  opacity: 0.8;
+  transform: translate3d(-14px, -6px, -190px);
+  filter: blur(0.5px);
+}
+
+.ob-vf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.ob-vf-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 7px var(--ob-accent-glow));
+  transition: stroke-dashoffset 1500ms var(--ob-ease);
+}
+
+.ob-vf-curve[data-lit="true"] .ob-vf-line {
+  stroke-dashoffset: 0;
+}
+
+.ob-vf-baseline {
+  fill: none;
+  stroke: var(--ob-hairline-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+  opacity: 0;
+  transition: opacity var(--ob-base) var(--ob-ease) 700ms;
+}
+
+.ob-vf-cone {
+  fill: none;
+  stroke: var(--ob-hairline-strong);
+  stroke-width: 1;
+  stroke-dasharray: 0.013 0.013;
+  opacity: 0;
+  transition: opacity var(--ob-base) var(--ob-ease) 1350ms;
+}
+
+.ob-vf-cone-fill {
+  fill: var(--ob-hover-wash);
+  opacity: 0;
+  transition: opacity var(--ob-base) var(--ob-ease) 1350ms;
+}
+
+.ob-vf-curve[data-lit="true"] .ob-vf-baseline {
+  opacity: 0.85;
+}
+
+.ob-vf-curve[data-lit="true"] .ob-vf-cone {
+  opacity: 0.62;
+}
+
+.ob-vf-curve[data-lit="true"] .ob-vf-cone-fill {
+  opacity: 0.5;
+}
+
+.ob-vf-wiper {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 1500ms var(--ob-ease);
+}
+
+.ob-vf-curve[data-lit="true"] .ob-vf-wiper {
+  transform: scaleX(1);
+}
+
+/* The live head. Percentage-positioned against the plot, so it needs no
+   measurement and survives any edit to the series. Blue on an object: this one
+   is live state, and it is the only solid accent the curve carries. */
+.ob-vf-head {
+  position: absolute;
+  left: var(--hx);
+  top: var(--hy);
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--ob-accent-bright);
+  box-shadow: 0 0 0 4px var(--ob-accent-wash), 0 0 16px 2px var(--ob-accent-glow);
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity var(--ob-base) var(--ob-ease) 1320ms, transform 520ms var(--ob-ease) 1320ms;
+}
+
+.ob-vf-curve[data-lit="true"] .ob-vf-head {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- the callout --------------------------------------------------------- */
+
+.ob-vf-callout {
+  position: absolute;
+  /* No `z-index`: this pane paints in tree order, which puts it BEHIND the
+     conclusion strips. The first strip crosses it and covers its `Payback` row
+     outright — that is the intended reading, not an accident. */
+  /* 26 — the scene's one inset, shared with the curve, the pane row, the strips
+     and the caption. */
+  right: 26px;
+  /* 12, not 2. Every object drifts up to 9px and the scene has no `overflow`
+     clip by design, so a pane parked at the top edge climbs out of the scene
+     and into the paragraph above it. */
+  top: 12px;
+  width: 214px;
+  /* Focus-in, not fade-in. On glass an entrance that resolves out of blur reads
+     as an object arriving in the volume; an opacity ramp reads as a layer being
+     switched on. Every object in this scene enters this way. */
+  opacity: 0;
+  filter: blur(14px);
+  transform: translate3d(28px, -18px, -260px) rotateY(-13deg);
+  transition: opacity 760ms var(--ob-ease), filter 760ms var(--ob-ease), transform var(--ob-enter)
+    var(--ob-ease);
+  transition-delay: 460ms;
+}
+
+.ob-vf-callout[data-in="true"] {
+  opacity: 1;
+  filter: none;
+  transform: translate3d(0, 0, 34px) rotateY(-5deg);
+}
+
+.ob-vf-callout .ob-vf-glass {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 13px 16px 14px;
+  gap: 2px;
+  /* No `background` here, deliberately: this is the plain `.ob-vf-glass` recipe,
+     the same surface as every other pane in the scene. A dark veil and a blue
+     light well were both tried on this pane and both changed what it IS. The
+     occlusion the crossing needs belongs on the strip in FRONT of it — see
+     `.ob-vf-strip .ob-vf-glass` — and the blue belongs behind everything, in the
+     bloom. Nothing about the crossing is allowed back onto this rule. */
+}
+
+.ob-vf-num {
+  font-size: 33px;
+  line-height: 1.05;
+  letter-spacing: var(--ob-tracking-h2);
+  color: var(--ob-text);
+  font-variant-numeric: tabular-nums;
+  margin-top: 5px;
+}
+
+.ob-vf-num-unit {
+  font-size: 0.56em;
+  color: var(--ob-muted);
+}
+
+.ob-vf-num-per {
+  font-size: 0.34em;
+  color: var(--ob-dim);
+  margin-left: 5px;
+}
+
+.ob-vf-cap {
+  margin-top: 3px;
+}
+
+.ob-vf-hair {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--ob-glass-edge);
+  margin: 11px 0 9px;
+}
+
+.ob-vf-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.ob-vf-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ob-vf-stat-num {
+  font-size: 13px;
+  color: var(--ob-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- the competitors ----------------------------------------------------- */
+
+.ob-vf-pane {
+  position: absolute;
+  /* An aligned row of three: same width, same top, same depth, no rotation.
+     The fan this replaced staggered y by 13px, z by 46px and rotateY by 8deg
+     per card, and it read as three cards dropped on a table rather than three
+     answers to the same question. It was also self-defeating: the volume is
+     `transform-style: flat`, so the DEEPEST card still painted over the one in
+     front of it, and the depth the stagger bought was contradicted by the paint
+     order in the same frame.
+
+     200 on a 213 step — three cards and two 13px gaps inside the scene's 26px
+     inset, the same inset the curve, the strips and the caption sit on. The
+     widest content in any pane needs 151px (Palisade's `Revenue ~$2M at close`
+     row plus this pane's padding), so 200 keeps ~49px of slack against a wrap
+     into the fixed 214px height. */
+  width: 200px;
+  left: calc(26px + var(--i) * 213px);
+  /* One top for all three. The descending stagger existed to dodge the callout,
+     which occupies the upper right; 240 clears the callout's rendered bottom
+     edge (~225) by 15px, which does the same job without breaking the row. */
+  top: 240px;
+  opacity: 0;
+  filter: blur(16px);
+  transform: translate3d(160px, -70px, -520px) rotateY(46deg) rotateZ(5deg);
+  transition: opacity 820ms var(--ob-ease), filter 820ms var(--ob-ease), transform var(--ob-enter)
+    var(--ob-ease);
+  transition-delay: calc(var(--i) * 190ms);
+}
+
+/* The ENTRANCE keeps all of its depth — each card still swings in from -520px
+   on an arc, 190ms after the one before it. Only the landing is square. */
+.ob-vf-pane[data-in="true"] {
+  opacity: 1;
+  filter: none;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Recedes rather than leaving — the same treatment the Curve gets once the
+   competitors arrive: it dims, sinks back in z and softens, but never drops to
+   zero. The card stays on screen while its own conclusion (the Strip at the
+   same index) comes forward in front of it and answers it. */
+.ob-vf-pane[data-receded="true"] {
+  opacity: 0.4;
+  filter: blur(3px);
+  /* Uniform, so the row recedes as a row. The per-card x offset that used to
+     live here re-introduced the stagger at the exact moment the strips in front
+     of it are being read as an aligned stack. */
+  transform: translate3d(0, -18px, -340px) scale(0.92);
+  transition-delay: calc(var(--i) * 150ms);
+}
+
+.ob-vf-pane .ob-vf-glass {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 12px 14px 13px;
+  gap: 3px;
+  /* Measured against the content, not chosen. `.ob-vf-glass` clips, so a pane
+     one line too short silently eats its own last row — at 180 Northline lost
+     its gap line and Palisade lost `Switching` entirely, with no warning. The
+     content measures 212 and the box is border-box, so 214 is the floor; the
+     assertion in `vp` verification is `scrollHeight <= clientHeight`. */
+  height: 214px;
+}
+
+.ob-vf-pane-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ob-vf-pane-name {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+
+.ob-vf-pane-price {
+  font-size: 13px;
+  color: var(--ob-muted);
+  margin-top: 3px;
+}
+
+.ob-vf-bar {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: 2px;
+  margin-top: 3px;
+  border-radius: 1px;
+  background: var(--ob-glass-edge);
+  overflow: hidden;
+}
+
+.ob-vf-bar > span {
+  display: block;
+  height: 100%;
+  width: var(--w);
+  background: var(--ob-muted);
+}
+
+/* The drill-downs. A dimension, where it landed, and the affordance that says
+   there is more behind it — which is what makes the card read as a row in an
+   analysis product rather than a summary tile. */
+.ob-vf-metrics {
+  display: flex;
+  flex-direction: column;
+  margin-top: 7px;
+}
+
+.ob-vf-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 0;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
+  /* Lands after its own pane has arrived, top to bottom, so the card is read as
+     a card first and a list of findings second. */
+  transition-delay: calc(var(--i) * 190ms + var(--j) * 130ms + 520ms);
+}
+
+.ob-vf-metric + .ob-vf-metric {
+  border-top: 1px solid var(--ob-glass-edge);
+}
+
+.ob-vf-pane[data-in="true"] .ob-vf-metric {
+  opacity: 1;
+  transform: none;
+}
+
+.ob-vf-metric-label {
+  flex: none;
+}
+
+.ob-vf-metric-value {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ob-text);
+  white-space: nowrap;
+}
+
+.ob-vf-chev {
+  flex: none;
+  color: var(--ob-dim);
+  align-self: center;
+}
+
+/* The line that survives the dissolve — this is the claim that becomes the
+   conclusion, so it is not a footnote under the price. */
+.ob-vf-pane-gap {
+  font-size: 12px;
+  color: var(--ob-text);
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--ob-glass-edge);
+}
+
+/* --- the conclusions ----------------------------------------------------- */
+
+.ob-vf-strip {
+  position: absolute;
+  width: 524px;
+  /* One left edge, shared with the pane row above it — card `i` collapses into
+     strip `i`, so the two belong in the same column. The loose stack this
+     replaced offset each strip 15px and rotated it 0.5deg, and gave each its own
+     z: at perspective 1300 that also rendered every strip ~5px narrower than the
+     one above it, so four rows meant to read as one set read as four widths. */
+  left: 26px;
+  /* 180 puts the first strip's top edge in the ~10px of clear space between the
+     callout's `CAC` and `Payback` rows: it covers `Payback` outright and leaves
+     `CAC` whole. Landing mid-row instead would slice a line of type in half,
+     which reads as a bug rather than as one object in front of another.
+
+     Measured, not guessed, and it only holds because the callout and the strips
+     share a `--d` and therefore drift as one: `CAC` ends at y 165 and `Payback`
+     starts at 175 in the frame both objects live in. Re-measure if either moves.
+
+     The step is 64, not 56 — pushing the stack up without opening the rows left
+     a growing band of dead scene above the caption. */
+  top: calc(180px + var(--i) * 64px);
+  opacity: 0;
+  filter: blur(13px);
+  transform: translate3d(0, 26px, -230px) scale(0.93);
+  transition: opacity 720ms var(--ob-ease), filter 720ms var(--ob-ease), transform var(--ob-enter)
+    var(--ob-ease);
+  transition-delay: calc(var(--i) * 210ms + 240ms);
+}
+
+/* Same deal as the panes: the focus-in from -230px keeps its depth, the landing
+   is flat and square so the four strips read as one stack. */
+.ob-vf-strip[data-in="true"] {
+  opacity: 1;
+  filter: none;
+  transform: translate3d(0, 0, 0);
+}
+
+.ob-vf-strip .ob-vf-glass {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 14px 0 16px;
+  height: 46px;
+  /* A ramp to opaque across the right edge only — the strip's own glass is far
+     too transparent to hide what it crosses, and `backdrop-filter` will not do
+     it either (see `--ob-glass-veil`). Without this the callout's `Payback` row
+     reads straight through the strip as sharp text lying under the claim.
+
+     The ramp is finished by 78%, which is where the callout's left edge falls on
+     a 524px strip, and it starts at 62%, which is past the end of the longest
+     claim. So it darkens nothing that carries type, and on the three strips that
+     cross nothing it is invisible — they have only canvas behind them. */
+  background: linear-gradient(90deg, transparent 62%, var(--ob-glass-veil) 78%),
+    linear-gradient(142deg, var(--ob-glass-hi), var(--ob-glass-lo));
+}
+
+/* Resolved strips carry a lit edge — the glass equivalent of §12's rule, and
+   the same job: the border of a verified object. */
+.ob-vf-strip[data-state] .ob-vf-glass {
+  border-color: var(--ob-glass-edge-lit);
+}
+
+.ob-vf-strip[data-state="verified"] .ob-vf-glass {
+  border-color: var(--ob-hairline-accent);
+}
+
+.ob-vf-tag {
+  flex: none;
+  width: 50px;
+}
+
+.ob-vf-claim {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+  white-space: nowrap;
+}
+
+.ob-vf-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin-left: auto;
+  font-family: var(--ob-font-mono);
+  font-size: 10px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ob-dim);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease), color
+    var(--ob-base) var(--ob-ease);
+}
+
+.ob-vf-strip[data-state] .ob-vf-mark {
+  opacity: 1;
+  transform: none;
+}
+
+.ob-vf-strip[data-state="verified"] .ob-vf-mark {
+  color: var(--ob-accent-bright);
+}
+
+/* The moment of verification, in this scene's own language: a specular sheen
+   crossing the pane, once. §12 draws a rule under an excerpt; on glass the
+   equivalent gesture is light travelling over a surface. Runs on the resolve,
+   never on a loop — this is a structural beat, not ambient. */
+.ob-vf-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(104deg, transparent 32%, var(--ob-glass-sheen) 48%, transparent 64%);
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.ob-vf-strip[data-state] .ob-vf-sheen {
+  animation: ob-vf-sheen 1100ms var(--ob-ease) both;
+}
+
+@keyframes ob-vf-sheen {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  74% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* --- the caption --------------------------------------------------------- */
+
+/* A floating line, not a footer bar: no top rule, no background, no bar height.
+   It sits at the bottom of the scene the way a plate sits under a figure. */
+.ob-vf-caption {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  /* One line, always. Wrapped, the caption grows upward into the last strip —
+     and it is the only thing in this scene laid out by flow rather than by
+     absolute position, so it is the only thing that can. */
+  white-space: nowrap;
+}
+
+.ob-vf-footnote {
+  margin-right: auto;
+}
+
+.ob-vf-stage {
+  animation: ob-vf-label var(--ob-base) var(--ob-ease) both;
+}
+
+@keyframes ob-vf-label {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+/* The settled counterpart to `.ob-dot`. Same 6px circle, dim and still — the
+   run is over, so there is nothing live left to report. */
+.ob-vf-rest-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ob-dim);
+}
+
+/* `line-height: 1` is load-bearing: `.ob-btn` inherits the body's 1.6, which
+   makes a 12px label a 19px line and pushes the caption row out of alignment
+   with the status dot beside it. */
+.ob-vf-replay {
+  line-height: 1;
+  padding-block: 9px;
+  margin-block: -9px;
+  color: var(--ob-dim);
+}
+
+.ob-vf-replay:hover:not(:disabled) {
+  color: var(--ob-text);
 }
 
 /* ============================================================
@@ -1226,8 +2541,62 @@ body::before {
     transform: scaleX(1);
   }
 
+  /* The Idea Session renders every step settled under reduced motion, and the
+     transcript has to already BE at the end — a smooth scroll to get there is
+     motion the blanket above cannot reach, because `scroll-behavior` is not a
+     transition or an animation. */
+  .ob-session-scroll {
+    scroll-behavior: auto;
+  }
+
+  /* The pointer and the replay control are never mounted under reduced motion
+     (the component's `reduced` branch drops both), so there is no end state to
+     pin here. This comment is the record that the omission is deliberate — an
+     absent rule in this block is otherwise indistinguishable from a forgotten
+     one, which is exactly what the completeness diff exists to catch. */
+
   .ob-verdict {
     opacity: 1;
     transform: none;
+  }
+
+  /* The Validate Field renders its LAST stage under reduced motion, so most of
+     §11b resolves through the `[data-lit]`/`[data-in]`/`[data-state]`
+     attributes the component already sets. What the blanket above cannot reach
+     is everything driven by `animation`, and this scene is built on perpetual
+     animation — so the whole float has to be named and stopped here.
+
+     **"Auto-advancing content is motion too", and so is content that never
+     stops.** A drifting scene is precisely what a visitor asking for reduced
+     motion is asking not to have, and `animation-duration: 0.001ms` above only
+     snaps each loop to its END keyframe — leaving every object permanently
+     offset by 6px, -9px and rotated 0.4°, which looks like a bug rather than a
+     resting composition. `animation: none` is the only thing that puts them
+     back where they were designed to sit.
+
+     The pointer tilt needs no rule: the component's `reduced` branch never
+     attaches the listener, so `--mx`/`--my` stay unset and every `var(…, 0)`
+     fallback resolves to zero. The replay control is likewise never mounted. */
+  .ob-vf-bob,
+  .ob-vf-light-a,
+  .ob-vf-light-b,
+  .ob-vf-light-c,
+  .ob-vf-stage,
+  .ob-vf-strip[data-state] .ob-vf-sheen {
+    animation: none;
+  }
+
+  /* The lights keep their painted position but stop swimming; the sheen is the
+     depiction of a verification happening, and nothing is happening any more. */
+  .ob-vf-sheen {
+    display: none;
+  }
+
+  .ob-vf-line {
+    stroke-dashoffset: 0;
+  }
+
+  .ob-vf-wiper {
+    transform: scaleX(1);
   }
 }

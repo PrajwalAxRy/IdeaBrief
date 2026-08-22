@@ -1,10 +1,8 @@
 import {
   FRAGMENT_CONVERSATION,
-  FRAGMENT_EVIDENCE,
   FRAGMENT_ROADMAP,
   type PillarFragment,
 } from '@/lib/content/landing';
-import { Check } from 'lucide-react';
 
 /**
  * Product fragments — real UI surfaces rendered in the marketing page rather
@@ -15,7 +13,8 @@ import { Check } from 'lucide-react';
  */
 export function Fragment({ kind }: { kind: PillarFragment }) {
   if (kind === 'conversation') return <BriefFragment />;
-  if (kind === 'evidence') return <EvidenceFragment />;
+  /* `'evidence'` never arrives here: `Pillars` routes pillar 02 to
+     `ValidateSession`, which supersedes the static evidence list. */
   return <RoadmapFragment />;
 }
 
@@ -45,40 +44,6 @@ function BriefFragment() {
           </div>
         ))}
         <p className="ob-meta mt-5">{FRAGMENT_CONVERSATION.footnote}</p>
-      </div>
-    </div>
-  );
-}
-
-/** Pillar 02 — the evidence stream, including one row that did not survive. */
-function EvidenceFragment() {
-  return (
-    <div className="ob-frag">
-      <FragHead title={FRAGMENT_EVIDENCE.title} status={FRAGMENT_EVIDENCE.status} />
-      <div className="ob-frag-body">
-        {FRAGMENT_EVIDENCE.rows.map((row) => (
-          <div className="ob-frag-row items-center" key={row.id}>
-            <span className="ob-frag-key ob-meta w-[74px]">{row.id}</span>
-            {/* Domain stacks under the finding rather than trailing it — inline
-                it wrapped mid-sentence at this column width. */}
-            <span
-              className="flex flex-1 flex-col gap-1"
-              style={row.verified ? undefined : { opacity: 0.4 }}
-            >
-              <span className="ob-body ob-body-bright text-[15px] leading-snug">{row.text}</span>
-              <span className="ob-meta">{row.domain}</span>
-            </span>
-            {row.verified ? (
-              <span className="ob-chip ob-chip-verified">
-                <Check size={10} aria-hidden="true" />
-                Verified
-              </span>
-            ) : (
-              <span className="ob-chip">Discarded</span>
-            )}
-          </div>
-        ))}
-        <p className="ob-meta mt-5">{FRAGMENT_EVIDENCE.footnote}</p>
       </div>
     </div>
   );

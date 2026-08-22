@@ -3,45 +3,57 @@
 import { PILLARS, PILLARS_SECTION } from '@/lib/content/landing';
 import { useEffect, useRef, useState } from 'react';
 import { Fragment } from './fragments';
+import { IdeaSession } from './idea-session';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionHead } from './section-head';
+import { ValidateSession } from './validate-session';
 
 /**
  * The three pillars, as sticky-left / scrolling-right scrollytelling.
  *
  * The heading column pins while the panels move past it and hand off one at a
  * time — the pinned feel, without ever taking the scrollbar away from the user.
- * Nothing here hijacks or scrubs the scroll; a single IntersectionObserver
- * watching a thin band across the viewport middle decides which panel is live.
+ * Nothing here hijacks or scrubs the scroll.
  */
 export function Pillars() {
   const panelRefs = useRef<(HTMLElement | null)[]>([]);
+  const titleRefs = useRef<(HTMLElement | null)[]>([]);
   const [active, setActive] = useState(0);
 
+  /* A panel goes live exactly when *its own title* crosses the reader's
+   * eyeline (viewport middle) — not when the panel's outer box (title + body
+   * + a sizeable animated fragment, which can run far taller than a title)
+   * happens to overlap some band. An IntersectionObserver watching whole
+   * panels was tried first: on a tall panel, the callback batch that reported
+   * the outgoing panel's bottom leaving the band could land separately from
+   * the one reporting the incoming panel's top entering it, so the active
+   * fragment dimmed while still on screen and the next one lit before its
+   * title had actually arrived. `useScrollSpy` hit the same class of bug for
+   * the report's section index and fixed it the same way: recompute from live
+   * `getBoundingClientRect()`s against a fixed line, driven by scroll, instead
+   * of trusting whatever the observer batched together.
+   */
   useEffect(() => {
-    const nodes = panelRefs.current.filter((n): n is HTMLElement => n !== null);
-    if (nodes.length === 0 || typeof IntersectionObserver === 'undefined') return;
+    const titles = titleRefs.current;
+    if (titles.length === 0) return;
 
-    const visible = new Set<number>();
+    function recompute() {
+      const mid = window.innerHeight / 2;
+      let current = 0;
+      for (let i = 0; i < titles.length; i++) {
+        const el = titles[i];
+        if (el && el.getBoundingClientRect().top <= mid) current = i;
+      }
+      setActive(current);
+    }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const index = Number((entry.target as HTMLElement).dataset.index);
-          if (entry.isIntersecting) visible.add(index);
-          else visible.delete(index);
-        }
-        /* Keep the last active when the band falls between panels, rather than
-           resetting to 0 and making the rail flicker. */
-        if (visible.size > 0) setActive(Math.min(...visible));
-      },
-      /* A 10%-tall band across the middle of the viewport. A panel becomes live
-         when it crosses the reader's eyeline, not when it first appears. */
-      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
-    );
-
-    for (const node of nodes) observer.observe(node);
-    return () => observer.disconnect();
+    recompute();
+    window.addEventListener('scroll', recompute, { passive: true });
+    window.addEventListener('resize', recompute);
+    return () => {
+      window.removeEventListener('scroll', recompute);
+      window.removeEventListener('resize', recompute);
+    };
   }, []);
 
   return (
@@ -85,7 +97,6 @@ export function Pillars() {
           {PILLARS.map((pillar, i) => (
             <article
               key={pillar.index}
-              data-index={i}
               data-dim={i !== active}
               className="ob-pillar-panel"
               ref={(node) => {
@@ -97,13 +108,30 @@ export function Pillars() {
                 <span className="ob-meta">{pillar.kicker}</span>
               </div>
 
-              <h3 className="ob-h2 mt-6 max-w-[17ch]">{pillar.title}</h3>
+              <h3
+                className="ob-h2 mt-6 max-w-[17ch]"
+                ref={(node) => {
+                  titleRefs.current[i] = node;
+                }}
+              >
+                {pillar.title}
+              </h3>
               <p className="ob-body mt-6 max-w-[58ch]">{pillar.body}</p>
 
               <p className="ob-body ob-proof mt-6 max-w-[52ch]">{pillar.proof}</p>
 
+              {/* This wrapper is the whole of pillars 01 and 02's scroll-driven
+                  motion: the card's entrance. `IdeaSession` and
+                  `ValidateSession` each run on their own timer once in view,
+                  and neither is ever scroll-scrubbed. */}
               <ScrollReveal delay={120} className="mt-10">
-                <Fragment kind={pillar.fragment} />
+                {pillar.fragment === 'conversation' ? (
+                  <IdeaSession />
+                ) : pillar.fragment === 'evidence' ? (
+                  <ValidateSession />
+                ) : (
+                  <Fragment kind={pillar.fragment} />
+                )}
               </ScrollReveal>
             </article>
           ))}

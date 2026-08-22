@@ -125,4 +125,58 @@
      the geometry itself is written in the recipes, not stored here. */
   --ob-grid: rgba(244, 244, 245, 0.06);
   --ob-hatch: rgba(244, 244, 245, 0.1);
+
+  /* ------------------------------------------------------------------
+     Glass field — pillar 02's floating scene on `/`, and nothing else.
+
+     **These are an addition to a list C2 declared closed, made knowingly.**
+     The alternative was colour literals in a component, which the rule at the
+     top of this file forbids outright; the escape hatch it names is a token.
+     They are grouped and prefixed so the blast radius is legible, and no app
+     surface references any of them.
+
+     Two things they are doing that the rest of the system does not:
+
+     - **Glass needs a lit backdrop or it is invisible.** On `#0A0A0B` a
+       translucent pane over nothing is just a slightly lighter rectangle.
+       The blooms below are the light the panes refract; without them the
+       whole treatment collapses. They exist only at `blur(70px)+`.
+     - **`--ob-bloom-violet` is a second hue, deliberately.** One hue blurred
+       across a whole scene reads as a coloured wash; two reads as a lit
+       space, because glass picks up different light at different depths.
+       It is never permitted to appear as a solid, an edge or a text colour —
+       only as out-of-focus light, which is why it needs no dark-on-light
+       contrast story.
+     ------------------------------------------------------------------ */
+  --ob-glass-hi: rgba(255, 255, 255, 0.075);
+  --ob-glass-lo: rgba(255, 255, 255, 0.022);
+  --ob-glass-edge: rgba(255, 255, 255, 0.11);
+  --ob-glass-edge-lit: rgba(255, 255, 255, 0.2);
+  --ob-glass-sheen: rgba(255, 255, 255, 0.16);
+  --ob-glass-cast: rgba(0, 0, 0, 0.55);
+  /* Measured down from 0.44/0.30/0.09, which produced a solid blue field rather
+     than a dark volume with lights in it — every dim grey in the scene went
+     illegible against its own backdrop. The scene has to read mostly BLACK,
+     with the light doing just enough to give the glass something to refract. */
+  --ob-bloom-accent: rgba(45, 127, 249, 0.17);
+  --ob-bloom-violet: rgba(74, 92, 219, 0.13);
+  --ob-bloom-pale: rgba(214, 226, 255, 0.05);
+  /* Stronger than the three above, and allowed to be only because it is AIMED:
+     one small pool behind the single place two glass panes cross, lit only once
+     they are crossing. The three above wash a whole scene, which is why they had
+     to come down to 0.17; this one is read through two stacked panes that each
+     attenuate it, and it never sits behind body text on its own. */
+  --ob-bloom-focus: rgba(45, 127, 249, 0.22);
+  /* Light pooled INSIDE a glass pane rather than behind it — the callout's
+     lower band, which a conclusion strip crosses. Stronger than the ambient
+     blooms for the same reason as `--ob-bloom-focus`: it is small, it is bounded
+     by one pane, and it pools where that pane has no text on it. */
+  /* Where one glass pane crosses in front of another, the front one has to
+     actually OCCLUDE — and `backdrop-filter` cannot do that job here. Chrome
+     does not sample an element that itself carries a `backdrop-filter` into
+     another element's backdrop, so two stacked glass panes never blur each
+     other at any radius (40px was tried; the pane behind still read as sharp
+     text through the one in front). Only real opacity hides it. Applied as a
+     narrow edge ramp, never to a whole pane — see `.ob-vf-strip .ob-vf-glass`. */
+  --ob-glass-veil: rgba(10, 10, 11, 0.78);
 }
