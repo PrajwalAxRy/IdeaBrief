@@ -20,7 +20,7 @@ export const HERO = {
   /* Split into lines by hand so the per-word mask reveal breaks where the
      design wants it to, not where the browser happens to wrap. */
   headlineLines: ['Go from an idea', 'to a roadmap', 'you can Trust.'],
-  lead: 'Describe what you’re thinking about — even if that’s “something in fitness, I don’t know what yet.” Five minutes later you have a written brief, the evidence, and a plan.',
+  lead: 'Describe what you’re thinking about — even “something in fitness, not sure what yet.” Five minutes later: a brief, the evidence, and a plan.',
   primary: { label: 'Start with an idea', href: '#start' },
   secondary: { label: 'See a finished run', href: '/r/demo' },
   cue: 'Scroll',
@@ -129,7 +129,7 @@ export type Pillar = {
 export const PILLARS_SECTION = {
   eyebrow: 'What you do here',
   headline: 'Three things, and nothing else.',
-  lead: 'Every part of this product sits inside one of them. If a feature doesn’t, it isn’t built.',
+  lead: 'Every feature lives in one of them. Nothing else gets built.',
 } as const;
 
 export const PILLARS: Pillar[] = [
@@ -137,24 +137,23 @@ export const PILLARS: Pillar[] = [
     index: '01',
     kicker: 'Define',
     title: 'Say it out loud until it’s clear.',
-    body: 'Talk to something that behaves like a thoughtful cofounder. It asks what it actually needs to ask, in whatever order makes sense. It pushes back when your customer is “everyone” and when your first version is six months of work. And it takes “I don’t know” as a real answer every single time — each one becomes a research question or an open question instead of a wall.',
-    proof: 'Ends with a written brief on screen. Edit any field, then approve it.',
+    body: 'Talk it through with something that acts like a sharp cofounder. It pushes back when your customer is “everyone” or your first version is six months of work — and it takes “I don’t know” as a real answer, turning it into a question instead of a wall.',
+    proof: 'Ends with a written brief. Edit any field, then approve it.',
     fragment: 'conversation',
   },
   {
     index: '02',
     kicker: 'Validate',
     title: 'Find out what the world already knows.',
-    body: 'One research run, the same for every idea — no routing, no specialisation. It writes its own search queries across five dimensions, reads around thirty pages, and reports what is actually there: who else is doing this, what they charge, where people describe this problem in their own words, and what would materially shape the build.',
-    proof:
-      'Findings land on screen as they are verified. No score, no verdict, no fake percentage.',
+    body: 'One research run, the same for every idea. It searches five dimensions, reads about thirty pages, and reports what’s actually there: competitors, pricing, real complaints, and anything that would change the build.',
+    proof: 'Findings appear as they’re verified. No score, no verdict, no fake percentage.',
     fragment: 'evidence',
   },
   {
     index: '03',
     kicker: 'Roadmap',
     title: 'Leave knowing what to do on Monday.',
-    body: 'Two lists. First, the questions the web cannot answer — each with the interview script written out word for word, who to ask, where to find them, and what a yes or a no would mean for the build. Then a plan that names the smallest thing worth making first and is blunt about what not to build yet.',
+    body: 'Two lists. Questions the web can’t answer — each with a ready-to-use interview script and who to ask. Then a plan naming the smallest thing worth building first, and what to skip for now.',
     proof: 'Four to seven questions, ordered by how much the answer would change the plan.',
     fragment: 'roadmap',
   },
@@ -165,9 +164,8 @@ export const PILLARS: Pillar[] = [
 export const VERIFICATION_SECTION = {
   eyebrow: 'The mechanic',
   headline: 'The one thing a chat prompt can’t do.',
-  body: 'Ask a model to research your idea and it will hand you confident, well-written, unfalsifiable prose. This does something dumber and far more useful: before an excerpt is allowed anywhere near your report, it is matched against the text of the page it was taken from. No match, it is discarded — quietly, and without being rewritten into something vaguer.',
-  kicker:
-    'It takes milliseconds, needs no model, and it is the entire difference between research and confident fiction.',
+  body: 'Ask a model to research your idea and you get confident, unfalsifiable prose. This does something dumber and more useful: every excerpt is checked against the page it came from. No match, it’s discarded — quietly, never softened into something vaguer.',
+  kicker: 'Milliseconds, no model needed — and the entire difference between research and confident fiction.',
 } as const;
 
 export type EvidenceDemo = {
@@ -223,15 +221,14 @@ export type ChatTurn = { role: 'user' | 'ai'; text: string };
 export const CHAT_SECTION = {
   eyebrow: 'Start here',
   headline: 'Talk to it.',
-  lead: 'What follows is the actual first screen. A sentence, a paragraph, or a direction you can’t name yet — all three are valid openings.',
+  lead: 'This is the actual first screen. A sentence, a paragraph, or a direction you can’t quite name yet — any of those works.',
   composerPlaceholder: 'I want to do something in fitness, I don’t know what yet…',
   seedsLabel: 'Try',
   seeds: ['dental recall SMS', 'a tool for freelance editors', 'something in fitness'],
   submitLabel: 'Start',
   submittingLabel: 'Starting',
   hint: '⌘ ↵ to start',
-  footnote:
-    'No signup. The run lives at its own URL — bookmark it, send it to someone, come back to it next week.',
+  footnote: 'No signup. Your run lives at its own URL — bookmark it, share it, come back anytime.',
   replayLabel: 'Replay',
 } as const;
 
@@ -664,7 +661,7 @@ export const FRAGMENT_CONVERSATION = {
     { key: 'Makes money', value: 'unknown', unknown: true },
     { key: 'Found how', value: 'unknown', unknown: true },
   ],
-  footnote: '2 unknowns → open questions. Nothing was invented to fill them.',
+  footnote: '2 unknowns → open questions. Nothing invented to fill them.',
 } as const;
 
 /* `FRAGMENT_EVIDENCE` was here. Pillar 02 now renders `ValidateSession`, which
@@ -675,7 +672,7 @@ export const FRAGMENT_ROADMAP = {
   status: 'Changes the plan most',
   question: 'Do clinics already track which patients are overdue?',
   matters:
-    'If the list exists, this is an automation product. If it does not, you are building the list first — a different product and a much harder sell.',
+    'If the list exists, this is automation. If not, you’re building the list first — a different, harder product.',
   script: [
     'Walk me through what happens when a patient misses a recall.',
     'How do you know who is overdue right now?',
