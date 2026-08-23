@@ -76,6 +76,23 @@ type Stage = (typeof STAGES)[number];
  */
 const FIRST_STRIP_UNDER_FIELD = 1;
 
+/**
+ * How long into the model beat the callout arrives.
+ *
+ * The beat builds in the order the figure would be drawn by hand: the line
+ * (1500ms to draw), the head landing on it (1420ms), the cone wiping open from
+ * that head (1620ms + 720ms, both in CSS), then this pane. 2460 sits after the
+ * cone has finished drawing and still leaves the 3900ms beat enough room for the
+ * figures to count up — the count is 1150ms and the entrance 760ms, so it lands
+ * with ~270ms to spare. Slide the cone and this has to slide with it.
+ *
+ * **It is a timer here rather than a `transition-delay` in CSS because it gates
+ * the COUNT as well as the entrance.** The count-up runs off this flag; left on
+ * `lit`, it would run while the pane was still invisible and the pane would
+ * arrive already showing $84k.
+ */
+const CALLOUT_ENTER_MS = 2460;
+
 const STAGE_HOLD: Record<Stage, number | null> = {
   wake: VALIDATE_STAGE_MS.wake,
   model: VALIDATE_STAGE_MS.model,
@@ -131,6 +148,7 @@ export function ValidateSession() {
   const [index, setIndex] = useState(0);
   const [resolved, setResolved] = useState(0);
   const [runId, setRunId] = useState(0);
+  const [calloutIn, setCalloutIn] = useState(false);
 
   const playing = inView && !reduced;
   /* Drives the timer chain: where the run actually is. */
@@ -160,6 +178,23 @@ export function ValidateSession() {
     setResolved(0);
     setRunId((n) => n + 1);
   }, []);
+
+  /* The callout is the third thing the model beat draws, after the line and the
+     cone. Under reduced motion the whole scene is settled from first paint, so
+     it is simply in. */
+  useEffect(() => {
+    if (reduced) {
+      setCalloutIn(true);
+      return;
+    }
+    if (!lit) {
+      setCalloutIn(false);
+      return;
+    }
+    if (!playing) return;
+    const timer = window.setTimeout(() => setCalloutIn(true), CALLOUT_ENTER_MS);
+    return () => window.clearTimeout(timer);
+  }, [playing, lit, reduced]);
 
   useEffect(() => {
     if (!playing) return;
@@ -244,7 +279,7 @@ export function ValidateSession() {
           arrays, so it cannot drift — is what gets read. */}
       <div className="ob-vf-volume" aria-hidden="true" key={runId}>
         <Curve lit={lit} receded={receded} />
-        <Callout lit={lit} receded={receded} />
+        <Callout shown={calloutIn} receded={receded} />
 
         {/* Conclusions first — and the competitors AFTER them, because in a
             `transform-style: flat` volume tree order is the z-order. Swapping
@@ -370,6 +405,23 @@ function Curve({ lit, receded }: { lit: boolean; receded: boolean }) {
             <clipPath id="ob-vf-wipe" clipPathUnits="userSpaceOnUse">
               <rect className="ob-vf-wiper" x="0" y="0" width={VB.w} height={VB.h} />
             </clipPath>
+            {/* The cone is REVEALED by a clip, not faded in — it has to draw out
+                from the head the way the line draws, and it starts at `DATA_W`
+                because that is where the line stops and the cone begins.
+
+                A clip rather than the line's `stroke-dashoffset` trick, because
+                the rails carry a dash pattern of their own and `stroke-dasharray`
+                cannot do both jobs at once. Clipping also reveals the fill and
+                both rails together, which draw-on would not. */}
+            <clipPath id="ob-vf-cone-wipe" clipPathUnits="userSpaceOnUse">
+              <rect
+                className="ob-vf-cone-wiper"
+                x={DATA_W}
+                y="0"
+                width={VB.w - DATA_W}
+                height={VB.h}
+              />
+            </clipPath>
           </defs>
 
           <g clipPath="url(#ob-vf-wipe)">
@@ -377,9 +429,12 @@ function Curve({ lit, receded }: { lit: boolean; receded: boolean }) {
           </g>
 
           <path className="ob-vf-baseline" d={paths.base} />
-          <path className="ob-vf-cone-fill" d={paths.wedge} />
-          <path className="ob-vf-cone" d={paths.high} pathLength="1" />
-          <path className="ob-vf-cone" d={paths.low} pathLength="1" />
+
+          <g clipPath="url(#ob-vf-cone-wipe)">
+            <path className="ob-vf-cone-fill" d={paths.wedge} />
+            <path className="ob-vf-cone" d={paths.high} pathLength="1" />
+            <path className="ob-vf-cone" d={paths.low} pathLength="1" />
+          </g>
           <path className="ob-vf-line" d={paths.line} pathLength="1" stroke="url(#ob-vf-stroke)" />
         </svg>
 
@@ -402,15 +457,19 @@ function Curve({ lit, receded }: { lit: boolean; receded: boolean }) {
 /**
  * The headline figure, on the only pane that never leaves.
  *
+ * It is the LAST of the three things the model beat draws — the line, the cone
+ * it opens into, then this. `shown` is not `lit`: it flips `CALLOUT_ENTER_MS`
+ * after the beat starts, and it starts the count-up as well as the entrance.
+ *
  * The first conclusion strip crosses it and covers its `Payback` row outright.
  * That is intended: the strips are the front plane. This pane keeps the scene's
  * plain glass surface and carries nothing to accommodate the crossing — the
  * occlusion lives on the strip in front of it.
  */
-function Callout({ lit, receded }: { lit: boolean; receded: boolean }) {
-  const v = useCountUp(peak, lit && !receded, 1150);
+function Callout({ shown, receded }: { shown: boolean; receded: boolean }) {
+  const v = useCountUp(peak, shown && !receded, 1150);
   return (
-    <div className="ob-vf-callout" data-in={lit}>
+    <div className="ob-vf-callout" data-in={shown}>
       {/* Drifts with the strips (`--d: 5`), not on its own phase — the first
           strip crosses this pane's lower edge, and an overlap whose depth
           changes every few seconds reads as jitter. */}
@@ -426,7 +485,7 @@ function Callout({ lit, receded }: { lit: boolean; receded: boolean }) {
         <span className="ob-vf-hair" />
         <span className="ob-vf-stats">
           {stats.map((s) => (
-            <Stat key={s.label} stat={s} run={lit && !receded} />
+            <Stat key={s.label} stat={s} run={shown && !receded} />
           ))}
         </span>
       </div>

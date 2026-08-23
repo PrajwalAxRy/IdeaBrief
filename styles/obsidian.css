@@ -1746,31 +1746,49 @@ body::before {
   transition: opacity var(--ob-base) var(--ob-ease) 700ms;
 }
 
+/* Dashes, not the near-dots this was (0.013/0.013). `pathLength="1"` on the
+   rails means these are fractions of the rail's own length, so the pattern holds
+   at any width the scene is read at instead of getting finer as the figure grows.
+
+   0.04, not the 0.055 tried first: the rails turn hard where the cone flares, and
+   a dash long enough to span that curvature reads as a scalloped fringe rather
+   than as a dashed line. */
 .ob-vf-cone {
   fill: none;
-  stroke: var(--ob-hairline-strong);
+  stroke: var(--ob-cone-edge);
   stroke-width: 1;
-  stroke-dasharray: 0.013 0.013;
-  opacity: 0;
-  transition: opacity var(--ob-base) var(--ob-ease) 1350ms;
+  stroke-dasharray: 0.04 0.026;
+  opacity: 0.9;
 }
 
 .ob-vf-cone-fill {
-  fill: var(--ob-hover-wash);
-  opacity: 0;
-  transition: opacity var(--ob-base) var(--ob-ease) 1350ms;
+  fill: var(--ob-cone-fill);
+  opacity: 1;
+}
+
+/* The cone's reveal, and the third beat of four. The whole model beat draws in
+   the order a hand would: line (1500ms), head (1420ms, landing as the line
+   reaches it), cone (1620ms + 720ms), then the pane that states the number
+   (`CALLOUT_ENTER_MS` — a JS timer, because that one gates the count-up too).
+   1620 is after the line has finished, so the cone never opens from a line that
+   is not there yet; the four numbers are a chain and moving one moves the rest.
+
+   No opacity transition on the two rules above: the clip is what reveals them,
+   and `scaleX(0)` hides them until it runs. Fading as well would put a ghost of
+   the whole cone on screen before it had drawn. */
+.ob-vf-cone-wiper {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 720ms var(--ob-ease) 1620ms;
+}
+
+.ob-vf-curve[data-lit="true"] .ob-vf-cone-wiper {
+  transform: scaleX(1);
 }
 
 .ob-vf-curve[data-lit="true"] .ob-vf-baseline {
   opacity: 0.85;
-}
-
-.ob-vf-curve[data-lit="true"] .ob-vf-cone {
-  opacity: 0.62;
-}
-
-.ob-vf-curve[data-lit="true"] .ob-vf-cone-fill {
-  opacity: 0.5;
 }
 
 .ob-vf-wiper {
@@ -1799,7 +1817,8 @@ body::before {
   box-shadow: 0 0 0 4px var(--ob-accent-wash), 0 0 16px 2px var(--ob-accent-glow);
   opacity: 0;
   transform: scale(0.3);
-  transition: opacity var(--ob-base) var(--ob-ease) 1320ms, transform 520ms var(--ob-ease) 1320ms;
+  /* 1420, so the head lands as the line reaches it rather than ahead of it. */
+  transition: opacity var(--ob-base) var(--ob-ease) 1420ms, transform 520ms var(--ob-ease) 1420ms;
 }
 
 .ob-vf-curve[data-lit="true"] .ob-vf-head {
@@ -1830,7 +1849,10 @@ body::before {
   transform: translate3d(28px, -18px, -260px) rotateY(-13deg);
   transition: opacity 760ms var(--ob-ease), filter 760ms var(--ob-ease), transform var(--ob-enter)
     var(--ob-ease);
-  transition-delay: 460ms;
+  /* No `transition-delay` here any more. This pane is the LAST of the three
+     things the model beat draws — line, cone, then the number — and its arrival
+     is owned by `CALLOUT_ENTER_MS` in the component, because the same moment has
+     to start the count-up. A delay here would stack on top of that one. */
 }
 
 .ob-vf-callout[data-in="true"] {

@@ -192,4 +192,11 @@
      `Payback` ghost through it again. 0.78 held at the old bloom levels, 0.84
      holds at these. Re-check it if the blooms move. */
   --ob-glass-veil: rgba(10, 10, 11, 0.84);
+  /* The cone past month 12 — the wedge the projection opens into, and the thing
+     that visually carries the eye from the curve to the pane that states its
+     number. It was drawn in `--ob-hairline-strong` over `--ob-hover-wash`, which
+     composited to about 2% white and read as an artefact rather than as part of
+     the figure. White, and enough of it to be the connection it is. */
+  --ob-cone-fill: rgba(244, 244, 245, 0.12);
+  --ob-cone-edge: rgba(244, 244, 245, 0.34);
 }
