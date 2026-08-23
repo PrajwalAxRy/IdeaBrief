@@ -1,5 +1,6 @@
 'use client';
 
+import { SectionLabel } from '@/components/ui/section-label';
 import { PILLARS, PILLARS_SECTION } from '@/lib/content/landing';
 import { useEffect, useRef, useState } from 'react';
 import { Fragment } from './fragments';
@@ -103,10 +104,7 @@ export function Pillars() {
                 panelRefs.current[i] = node;
               }}
             >
-              <div className="flex items-baseline gap-4">
-                <span className="ob-pillar-index">{pillar.index}</span>
-                <span className="ob-meta">{pillar.kicker}</span>
-              </div>
+              <SectionLabel index={pillar.index}>{pillar.kicker}</SectionLabel>
 
               <h3
                 className="ob-h2 mt-6 max-w-[17ch]"

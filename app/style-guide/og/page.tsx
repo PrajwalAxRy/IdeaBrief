@@ -135,7 +135,7 @@ export default async function OgCardsPage() {
     {
       name: 'default',
       eyebrow: '',
-      headline: 'From a hunch to something you can defend.',
+      headline: 'Go from an idea to a roadmap you can Trust.',
       meta: ['NO SCORE', 'NO VERDICT', 'NO LOGIN'],
     },
     {

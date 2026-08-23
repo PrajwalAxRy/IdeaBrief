@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: 'Groundwork',
   title: {
-    default: 'Groundwork — from a hunch to something you can defend',
+    default: 'Groundwork — go from an idea to a roadmap you can Trust',
     template: '%s — Groundwork',
   },
   description:
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Groundwork',
     url: '/',
-    title: 'Groundwork — from a hunch to something you can defend',
+    title: 'Groundwork — go from an idea to a roadmap you can Trust',
     description:
       'An evidence-backed picture of an early idea. Every claim matched to text on a real page.',
     images: [

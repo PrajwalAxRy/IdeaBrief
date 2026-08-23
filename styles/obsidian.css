@@ -262,7 +262,7 @@ body::before {
 .ob-body {
   font-size: var(--ob-body);
   line-height: var(--ob-leading-body);
-  color: var(--ob-muted);
+  color: var(--ob-text);
   margin: 0;
 }
 
@@ -375,12 +375,20 @@ body::before {
 /* Bare — text with an arrow, for tertiary placement. */
 .ob-btn-bare {
   padding-inline: 0;
-  font-size: var(--ob-meta);
+  font-size: var(--ob-body);
   color: var(--ob-text);
 }
 
 .ob-btn-bare:hover:not(:disabled) {
   color: var(--ob-text);
+}
+
+/* Scoped to the nav shell — "See a finished run" sits next to plain-text
+   nav links at the same brightness now, so it needs the underline to still
+   read as a link rather than a fourth label. */
+.ob-nav-inner .ob-btn-bare {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .ob-btn-bare .ob-arrow {
@@ -392,40 +400,15 @@ body::before {
 }
 
 /* ============================================================
-   5. Badge / pill — the hero eyebrow and status chips.
+   5. Badge / pill — status chips.
+
+   `.ob-badge` / `.ob-badge-tag` lived here and carried the hero eyebrow
+   ("NEW — every excerpt is checked against the page it came from"). The
+   eyebrow was removed from the hero and nothing else used the recipe, so it
+   is gone rather than left as dead CSS. The canonical version survives in
+   `.claude/skills/obsidian-design/assets/recipes.css` if a badge is ever
+   wanted again.
    ============================================================ */
-
-.ob-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 6px 6px 14px;
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-pill);
-  background: var(--ob-surface);
-  color: var(--ob-muted);
-  font-size: var(--ob-sm);
-  letter-spacing: var(--ob-tracking-snug);
-  transition: border-color var(--ob-base) var(--ob-ease);
-}
-
-.ob-badge:hover {
-  border-color: var(--ob-hairline-strong);
-}
-
-.ob-badge-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 9px;
-  border-radius: var(--ob-r-pill);
-  background: var(--ob-accent);
-  color: var(--ob-on-accent);
-  font-family: var(--ob-font-mono);
-  font-size: 10px;
-  font-weight: var(--ob-weight-meta);
-  letter-spacing: var(--ob-tracking-meta);
-  text-transform: uppercase;
-}
 
 /* Live dot — the only thing that pulses. */
 .ob-dot {
@@ -490,29 +473,11 @@ body::before {
   backdrop-filter: blur(14px);
 }
 
-.ob-nav-link {
-  font-size: var(--ob-meta);
-  letter-spacing: var(--ob-tracking-snug);
-  color: var(--ob-text);
-  transition: color var(--ob-fast) var(--ob-ease);
-}
-
-/* `.ob-btn-bare` already carries the meta size/colour globally now. `.ob-btn-ghost`
-   ("Start") still needs the smaller nav size — scoped here, not on `.ob-btn`
-   itself, so ghost buttons elsewhere in the app keep their normal size. */
+/* Scoped to the nav shell so "Start" keeps the larger, brighter nav-link size
+   the header settled on, without resizing `.ob-btn-ghost` everywhere else
+   it's used in the app. */
 .ob-nav-inner .ob-btn-ghost {
-  font-size: var(--ob-meta);
-}
-
-.ob-nav-link:hover,
-.ob-nav-link:focus-visible {
-  color: var(--ob-text);
-  outline: none;
-}
-
-.ob-nav-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 5px;
+  font-size: var(--ob-body);
 }
 
 /* The nav CTA is held back until the hero's primary button has scrolled away,
@@ -751,6 +716,7 @@ body::before {
   gap: 18px;
   padding-inline: 18px;
   white-space: nowrap;
+  font-size: var(--ob-body);
 }
 
 /* Dim, not accent. Blue has three jobs — verification, the primary action, and
@@ -791,6 +757,15 @@ body::before {
   flex: 1;
   height: 1px;
   background: var(--ob-hairline);
+}
+
+/* One step up from bare `.ob-meta` (12px, `--ob-dim`) — every numbered section
+   overline shares this bump (`SectionHead`, `SectionLabel`, the pillar panel
+   header), scoped to the combination so the thousand other `.ob-meta` labels
+   in the app (timestamps, counts, captions) are untouched. */
+.ob-eyebrow.ob-meta {
+  font-size: var(--ob-sm);
+  color: var(--ob-text);
 }
 
 /* ============================================================
@@ -2639,7 +2614,7 @@ body::before {
 
 .ob-footer-link {
   color: var(--ob-text);
-  font-size: var(--ob-meta);
+  font-size: var(--ob-body);
   transition: color var(--ob-fast) var(--ob-ease);
 }
 
@@ -2689,6 +2664,14 @@ body::before {
 
 [data-shown="true"] .ob-word {
   transform: none;
+}
+
+/* "Trust" is the hero's one deliberate exception to "blue means action,
+   verification, live state" — it's doing the verification job a beat early,
+   naming the thing the rest of the page proves. Scoped to the hero headline
+   only; every other `WordReveal` stays plain text. */
+.ob-hero-headline .ob-word-line:last-child .ob-word:last-child {
+  color: var(--ob-accent);
 }
 
 /* ============================================================

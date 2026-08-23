@@ -1,7 +1,7 @@
 'use client';
 
 import { Wordmark } from '@/components/layout/wordmark';
-import { HERO, NAV_LINKS } from '@/lib/content/landing';
+import { HERO } from '@/lib/content/landing';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -45,14 +45,6 @@ export function SiteNav() {
         {/* One glyph definition in the repo. A2 re-authored `LogoMark` and
             deliberately left this call site to A4 — this is that dedupe. */}
         <Wordmark />
-
-        <nav aria-label="Primary" className="flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <a key={link.href} href={link.href} className="ob-nav-link">
-              {link.label}
-            </a>
-          ))}
-        </nav>
 
         <div className="flex items-center gap-4">
           <Link href={HERO.secondary.href} className="ob-btn ob-btn-bare">

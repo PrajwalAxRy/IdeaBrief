@@ -172,7 +172,7 @@ function Counter({ value, accent, label }: { value: number; accent: boolean; lab
   return (
     <div ref={ref} className="flex flex-col gap-3">
       <span className={accent ? 'ob-counter ob-counter-accent' : 'ob-counter'}>{shown}</span>
-      <span className="ob-meta">{label}</span>
+      <span className="ob-meta ob-meta-solid">{label}</span>
     </div>
   );
 }

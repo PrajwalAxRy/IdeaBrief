@@ -1,6 +1,5 @@
 import { MediaSlot } from '@/components/ui/media-slot';
 import { HERO } from '@/lib/content/landing';
-import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { HeroCollage } from './hero-collage';
 import { ScrollReveal } from './scroll-reveal';
@@ -24,14 +23,6 @@ export function Hero() {
       <div className="ob-hero-content ob-container">
         <div className="ob-hero-grid">
           <div className="ob-hero-copy flex flex-col items-start gap-8">
-            <ScrollReveal delay={80}>
-              <a href="#verification" className="ob-badge">
-                <span className="ob-badge-tag">{HERO.badge.tag}</span>
-                <span>{HERO.badge.text}</span>
-                <ArrowUpRight size={15} className="ob-arrow mr-3 shrink-0" aria-hidden="true" />
-              </a>
-            </ScrollReveal>
-
             <WordReveal
               as="h1"
               id="hero-headline"

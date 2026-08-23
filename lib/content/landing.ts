@@ -11,27 +11,15 @@
 
 export const BRAND = {
   name: 'Groundwork',
-  tagline: 'From a hunch to something you can defend.',
+  tagline: 'Go from an idea to a roadmap you can Trust.',
 } as const;
-
-/* ------------------------------------------------------------------ nav --- */
-
-export const NAV_LINKS = [
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Verification', href: '#verification' },
-  { label: 'Start', href: '#start' },
-] as const;
 
 /* ----------------------------------------------------------------- hero --- */
 
 export const HERO = {
-  badge: {
-    tag: 'New',
-    text: 'Every excerpt is checked against the page it came from',
-  },
   /* Split into lines by hand so the per-word mask reveal breaks where the
      design wants it to, not where the browser happens to wrap. */
-  headlineLines: ['From a hunch to', 'something you', 'can defend.'],
+  headlineLines: ['Go from an idea', 'to a roadmap', 'you can Trust.'],
   lead: 'Describe what you’re thinking about — even if that’s “something in fitness, I don’t know what yet.” Five minutes later you have a written brief, the evidence, and a plan.',
   primary: { label: 'Start with an idea', href: '#start' },
   secondary: { label: 'See a finished run', href: '/r/demo' },
