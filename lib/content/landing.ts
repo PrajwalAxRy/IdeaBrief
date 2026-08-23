@@ -502,17 +502,31 @@ export const VALIDATE_STAGE_MS = {
   model: 3900,
   /** Chart recedes; the assumptions land and each one resolves in turn. */
   verify: 3900,
-  /** The conclusions recede; three competitors swing in on an arc, in front of
-      everything, and close the scene.
-      4600, not 3300: each pane carries three drill-down metrics, and at 3300 the
-      last one had barely landed before the stage ended. */
-  field: 4600,
+  /** The conclusions recede; a scan card fills 0→100%, then three competitors
+      swing in on an arc, landing on top of it, and close the scene — the scan
+      card stays mounted underneath rather than exiting.
+      9600, not 7600: `VALIDATE_SCAN_MS` is 5000 — the bar needs to read as
+      genuinely working the field, not just clearing three seconds — and the
+      original 4600 for the three competitor panes (each carries three
+      drill-down metrics) is preserved in full after it rather than being
+      carved out of it. This pushes the whole card well past pillar 01's
+      ~14s pass; that "shorter than pillar 01" rule was a pacing preference,
+      not a hard limit, and loses to giving the scan real dwell time. */
+  field: 9600,
 } as const;
 
 /** Inside the verify stage: the settle after the stack lands, then one row
     resolving per beat. Was `collapse` when the competitive field ran first and
     its cards folded into these rows; nothing collapses into them now. */
 export const VALIDATE_VERIFY_MS = { settle: 1000, row: 640 } as const;
+
+/** Inside the field stage, before the cards: one shared scan card fills its
+    bar 0→100%, then the three competitor cards land on top of it — it stays
+    mounted underneath, covered rather than replaced. Kept alongside
+    `VALIDATE_VERIFY_MS` rather than as a component constant since it also has
+    to be reflected in `VALIDATE_STAGE_MS.field` above — a single source of
+    truth for a number that lives in two places. */
+export const VALIDATE_SCAN_MS = 5000;
 
 export type ValidateRow = {
   /** Evidence id, or an em-dash pair where there is nothing to cite. */
@@ -556,7 +570,12 @@ export const VALIDATE_SESSION = {
     /* Only ever shown if `done` is somehow false at rest; the caption swaps to
        `bar.done` there. Kept honest anyway. */
     rest: 'Competitive field',
+    /* Transient: shown only while the scan card's bar is filling, at the
+       start of `field`, then swapped for `field` above once cards land. */
+    scanning: 'Scanning competitors',
   },
+  /** The scan card's own label, shown above its bar while it fills. */
+  scan: { label: 'Analysing competition' },
   chart: {
     label: 'Projected revenue',
     /** $k/mo, months 1–12. */

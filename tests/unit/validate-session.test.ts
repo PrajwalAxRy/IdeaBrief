@@ -20,11 +20,13 @@ describe('validate session — timing', () => {
   });
 
   it('runs long enough to read and short enough to sit through', () => {
-    /* Pillar 01's session lands at ~14s; this one is denser per beat, so it is
-       deliberately shorter. Both play once and rest, so neither is a loop the
-       visitor has to escape. */
+    /* Pillar 01's session lands at ~14s. Pillar 02 used to run shorter than
+       that on the theory that it's denser per beat, but the scan card needs
+       five real seconds to read as genuinely working the field rather than a
+       flicker, so this one now runs well past it. Both still play once and
+       rest, so neither is a loop the visitor has to escape. */
     expect(validateTotalMs).toBeGreaterThan(9_000);
-    expect(validateTotalMs).toBeLessThan(14_000);
+    expect(validateTotalMs).toBeLessThan(19_000);
   });
 
   it('opens on a frame with no data, so the panel is an instrument first', () => {

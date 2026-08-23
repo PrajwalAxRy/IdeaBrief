@@ -204,10 +204,45 @@ absence rather than an upgrade.
 
 ---
 
+## 7. Hero product loop `[HIGH PRIORITY]`
+
+**Lives in:** `components/landing/hero.tsx`, right column of `.ob-hero-grid`.
+**Currently:** a `MediaSlot` at 16/9. The hero was rebuilt as a split — claim
+left, loop right — and this is the half that does not exist yet.
+
+**What it has to say:** the sentence the headline makes, demonstrated. A single
+typed idea resolving into a written brief with evidence attached. It is the only
+place on the page where someone sees the product actually run, so it has to be
+the *product*, not an abstraction of it.
+
+**This is not a generation.** It is Batch C work — a Playwright capture of the
+live app in motion, per the line
+[`higgsfield_generation_queue.md`](higgsfield_generation_queue.md) draws: a
+static screenshot shipped as an image stays forbidden, a screenshot fed to a
+generator is worse, but a capture of the real app moving is endorsed. The run
+pages exist now (A0–A17), so nothing blocks it.
+
+| | |
+|---|---|
+| **Length** | 10–14s, silent, seamless — first and last frame identical. |
+| **Content** | Composer typing one sentence → Define brief filling in → a citation chip resolving to a verified excerpt. No cursor teleports, no cuts. |
+| **Palette** | The app's own. Near-monochrome by construction; the one electric blue is already load-bearing on the live and verified marks. |
+| **Crop** | 16/9, UI fills the frame edge to edge. No browser chrome, no device mock. |
+| **Format** | 1600×900 WebM (VP9) + MP4 (H.264) fallback, plus a poster still. |
+| **Deliver to** | `public/media/hero/product-loop.webm` / `.mp4` / `.jpg` |
+
+**Code change when it lands:** replace the `MediaSlot` in `hero.tsx` with an
+autoplaying muted looping `<video>` carrying `poster`, `playsInline`, and a
+`prefers-reduced-motion` fallback to the poster still. Keep the 16/9 box so
+nothing shifts.
+
+---
+
 ## Priority order
 
 1. **§6 OG image** — a real gap, cheap to fill, visible every time the link is shared.
-2. **§1 hero collage** — the largest single lift in how designed the page feels.
-3. **§2 ambient field** — only if §1 lands and the hero still feels static.
-4. §3 / §5 — optional, and easy to make worse.
-5. **§4 — do not touch.**
+2. **§7 hero product loop** — the other real absence, and the only proof-of-product on the page.
+3. **§1 hero collage** — the largest single lift in how designed the page feels.
+4. **§2 ambient field** — only if §1 lands and the hero still feels static.
+5. §3 / §5 — optional, and easy to make worse.
+6. **§4 — do not touch.**

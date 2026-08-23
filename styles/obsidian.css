@@ -285,6 +285,12 @@ body::before {
   color: var(--ob-muted);
 }
 
+/* One step brighter than `.ob-meta-bright` — the full `--ob-text` white, for
+   meta-layer copy that has to carry real reading (not just a label glance). */
+.ob-meta-solid {
+  color: var(--ob-text);
+}
+
 .ob-meta-accent {
   color: var(--ob-accent);
 }
@@ -369,7 +375,8 @@ body::before {
 /* Bare — text with an arrow, for tertiary placement. */
 .ob-btn-bare {
   padding-inline: 0;
-  color: var(--ob-muted);
+  font-size: var(--ob-meta);
+  color: var(--ob-text);
 }
 
 .ob-btn-bare:hover:not(:disabled) {
@@ -484,10 +491,17 @@ body::before {
 }
 
 .ob-nav-link {
-  font-size: var(--ob-sm);
+  font-size: var(--ob-meta);
   letter-spacing: var(--ob-tracking-snug);
-  color: var(--ob-muted);
+  color: var(--ob-text);
   transition: color var(--ob-fast) var(--ob-ease);
+}
+
+/* `.ob-btn-bare` already carries the meta size/colour globally now. `.ob-btn-ghost`
+   ("Start") still needs the smaller nav size — scoped here, not on `.ob-btn`
+   itself, so ghost buttons elsewhere in the app keep their normal size. */
+.ob-nav-inner .ob-btn-ghost {
+  font-size: var(--ob-meta);
 }
 
 .ob-nav-link:hover,
@@ -625,6 +639,31 @@ body::before {
 .ob-hero-content {
   position: relative;
   z-index: 2;
+}
+
+/* Split hero: claim on the left, product loop on the right. The columns are
+   near-equal but the copy side takes the extra space — the headline is the
+   subject, the loop is the proof. */
+.ob-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 72px;
+}
+
+/* The split drops the headline from display to h1 scale. At 104px these three
+   lines overrun a half-width column and the browser re-breaks them mid-phrase,
+   which is exactly what pre-broken `lines` exist to prevent. */
+.ob-hero-headline {
+  font-size: var(--ob-h1);
+  letter-spacing: var(--ob-tracking-h1);
+  line-height: var(--ob-leading-tight);
+  max-width: 15ch;
+  text-align: left;
+}
+
+.ob-hero-media {
+  width: 100%;
 }
 
 /* Scroll cue at the foot of the hero. */
@@ -1927,6 +1966,75 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
+/* --- the scan card -------------------------------------------------------- */
+
+/* Same footprint as the three-card row it sits under — see `.ob-vf-pane`
+   below, whose `left`/`width`/`top` this reproduces as one box (200*3 +
+   13*2 = 626) rather than three. That is what makes the handoff read as one
+   object resolving: the scan card fills, and the cards that land on top of it
+   cover the exact space it occupies, rather than replacing it. It stays
+   mounted for the whole field beat — entrance only, same trigger as
+   `.ob-vf-pane` but no matching exit until the beat itself ends. */
+.ob-vf-scan {
+  position: absolute;
+  width: 626px;
+  left: 26px;
+  top: 240px;
+  opacity: 0;
+  filter: blur(16px);
+  transition: opacity 620ms var(--ob-ease), filter 620ms var(--ob-ease);
+}
+
+.ob-vf-scan[data-in="true"] {
+  opacity: 1;
+  filter: none;
+}
+
+.ob-vf-scan .ob-vf-glass {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 28px;
+  height: 214px;
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  backdrop-filter: blur(24px) saturate(120%);
+}
+
+.ob-vf-scan-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ob-vf-scan-pct {
+  font-size: 13px;
+  color: var(--ob-accent-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.ob-vf-scan-track {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ob-glass-edge);
+  overflow: hidden;
+}
+
+/* Accent, not the muted grey `.ob-vf-bar` uses below: that bar reports a
+   static fact (coverage), this one reports a live state (analysis in
+   progress) — blue's job here is live/active, one of its three. */
+.ob-vf-scan-track > span {
+  display: block;
+  height: 100%;
+  width: var(--w);
+  background: var(--ob-accent-bright);
+  box-shadow: 0 0 8px var(--ob-accent-glow);
+}
+
 /* --- the competitors ----------------------------------------------------- */
 
 .ob-vf-pane {
@@ -2530,8 +2638,8 @@ body::before {
 }
 
 .ob-footer-link {
-  color: var(--ob-muted);
-  font-size: var(--ob-sm);
+  color: var(--ob-text);
+  font-size: var(--ob-meta);
   transition: color var(--ob-fast) var(--ob-ease);
 }
 

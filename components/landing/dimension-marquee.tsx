@@ -18,7 +18,7 @@ export function DimensionMarquee() {
           <span
             // biome-ignore lint/suspicious/noArrayIndexKey: an intentionally repeated set; position is the identity
             key={`${dimension}-${i}`}
-            className="ob-marquee-item ob-meta"
+            className="ob-marquee-item ob-meta ob-meta-solid"
           >
             <span className="ob-marquee-sep">◇</span>
             {dimension}
