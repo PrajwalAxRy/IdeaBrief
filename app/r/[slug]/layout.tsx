@@ -12,7 +12,7 @@ import {
   runExists,
 } from '@/lib/db/queries';
 import { formatClockTime, formatDate } from '@/lib/format';
-import { isOnAxis } from '@/lib/run-plan';
+import { waitWeeks } from '@/lib/run-plan';
 import type { RunSegment } from '@/lib/run-stage';
 import type { RunSummary } from '@/lib/run-summary';
 import type { Roadmap } from '@/lib/schemas/roadmap';
@@ -54,9 +54,16 @@ function buildMetaParts(
         `${summary.pages_fetched} SOURCES`,
       ];
     case 'roadmap': {
-      const onAxis = roadmap.steps.filter(isOnAxis).length;
-      const tripwires = roadmap.steps.length - onAxis;
-      return [id, researched, `${onAxis} BUILD STEPS`, `${tripwires} TRIPWIRE`];
+      /* The same two numbers the page's own MetaLine and the OG description
+         carry, from the same helpers — a count authored twice is a count that
+         drifts. */
+      const wait = waitWeeks(roadmap);
+      return [
+        id,
+        researched,
+        `${roadmap.phases.length} STEPS`,
+        `${wait.low}–${wait.high} WEEKS OF WAITING`,
+      ];
     }
     case 'sources':
       return [

@@ -1,58 +1,115 @@
 import { roadmapFixture } from '@/lib/fixtures/roadmap';
-import { fanOut, isOnAxis, planHorizon, planSpans } from '@/lib/run-plan';
+import {
+  allAmbushes,
+  citedAmbushes,
+  phaseAnchor,
+  phaseById,
+  phaseSpan,
+  waitLabel,
+  waitWeeks,
+} from '@/lib/run-plan';
 import { describe, expect, it } from 'vitest';
 
-describe('run-plan — the roadmap week model', () => {
-  it('planHorizon is 12 weeks', () => {
-    expect(planHorizon(roadmapFixture)).toBe(12);
+const phase = (id: string) => {
+  const found = phaseById(roadmapFixture, id);
+  if (!found) throw new Error(`no phase ${id}`);
+  return found;
+};
+
+const setup = (id: string) => {
+  const found = roadmapFixture.setup.find((s) => s.id === id);
+  if (!found) throw new Error(`no setup item ${id}`);
+  return found;
+};
+
+describe('run-plan — the journey model', () => {
+  /* The chart is one level deep and stays that way. Seven rows is where it
+     stopped being readable last time; the schema caps it at six and this
+     asserts the fixture actually spends five. */
+  it('is five phases, in start order', () => {
+    expect(roadmapFixture.phases).toHaveLength(5);
+    const starts = roadmapFixture.phases.map((p) => p.start);
+    expect(starts).toEqual([...starts].sort((a, b) => a - b));
   });
 
-  it('the four build spans tile W1-W2, W3-W6, W7-W11 and W12 onward', () => {
-    const spans = planSpans(roadmapFixture);
-    expect(spans).toHaveLength(4);
-    expect(spans.map((s) => [s.step.id, s.startWeek, s.endWeek])).toEqual([
-      ['S01', 1, 2],
-      ['S02', 3, 6],
-      ['S03', 7, 11],
-      ['S04', 12, null],
-    ]);
+  it('gives every phase its own tint, since tint is how a bar names its section', () => {
+    const tints = roadmapFixture.phases.map((p) => p.tint);
+    expect(new Set(tints).size).toBe(tints.length);
   });
 
-  it('S04 is open-ended — duration_weeks is null and endWeek is null', () => {
-    const s04 = planSpans(roadmapFixture).find((s) => s.step.id === 'S04');
-    expect(s04?.step.duration_weeks).toBeNull();
-    expect(s04?.endWeek).toBeNull();
-    expect(s04?.openEnded).toBe(true);
+  /* The geometry is a fraction-to-percent conversion and nothing more. These
+     are ratios, never pixels — the container width is not this module's
+     business and has changed twice already. */
+  it('phaseSpan converts fractions to percentages and runs open phases to the edge', () => {
+    const dated = phaseSpan(phase('P2'));
+    expect(dated.leftPct).toBeCloseTo(10, 6);
+    expect(dated.widthPct).toBeCloseTo(20, 6);
+    expect(dated.openEnded).toBe(false);
+
+    const open = phaseSpan(phase('P4'));
+    expect(open.openEnded).toBe(true);
+    expect(open.leftPct + open.widthPct).toBeCloseTo(100, 6);
   });
 
-  it('isOnAxis excludes the tripwire and includes all four build steps', () => {
-    const onAxis = roadmapFixture.steps.filter(isOnAxis).map((s) => s.id);
-    expect(onAxis).toEqual(['S01', 'S02', 'S03', 'S04']);
-    const tripwire = roadmapFixture.steps.filter((s) => s.kind === 'tripwire');
-    expect(tripwire.map((s) => s.id)).toEqual(['S05']);
-    expect(tripwire.filter(isOnAxis)).toEqual([]);
+  /**
+   * The rule the whole model rests on, and the reason A17 moved the waits into
+   * `setup`: a number may only appear on time the founder does not control. A
+   * phase has no field to put one in, so this asserts the shape rather than the
+   * value — if `wait_low` ever appears on a phase, the page has started lying
+   * about build estimates again.
+   */
+  it('no phase carries a week number anywhere', () => {
+    for (const p of roadmapFixture.phases) {
+      expect(p).not.toHaveProperty('wait_low');
+      expect(p).not.toHaveProperty('weeks_low');
+      expect(JSON.stringify(p)).not.toMatch(/\b\d+\s*weeks?\b/i);
+    }
   });
 
-  it('fanOut is Q01 2, Q02 1, Q03 1, Q04 2, Q05 1, Q06 3', () => {
-    const counts = Object.fromEntries(
-      Object.entries(fanOut(roadmapFixture)).map(([id, steps]) => [id, steps.length]),
-    );
-    expect(counts).toEqual({ Q01: 2, Q02: 1, Q03: 1, Q04: 2, Q05: 1, Q06: 3 });
+  it('collapses an equal range to a single number, and skips an errand entirely', () => {
+    expect(waitLabel(setup('S4'))).toBe('2 weeks');
+    expect(waitLabel(setup('S2'))).toBe('2–3 weeks');
+    expect(waitLabel(setup('S1'))).toBeNull();
   });
 
-  it('sorting by fan-out descending, ties by rank, reproduces the priority order', () => {
-    const edges = fanOut(roadmapFixture);
-    const byFanOut = [...roadmapFixture.open_questions]
-      .sort((a, b) => edges[b.id].length - edges[a.id].length || a.priority - b.priority)
-      .map((q) => q.id);
-    const byPriority = [...roadmapFixture.open_questions]
-      .sort((a, b) => a.priority - b.priority)
-      .map((q) => q.id);
+  /* The headline insight is derived, never authored — three setup items are
+     queues somebody else controls, summing to 6-8 weeks of calendar the
+     founder cannot compress but can start early. */
+  it('waitWeeks sums only the queues, and only from setup', () => {
+    expect(waitWeeks(roadmapFixture)).toEqual({ low: 6, high: 8, count: 3 });
+  });
 
-    /* Not a coincidence to be preserved by hand — it is why FanOutMeter's
-       caption and the card order read off the same data with no second
-       source. */
-    expect(byFanOut).toEqual(byPriority);
-    expect(byPriority).toEqual(['Q06', 'Q01', 'Q04', 'Q02', 'Q05', 'Q03']);
+  it('every setup item that claims a wait contributes to that sum', () => {
+    const queues = roadmapFixture.setup.filter((s) => s.wait_low !== null);
+    expect(queues).toHaveLength(waitWeeks(roadmapFixture).count);
+  });
+
+  /**
+   * Exactly two ambushes cite, because the run's PRACTICAL dimension came back
+   * thin with two verified findings. A third citation here means someone
+   * invented research the run did not do.
+   */
+  it('exactly the run-sourced ambushes carry citations', () => {
+    const cited = citedAmbushes(roadmapFixture);
+    expect(cited.map((a) => a.id)).toEqual(['A10', 'A11']);
+    expect(cited.map((a) => a.citation_id)).toEqual([46, 47]);
+    for (const ambush of allAmbushes(roadmapFixture)) {
+      expect(ambush.citation_id !== undefined).toBe(ambush.source === 'run');
+    }
+  });
+
+  /* Not a quota — the opposite. A step with nothing surprising on it is an
+     honest step, and forcing two per step is what manufactures filler. */
+  it('leaves at least one phase and one setup item with no ambush at all', () => {
+    expect(roadmapFixture.phases.filter((p) => p.ambushes.length === 0).length).toBeGreaterThan(0);
+    expect(roadmapFixture.setup.filter((s) => s.ambushes.length === 0).length).toBeGreaterThan(0);
+  });
+
+  /* One definition of a phase's DOM id, used by the chart's jump link and the
+     section's own attribute. Two spellings is a link that scrolls nowhere. */
+  it('derives one anchor per phase', () => {
+    expect(phaseAnchor('P3')).toBe('step-p3');
+    const anchors = roadmapFixture.phases.map((p) => phaseAnchor(p.id));
+    expect(new Set(anchors).size).toBe(anchors.length);
   });
 });

@@ -1215,118 +1215,6 @@ button.ob-domain-row[aria-pressed="true"] .ob-domain-track {
   letter-spacing: -0.02em;
 }
 
-.ob-fanout {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.ob-fanout-ticks {
-  display: inline-flex;
-  gap: 3px;
-}
-.ob-fanout-tick {
-  width: 3px;
-  height: 16px;
-  background: var(--ob-hairline-strong);
-}
-.ob-fanout-tick-on {
-  background: var(--ob-text);
-}
-/* The governed tripwire: an outline tick with a chalk border, not a solid one.
-   It is a dependency but it is not a build step, and D13 takes it off the axis
-   for the same reason. The fill vocabulary is the stance marks', reused. */
-.ob-fanout-tick-tripwire {
-  background: transparent;
-  border: 1px solid var(--ob-text);
-}
-
-/* **A12 rebuilt this from absolute percentages onto one grid.** The ruler and
-   the bars now share a single set of tracks, so a bar's position is a
-   `grid-column` rather than two computed percentages that have to agree with
-   the ticks by arithmetic. `--ob-plan-cols` is written inline by `WeekAxis`
-   from `planHorizon()`.
-
-   **The `, 12` fallback is not optional.** An undefined custom property voids
-   its entire declaration, and the failure mode here is a silent one-column
-   grid that still renders bars, still looks plausible, and is wrong (pitfalls
-   §3). The exit test counts twelve resolved tracks for exactly this reason. */
-.ob-week-axis-wrap {
-  position: relative;
-}
-.ob-week-caption {
-  color: var(--ob-dim);
-  margin-bottom: 12px;
-}
-.ob-week-axis {
-  display: grid;
-  grid-template-columns: repeat(var(--ob-plan-cols, 12), minmax(0, 1fr));
-  border-bottom: 1px solid var(--ob-grid);
-}
-.ob-week-tick {
-  border-left: 1px solid var(--ob-grid);
-  padding: 0 0 8px 8px;
-}
-.ob-week-label {
-  display: block;
-  color: var(--ob-dim);
-  white-space: nowrap;
-}
-.ob-week-lanes {
-  display: grid;
-  grid-template-columns: repeat(var(--ob-plan-cols, 12), minmax(0, 1fr));
-  grid-auto-rows: 34px;
-  row-gap: 10px;
-  margin-top: 12px;
-}
-
-/* **Not a pill** — 4px, the chips radius. Only buttons get 999px and these are
-   bars first. */
-.ob-plan-bar {
-  display: flex;
-  align-items: center;
-  height: 34px;
-  padding: 0 12px;
-  background: var(--ob-surface);
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-tag);
-  overflow: hidden;
-  text-align: left;
-}
-.ob-plan-bar-label {
-  font-family: var(--ob-font-mono);
-  font-size: 12px;
-  font-weight: var(--ob-weight-meta);
-  letter-spacing: var(--ob-tracking-meta);
-  text-transform: uppercase;
-  color: var(--ob-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color var(--ob-fast) var(--ob-ease);
-}
-/* The plan wrote "over `--ob-base`"; `--ob-base` is the 320ms duration token
-   and would have voided the declaration silently. `--ob-raised` is the surface
-   one step above `--ob-surface`, which is what the sentence meant. */
-.ob-plan-bar:hover {
-  border-color: var(--ob-hairline-strong);
-  background: var(--ob-raised);
-}
-.ob-plan-bar:hover .ob-plan-bar-label {
-  color: var(--ob-text);
-}
-.ob-plan-bar:focus-visible {
-  outline: 2px solid var(--ob-accent);
-  outline-offset: 2px;
-  transition: none;
-}
-/* **Not a translate here, and this is the one place in the build that differs.**
-   `.ob-reveal` owns this element's `transform` for the length of the lane
-   stagger; a `:active` translate would fight it mid-entrance and, worse, would
-   win by source order and strand a pressed bar 22px low. Border does the job. */
-.ob-plan-bar:active {
-  border-color: var(--ob-text);
-}
-
 /* ============================================================
    5. RUN CHROME                                       [owner: A4]
    ============================================================ */
@@ -2097,7 +1985,10 @@ button.ob-finding-claim:focus-visible {
   border-left: 1px solid var(--ob-hairline);
   padding: 16px 18px;
   margin: 0;
-  opacity: 0.62;
+  /* Up from 0.62. This multiplies against `--ob-discard` on the text inside,
+     and the two together were what made a discarded excerpt unreadable rather
+     than merely receded. */
+  opacity: 0.8;
   transform: translateY(6px);
 }
 
@@ -2757,8 +2648,11 @@ main:has(> .ob-define) {
 }
 
 .ob-phase-item[data-state="pending"] {
+  /* `--ob-dim` alone. It used to also carry `opacity: 0.5`, which multiplied
+     against the token and put a pending phase name at roughly 2.6:1 — two
+     de-emphasis mechanisms stacked on one string. The token is the one that
+     stays. */
   color: var(--ob-dim);
-  opacity: 0.5;
 }
 .ob-phase-item[data-state="done"] {
   color: var(--ob-dim);
@@ -2878,8 +2772,8 @@ main:has(> .ob-define) {
   line-height: 1;
 }
 .ob-qglyph[data-state="queued"] {
+  /* Token only — same stacked-de-emphasis fix as `.ob-phase-item`. */
   color: var(--ob-dim);
-  opacity: 0.55;
 }
 .ob-qglyph[data-state="running"] {
   color: var(--ob-accent);
@@ -3607,596 +3501,926 @@ main:has(> .ob-define) {
 }
 
 /* ============================================================
-   12. ROADMAP — OPEN QUESTIONS                       [owner: A11]
+   12. ROADMAP — PAGE SHELL & THE JOURNEY CHART        [owner: A17]
    ============================================================ */
 
-/* One left edge, two right edges: the page header, the sticky nav, the section
-   eyebrows and the `01`/`02` rules all run the full 1200px container, while the
-   question stack is capped at 920 and left-aligned to it. The wide edge belongs
-   to the rules, the narrow one to the reading — and the widening at the
-   fieldwork band is what makes the page's hinge read as a hinge.
+/* A17 rewrote §12 and §13 together. What was here before — A11's open-question
+   card stack and A16's six-track chart — is gone, not amended: the page's
+   problem was density, and density is not fixed by tuning the padding on the
+   thing causing it.
+
+   One left edge, two right edges: the page header, the sticky nav and the
+   section eyebrows all run the full container, while running prose is capped
+   at a measure and left-aligned to it. The wide edge belongs to the rules, the
+   narrow one to the reading.
 
    §12 writes **no `scroll-margin-top` rule at all** — `--ob-anchor-inset` has
    exactly one home, A0's §1, and a second rule here would win on specificity
    and cost an afternoon (pitfalls §11). It also declares no `.ob-eyebrow`, no
-   `.ob-segmented`, no `.ob-cite` and no `.ob-fanout*` rule: those are A2's,
-   A5's and A3's. */
+   `.ob-segmented` and no `.ob-cite`: those are A2's and A5's. */
 
+/* **`position: relative; z-index: 1` is load-bearing, not decoration.**
+   `AppBackdrop` renders as a *sibling* of this container inside `main`, and it
+   is `position: fixed; z-index: 0`. A positioned element with `z-index: 0`
+   paints at step 6 of its stacking context; static in-flow text paints at step
+   5. So without this rule the backdrop paints **over every static word on the
+   page** — the h1, the lead, the step names — while absolutely-positioned
+   children survive because they are positioned too and come later in tree
+   order.
+
+   The failure is invisible until the backdrop asset exists: with
+   `/media/roadmap/backdrop.webp` missing the `<img>` painted nothing, which is
+   why this shipped. Measured, not reasoned about. `z-index: -1` on the backdrop
+   is not the alternative: globals.css records that it must stay above the body
+   background or it disappears entirely. */
 .ob-roadmap {
+  position: relative;
+  z-index: 1;
   padding-block: 64px 96px;
 }
 
 .ob-roadmap-head {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 920px;
-  margin-bottom: 56px;
+  max-width: 1000px;
 }
+
 .ob-roadmap-head .ob-lead {
+  max-width: 62ch;
+  margin-top: 24px;
+}
+
+/* The lesson of the chart, set below the lead and above the meta line. Larger
+   than body because it is the one paragraph on the page a reader who skims
+   everything else should still take away. */
+.ob-roadmap-crit {
+  max-width: 66ch;
+  margin-top: 28px;
+  font-size: var(--ob-body);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.7;
   color: var(--ob-muted);
 }
 
-/* A4 made the header genuinely fixed; this makes the control under it
-   genuinely pin. **Before believing it, walk every ancestor for a non-visible
-   `overflow`** — A0 moved `overflow-x: clip` onto `:root` once already, and
-   pitfalls §5 is exactly this trap. */
+.ob-roadmap-head .ob-metaline {
+  margin-top: 34px;
+}
+
+/* R9's sticky nav. The stickiness lives on this wrapper, never on
+   `.ob-segmented` — a primitive that hardcodes `position: sticky` is a
+   primitive that cannot be used anywhere else. */
 .ob-roadmap-nav {
   position: sticky;
   top: var(--ob-header-h-condensed);
-  z-index: 20;
+  z-index: 4;
+  margin-top: 56px;
+  padding-block: 14px;
   background: var(--ob-canvas);
   border-bottom: 1px solid var(--ob-hairline);
-  height: 40px;
-  display: flex;
-  align-items: center;
 }
 
 .ob-roadmap-section {
-  padding-block: var(--ob-section-gap-app);
-  border-top: 1px solid var(--ob-hairline);
-}
-.ob-roadmap-section:first-of-type {
-  border-top: 0;
-}
-.ob-roadmap-section > * + * {
-  margin-top: 40px;
+  margin-top: 78px;
 }
 
-.ob-oq-stack {
-  max-width: 920px;
-}
-
-/* --- the card, which is not a card -------------------------------------- */
-
-/* No radius, no border box, no shadow, no ring. */
-.ob-oq {
-  border-top: 1px solid var(--ob-hairline);
-  padding: 32px 0;
-}
-.ob-oq:last-of-type {
-  border-bottom: 1px solid var(--ob-hairline);
-}
-/* The fill bleeds past the text column; the rules stay put. */
-.ob-oq[data-expanded="true"] {
-  background: var(--ob-surface);
-  margin-inline: -24px;
-  padding-inline: 24px;
-}
-
-/* R2 — the pulse, finally defined. **The `ob-app-` prefix is C1's rule and here
-   is the live reason for it:** `@keyframes ob-pulse` already exists in
-   obsidian.css as the 2.4s live-dot animation, this file is imported after it
-   in the same layer, and a duplicate name is silently *replaced*, not merged —
-   an unprefixed declaration here would stop `.ob-dot` pulsing on every route,
-   with no error, on a page that still looks right.
-
-   Blue is legitimate: job 3, live/active. It confirms, for 600ms, that this is
-   the element you just navigated to. */
-.ob-oq[data-pulse] {
-  animation: ob-app-pulse 600ms var(--ob-ease) 1;
-}
-
-/* A11's interim `.ob-roadmap .timeline-step[data-pulse]` rule is **gone** —
-   A12 absorbed it. The reverse direction now lands on `.ob-plan-step` and
-   `.ob-tripwire`, both in §13, both on this keyframe. */
-
-@keyframes ob-app-pulse {
-  0%,
-  30% {
-    border-top-color: var(--ob-hairline-accent);
-    border-bottom-color: var(--ob-hairline-accent);
-  }
-  100% {
-    border-top-color: var(--ob-hairline);
-    border-bottom-color: var(--ob-hairline);
-  }
-}
-
-/* The grid A14's `roadmap/loading.tsx` mirrors: 160px, not 120px. */
-.ob-oq-grid {
-  display: grid;
-  grid-template-columns: 160px minmax(0, 1fr);
-  column-gap: 32px;
-  row-gap: 28px;
-  align-items: start;
-}
-
-.ob-oq-label {
-  font-family: var(--ob-font-mono);
-  font-size: var(--ob-meta);
-  font-weight: var(--ob-weight-meta);
-  letter-spacing: var(--ob-tracking-meta);
-  text-transform: uppercase;
-  color: var(--ob-dim);
-  padding-top: 6px;
-}
-
-/* R15(a). `nowrap` + ellipsis is deleted. **The clamp is a guard against a
-   future 200-character question, not a routine truncation** — so it is set at
-   the line count that renders every real question whole. The value column is
-   728px (920 − 160 − 32), not the 760 the plan estimated, and Q02 runs 152
-   characters: at two lines it clipped, measured. Three lines is ~220
-   characters, which is still a guard and clips nothing that exists. */
-.ob-oq-question {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  text-align: left;
-  font-size: var(--ob-h3);
-  font-weight: var(--ob-weight);
-  letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.24;
-  color: var(--ob-text);
-  transition: color var(--ob-fast) var(--ob-ease);
-}
-.ob-oq-question:hover {
-  color: var(--ob-text);
-}
-.ob-oq-question:focus-visible {
-  outline: 2px solid var(--ob-accent);
-  outline-offset: 3px;
-  transition: none;
-}
-.ob-oq[data-expanded="true"] .ob-oq-question {
-  -webkit-line-clamp: unset;
-}
-
-.ob-oq-meta {
-  margin-top: 12px;
-}
-
-/* Sans, because it is a sentence. Mono carries no sentences. */
-.ob-oq-ask {
-  margin-top: 8px;
-  font-size: var(--ob-sm);
-  line-height: 1.55;
-  color: var(--ob-muted);
-}
-.ob-oq-ask .ob-meta {
-  margin-right: 8px;
-}
-
-.ob-oq-badge {
-  display: inline-block;
-  margin-top: 12px;
-  font-family: var(--ob-font-mono);
-  font-size: var(--ob-meta);
-  font-weight: var(--ob-weight-meta);
-  letter-spacing: var(--ob-tracking-meta);
-  color: var(--ob-text);
-  border: 1px solid var(--ob-hairline-strong);
-  border-radius: var(--ob-r-tag);
-  padding: 2px 8px;
-}
-
-.ob-oq-note {
-  font-size: var(--ob-sm);
-  line-height: 1.55;
-  color: var(--ob-dim);
-}
-.ob-oq-count {
+/* One sentence under a section eyebrow, naming what the section is for. Six
+   questions in a row read as six chores without it. */
+.ob-roadmap-sublead {
+  max-width: 68ch;
+  margin-top: 24px;
   font-size: var(--ob-body);
-  line-height: var(--ob-leading-body);
-  color: var(--ob-text);
-}
-
-/* `0fr -> 1fr`, the one structural motion this section has. */
-.ob-oq-body {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows var(--ob-base) var(--ob-ease);
-}
-.ob-oq-body[data-open="true"] {
-  grid-template-rows: 1fr;
-}
-.ob-oq-body-inner {
-  overflow: hidden;
-  min-height: 0;
-}
-.ob-oq-body[data-open="true"] .ob-oq-body-inner {
-  overflow: visible;
-}
-.ob-oq-body-inner > * + * {
-  margin-top: 28px;
-}
-.ob-oq-body[data-open="true"] .ob-oq-grid {
-  padding-top: 28px;
-}
-
-.ob-also-unknown {
-  max-width: 920px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* --- the script and the survey ------------------------------------------ */
-
-/* **Numbering is CSS, and the data carries none.** A `"1. "` stored in a
-   fixture string is presentation living in a field: un-restylable, wrong the
-   moment a line is inserted, and needing a strip before any other use. */
-.ob-script {
-  counter-reset: ob-script;
-  background: var(--ob-void);
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-card);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-.ob-script-line {
-  counter-increment: ob-script;
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  /* Sans: this is material the user reads aloud, not metadata. */
-  font-size: var(--ob-sm);
-  line-height: 1.55;
-  color: var(--ob-text);
-}
-.ob-script-line::before {
-  content: counter(ob-script) ".";
-  color: var(--ob-dim);
-  font-family: var(--ob-font-mono);
-}
-.ob-script-opts {
-  display: block;
-  margin-top: 4px;
-  font-family: var(--ob-font-mono);
-  font-size: var(--ob-meta);
-  letter-spacing: var(--ob-tracking-meta);
-  color: var(--ob-dim);
-}
-
-.ob-survey-note {
-  font-size: var(--ob-sm);
-  line-height: 1.55;
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.7;
   color: var(--ob-muted);
-}
-.ob-survey-standing {
-  color: var(--ob-dim);
-}
-
-/* --- the bidirectional wiring ------------------------------------------- */
-
-.ob-dep-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-.ob-changes-row {
-  border-top: 1px solid var(--ob-hairline);
-  padding-top: 20px;
-}
-
-/* **Not a pill** — that radius is buttons alone (rule 8). */
-.ob-dep-chip {
-  font-family: var(--ob-font-mono);
-  font-size: var(--ob-meta);
-  font-weight: var(--ob-weight-meta);
-  letter-spacing: var(--ob-tracking-meta);
-  color: var(--ob-muted);
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-tag);
-  padding: 3px 9px;
-  transition: color var(--ob-base) var(--ob-ease), border-color var(--ob-base) var(--ob-ease);
-}
-.ob-dep-chip:hover {
-  color: var(--ob-text);
-  border-color: var(--ob-hairline-strong);
-}
-.ob-dep-chip:focus-visible {
-  outline: 2px solid var(--ob-accent);
-  outline-offset: 2px;
-  transition: none;
-}
-/* A translate, never a scale. */
-.ob-dep-chip:active {
-  transform: translateY(1px);
-}
-
-/* --- the fieldwork band ------------------------------------------------- */
-
-/* The hinge. Full container width against the stack's 920, which is what makes
-   it read as a widening. */
-.ob-fieldwork {
-  border-top: 1px solid var(--ob-hairline);
-  border-bottom: 1px solid var(--ob-hairline);
-  padding-block: 96px;
-  margin-top: 96px;
-}
-.ob-fieldwork-headline {
-  max-width: 16ch;
-}
-.ob-fieldwork-lead {
-  margin-top: 20px;
-  max-width: 720px;
-  color: var(--ob-muted);
-}
-.ob-fieldwork-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-  margin-top: 48px;
-}
-/* The height is a function of the column width alone, so **it does not change
-   when a real asset arrives** — slot and asset are the same branch. */
-.ob-fieldwork-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.ob-fieldwork-panel > .ob-slot,
-.ob-fieldwork-media {
-  aspect-ratio: 16 / 9;
-  width: 100%;
-  border-radius: var(--ob-r-card);
-}
-.ob-fieldwork-media {
-  position: relative;
-  object-fit: cover;
-  border: 1px solid var(--ob-hairline);
-  /* Survives ~60% darkening, same as `/`. */
-  filter: grayscale(0.4) contrast(1.06);
 }
 
 /* ============================================================
-   13. ROADMAP — BUILD PLAN                           [owner: A12]
+   §12b — the journey chart
+
+   **Black, like everything else.** A light card was tried for one revision
+   and reverted: it bought horizontal legibility and read as a spreadsheet
+   dropped into the page. Contrast comes from the system's own vocabulary
+   instead — a surface a hair above the canvas, two ambient blooms lighting
+   it, and bars that are a dark tinted slab with a luminous rim.
+
+   **The rows are flush.** No gap, no separator, no radius large enough to
+   read as five detached objects: the bars stack directly one under the next
+   so the chart is one mass whose left and right edges are the whole point.
+   Overlap is read by following an edge down, which needs the rows adjacent,
+   not spaced.
+
+   Every colour below is a token. This is the only place in the repository
+   where `--ob-rm-*` appears.
    ============================================================ */
 
-/* §13 carries the page's own classes and **the two `.ob-plan-bar` modifiers
-   only**. `.ob-week-axis`, `.ob-week-tick`, `.ob-week-label`, `.ob-week-lanes`
-   and the bare `.ob-plan-bar` are §4's and are not redeclared here — A12
-   amended them in place rather than shadowing them, because a second
-   declaration of a figure-kit class in a page section is how a figure grows
-   two geometries.
-
-   §13 declares **no `@keyframes`** and **no `scroll-margin-top`**. The pulse is
-   A11's `ob-app-pulse` from §12; the anchor inset is A0's single §1 rule. Both
-   are load-bearing: an unprefixed keyframe here would silently replace
-   `obsidian.css`'s 2.4s `ob-pulse` and kill the live dot app-wide, and a second
-   anchor rule would win on specificity and cost an afternoon (pitfalls §3, §11). */
-
-.ob-plan > * + * {
-  margin-top: 56px;
+.ob-rm-chart {
+  margin-top: 36px;
 }
 
-/* --- the two bar modifiers ---------------------------------------------- */
-
-/* **The lead step's emphasis is scale and fill, not blue.** Blue has three jobs
-   — action, verification, live/active — and "the step to build first" is none
-   of them. This is the only solid-filled bar on the axis, against three
-   `--ob-surface` bars with hairline borders: the same fill vocabulary the
-   stance marks use, legible in a screenshot, under reduced motion, and in
-   greyscale. C8 is why it matters — the funnel's verified bar is the only
-   accent mark in the entire figure layer, and a blue bar here would be the
-   second. */
-.ob-plan-bar--lead {
-  background: var(--ob-text);
-  border-color: var(--ob-text);
-}
-.ob-plan-bar--lead .ob-plan-bar-label {
-  color: var(--ob-canvas);
-}
-.ob-plan-bar--lead:hover {
-  background: var(--ob-text);
-}
-.ob-plan-bar--lead:hover .ob-plan-bar-label {
-  color: var(--ob-canvas);
+.ob-rm-card {
+  position: relative;
+  padding: 38px 44px 24px;
+  background: var(--ob-rm-card);
+  border: 1px solid var(--ob-rm-card-edge);
+  border-radius: var(--ob-r-lg);
 }
 
-/* The open-ended tail: solid left, top and bottom, no right terminus at all.
-   The bar runs to the container edge and dissolves.
+/* The ambient light. Warm where the journey starts, cool where it ends —
+   two pools rather than one, because a single blurred hue reads as a
+   coloured wash and two read as a lit space (the same reasoning the glass
+   field's `--ob-bloom-violet` records).
 
-   `currentColor`, not a hex — **a mask gradient still counts as a colour value
-   under standing rule 2**, and `styles/obsidian.css`'s marquee already carries
-   a `#000` literal that is not copied forward here. */
-.ob-plan-bar--open {
-  border-right: none;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  mask-image: linear-gradient(to right, currentColor 0%, currentColor 55%, transparent 100%);
+   **No `overflow: hidden` on the card**, or the milestone tooltip is
+   clipped; the gradients are sized to fade out well before the edge
+   instead. */
+.ob-rm-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(60% 70% at 18% 12%, var(--ob-rm-bloom-warm), transparent 70%),
+    radial-gradient(62% 76% at 82% 88%, var(--ob-rm-bloom-cool), transparent 72%);
+  pointer-events: none;
 }
-/* **`clip`, not `ellipsis`, and only on this bar.** A single week is 93px and
-   `LATER, AND ONLY IF` is not going to fit in it — but an ellipsis renders
-   `LATER, …`, which reads as *truncated text* when the thing being said is
-   *this does not end*. Clipped, the label runs off the edge and fades out
-   under the same mask as the bar, which is the sentence. The full name reads
-   one block below at `--ob-h3`. */
-.ob-plan-bar--open .ob-plan-bar-label {
-  text-overflow: clip;
+/* Everything real sits above the blooms.
+
+   **The axis outranks the rows, and that is not arbitrary.** Giving both
+   `z-index: 1` made `.ob-rm-axis` a stacking context, which trapped the open
+   marker's `z-index: 5` inside it — and with equal z-index the later sibling
+   wins, so every bar painted over the milestone tooltip. Same trap the
+   `transform` on `.ob-rm-mark` sets, reached a different way: the moment a
+   container gets a z-index, a descendant's z-index stops meaning anything
+   outside it. */
+.ob-rm-axis {
+  position: relative;
+  z-index: 2;
+}
+.ob-rm-rows,
+.ob-rm-hint {
+  position: relative;
+  z-index: 1;
 }
 
-/* --- the step blocks ----------------------------------------------------- */
+/* ---- The axis. Milestones, never months. ---- */
 
-/* The `<ol>` the four step blocks live in. It carries no `margin-top` —
-   `.ob-plan > * + *` already gives it 56px, and declaring both stacked into a
-   112px hole under the last lane. It is declared rather than left as a bare
-   hook because an emitted-but-undefined class is the R2 failure class, and a
-   rule that documents why it is empty is cheaper than the next audit finding
-   it. `list-style` is explicit for the same reason, and is now load-bearing
-   rather than defensive: the reset that used to suppress the numerals lived in
-   `styles/components.css`, which A15 deleted. */
-.ob-plan-steps {
+/* Indented by the row-name column so a marker sits over the lane it refers
+   to and not over the labels. */
+.ob-rm-axis {
+  height: 30px;
+  margin-left: var(--ob-rm-name-w, 230px);
+  margin-bottom: 16px;
+}
+
+/* **`z-index` here is load-bearing, and the reason is the `transform`.** A
+   transform creates a stacking context, so `.ob-rm-tip`'s `z-index` orders
+   it only against its siblings *inside this marker* — against the lane rules
+   below it counts for nothing, and those rules are positioned elements later
+   in tree order, so they paint on top. Measured, not reasoned about: a
+   gridline ran straight through the tooltip's text. Lifting the whole marker
+   is the fix; raising the tip's own `z-index` is not, at any value. */
+.ob-rm-mark {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  transform: translateX(-50%);
+}
+/* Above the other four, so an open tip is never cut by a neighbouring chip. */
+.ob-rm-mark[data-open] {
+  z-index: 5;
+}
+/* M1 is at 0, so the default `translateX(-50%)` would hang half the chip over
+   the row-name column. It anchors to the axis start instead. */
+.ob-rm-mark:first-child {
+  transform: none;
+}
+
+.ob-rm-mark-btn {
+  display: block;
+  padding: 4px 9px;
+  background: none;
+  border: 1px solid var(--ob-rm-rule-strong);
+  border-radius: var(--ob-r-tag);
+  font-family: var(--ob-font-mono);
+  font-size: 11px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  color: var(--ob-muted);
+}
+/* **No hover state, deliberately.** The chip used to invert on hover, which
+   put a second thing in motion at the moment the tooltip was already arriving.
+   The tooltip is the feedback. `:focus-visible` stays — that is the keyboard
+   affordance, not a hover treatment. */
+.ob-rm-mark-btn:focus-visible {
+  outline: 2px solid var(--ob-accent);
+  outline-offset: 2px;
+}
+
+/* The tooltip. `--ob-raised` rather than the card, so it separates from the
+   surface it floats over — on a dark card a dark tooltip needs the step up
+   plus a border or it reads as a hole. `visibility` as well as `opacity`, so
+   a hidden tip is not a click target sitting over the bars underneath. */
+.ob-rm-tip {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  z-index: 3;
+  width: 250px;
+  padding: 12px 14px;
+  transform: translateX(-50%);
+  /* stylelint-disable-next-line -- see the first-child rule below */
+  background: var(--ob-raised);
+  border: 1px solid var(--ob-hairline-strong);
+  border-radius: var(--ob-r-card);
+  box-shadow: 0 12px 32px -8px var(--ob-scrim);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--ob-fast) var(--ob-ease), visibility var(--ob-fast) var(--ob-ease);
+}
+.ob-rm-mark[data-open] .ob-rm-tip {
+  opacity: 1;
+  visibility: visible;
+}
+/* The two ends. M1 is at 0 and M5 at 92%, so a 250px tip centred on either
+   runs off the card — each anchors to its own side instead. The three in the
+   middle clear comfortably and stay centred. */
+.ob-rm-mark:first-child .ob-rm-tip {
+  left: 0;
+  transform: none;
+}
+.ob-rm-mark:last-child .ob-rm-tip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.ob-rm-tip-label {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+.ob-rm-tip-proof {
+  margin-top: 6px;
+  font-size: 13px;
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.5;
+  color: var(--ob-muted);
+}
+
+/* ---- The rows ---- */
+
+.ob-rm-rows {
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-/* No `margin-top` on it: `.ob-plan > * + *` already gives the step list its 56px
-   and declaring both stacked them into a 112px hole under the last lane. */
+/* `--ob-rm-name-w` is a component-scoped custom property, not a token: it is
+   a layout constant shared by the axis inset and the row grid, and the two
+   drifting apart is what puts a milestone marker over the wrong lane.
 
-/* Deliberately the same 160px gutter as A11's `.ob-oq-grid`, so the two halves
-   of the page share one left edge. */
-.ob-plan-step {
+   **No `border-top` between rows, and no row gap.** The bars are the
+   structure here; a separator every 46px cut the chart into five strips and
+   fought the thing the geometry exists to show. */
+.ob-rm-row {
+  --ob-rm-name-w: 230px;
   display: grid;
-  grid-template-columns: 160px minmax(0, 1fr);
-  column-gap: 32px;
-  padding: 40px 0;
-  border-top: 1px solid var(--ob-hairline);
-}
-.ob-plan-step:last-child {
-  border-bottom: 1px solid var(--ob-hairline);
-}
-/* Same keyframe, same 600ms, same justification as §12's question pulse: job
-   three, live/active — it confirms for 600ms that this is the element you just
-   navigated to. */
-.ob-plan-step[data-pulse] {
-  animation: ob-app-pulse 600ms var(--ob-ease) 1;
+  grid-template-columns: var(--ob-rm-name-w) minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0;
+  min-height: 46px;
 }
 
-.ob-plan-span {
+.ob-rm-row-name {
+  padding-right: 28px;
+  font-size: 17px;
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.25;
+  color: var(--ob-text);
+  transition: color var(--ob-fast) var(--ob-ease);
+}
+
+.ob-rm-lane {
+  position: relative;
+  height: 46px;
+}
+
+/* The gridlines run the full height of every lane, so they read as one
+   continuous rule down a chart that has no other vertical structure. */
+.ob-rm-lane-rules {
+  position: absolute;
+  inset: 0;
+}
+.ob-rm-lane-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--ob-rm-rule);
+}
+
+/* ---- The bars ---- */
+
+/* 44px in a 46px lane: one pixel of air top and bottom, which keeps two
+   overlapping bars from literally merging without reintroducing a gap. */
+.ob-rm-bar {
+  position: absolute;
+  top: 1px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Two elements rather than one because the reveal is a `scaleX` and the
+   button itself owns `left`/`width` from the inline style — a transform on
+   the button would fight the geometry.
+
+   **Slab plus rim plus cast.** The fill is dark enough to sit inside the
+   page's value range; the 1px edge is what makes the bar trackable across
+   800px; the `box-shadow` is the light it throws onto the card, which is
+   what stops five dark rectangles reading as five holes. */
+.ob-rm-bar-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  /* Colour and light are separate layers: the tint is the `background-color`,
+     the slab lighting is a `background-image` over it. That is why there is
+     no per-tint "shade" token — one light direction serves all five. */
+  background-color: var(--ob-rm-tint, var(--ob-hairline-strong));
+  background-image: linear-gradient(
+    to bottom,
+    var(--ob-rm-slab-top),
+    transparent 42%,
+    var(--ob-rm-slab-bottom)
+  );
+  border: 1px solid var(--ob-rm-tint-edge, var(--ob-hairline-strong));
+  /* **Inset only — no outer glow.** A cast glow was tried and removed: on
+     flush rows five of them bled into each other and the chart read as a haze
+     rather than as five defined objects. This one sharpens the rim from the
+     inside so a 1px border still holds an edge across 800px. */
+  box-shadow: inset 0 0 0 1px var(--ob-rm-slab-top);
+  /* Never `width`: transform, opacity and filter only. */
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--ob-enter) var(--ob-ease) var(--ob-reveal-delay, 0ms),
+    filter var(--ob-fast) var(--ob-ease);
+}
+.ob-rm-bar[data-shown="true"] .ob-rm-bar-fill {
+  transform: scaleX(1);
+}
+
+/* An open-ended step does not end — it dissolves, rather than inventing a
+   finish line the plan cannot promise. The rim goes with it, or a hard right
+   edge survives the fade and reads as the end it is denying. */
+.ob-rm-bar[data-open] .ob-rm-bar-fill {
+  border-right: 0;
+  mask-image: linear-gradient(to right, black 0%, black 78%, transparent 100%);
+}
+
+/* Hover is a brightness change and nothing else now — with the glow gone
+   there is no halo to grow, and the row name changing colour beside it is
+   already the louder half of the signal. */
+.ob-rm-bar:hover .ob-rm-bar-fill {
+  filter: brightness(1.34) saturate(1.1);
+}
+.ob-rm-bar:active .ob-rm-bar-fill {
+  filter: brightness(1.08);
+}
+.ob-rm-bar:focus-visible {
+  outline: 2px solid var(--ob-accent);
+  outline-offset: 3px;
+}
+/* The name is part of the target even though it is not the button — a row
+   that lights up as one object is a row you know is clickable. */
+.ob-rm-row:hover .ob-rm-row-name {
+  color: var(--ob-rm-tint-edge, var(--ob-text));
+}
+
+/* The five tints. Hue is identity here, not meaning — see `tokens.css`. Set
+   on the row so the name, the bar and anything else in the row read them. */
+.ob-rm-row[data-tint="amber"] {
+  --ob-rm-tint: var(--ob-rm-amber);
+  --ob-rm-tint-edge: var(--ob-rm-amber-edge);
+}
+.ob-rm-row[data-tint="sage"] {
+  --ob-rm-tint: var(--ob-rm-sage);
+  --ob-rm-tint-edge: var(--ob-rm-sage-edge);
+}
+.ob-rm-row[data-tint="sky"] {
+  --ob-rm-tint: var(--ob-rm-sky);
+  --ob-rm-tint-edge: var(--ob-rm-sky-edge);
+}
+.ob-rm-row[data-tint="lilac"] {
+  --ob-rm-tint: var(--ob-rm-lilac);
+  --ob-rm-tint-edge: var(--ob-rm-lilac-edge);
+}
+.ob-rm-row[data-tint="clay"] {
+  --ob-rm-tint: var(--ob-rm-clay);
+  --ob-rm-tint-edge: var(--ob-rm-clay-edge);
+}
+
+/* A clickable bar has to say so. Right-aligned under the lane, quiet. */
+.ob-rm-hint {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ob-rm-rule);
+  text-align: right;
   font-family: var(--ob-font-mono);
   font-size: var(--ob-meta);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
   color: var(--ob-dim);
+}
+
+.ob-rm-axis-cap {
+  max-width: 62ch;
+  margin-top: 18px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.6;
+  color: var(--ob-dim);
+}
+
+/* ============================================================
+   13. ROADMAP — STEPS, QUESTIONS, SETUP, MONEY        [owner: A17]
+   ============================================================ */
+
+/* Everything below the chart, all of it back on `--ob-canvas`. §13 declares no
+   `@keyframes` and no `scroll-margin-top`; the anchor inset is §1's single
+   rule, which is what makes a bar click land below the sticky header. */
+
+/* ---- §13a — the five steps ---- */
+
+.ob-step-stack {
+  margin-top: 34px;
+}
+
+.ob-step {
+  padding-top: 26px;
+  border-top: 1px solid var(--ob-hairline);
+}
+.ob-step + .ob-step {
+  margin-top: 38px;
+}
+
+.ob-step-head {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  align-items: start;
+}
+
+.ob-step-index {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding-top: 8px;
+  color: var(--ob-dim);
 }
 
-.ob-plan-body > * + * {
-  margin-top: 16px;
+/* The tint, restated on the dark canvas so a section is recognisably the bar
+   the reader clicked. A lifted variant — a pastel tuned for a light card falls
+   to about 3:1 on `--ob-canvas`. */
+.ob-step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ob-rm-dot, var(--ob-muted));
+}
+.ob-step[data-tint="amber"] {
+  --ob-rm-dot: var(--ob-rm-amber-edge);
+}
+.ob-step[data-tint="sage"] {
+  --ob-rm-dot: var(--ob-rm-sage-edge);
+}
+.ob-step[data-tint="sky"] {
+  --ob-rm-dot: var(--ob-rm-sky-edge);
+}
+.ob-step[data-tint="lilac"] {
+  --ob-rm-dot: var(--ob-rm-lilac-edge);
+}
+.ob-step[data-tint="clay"] {
+  --ob-rm-dot: var(--ob-rm-clay-edge);
 }
 
-/* Size is a class; level is structure. Both names are `<h3>` (C17). */
-.ob-plan-name {
+.ob-step-name {
   font-size: var(--ob-h3);
   font-weight: var(--ob-weight);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: var(--ob-leading-tight);
+  line-height: 1.15;
   color: var(--ob-text);
 }
-.ob-plan-name--lead {
-  font-size: var(--ob-h2);
-  letter-spacing: var(--ob-tracking-h2);
-}
-.ob-plan-sub {
-  margin-top: 6px;
+.ob-step-tagline {
+  max-width: 60ch;
+  margin-top: 8px;
   font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
   line-height: 1.55;
   color: var(--ob-dim);
 }
-.ob-plan-desc {
+
+/* Prose left, ambushes right — so "what you'll hit" is beside the step rather
+   than buried under it, and the section reads in one screen. The `100px`
+   leader keeps the body aligned with the heading above it. */
+.ob-step-body {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr) 400px;
+  column-gap: 56px;
+  margin-top: 22px;
+}
+.ob-step-main {
+  grid-column: 2;
+}
+.ob-step-aside {
+  grid-column: 3;
+}
+
+.ob-step-summary {
+  max-width: 62ch;
   font-size: var(--ob-body);
-  line-height: var(--ob-leading-body);
-  color: var(--ob-muted);
-  max-width: 64ch;
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.7;
+  color: var(--ob-text);
 }
 
-/* --- NOT IN IT, inverted ------------------------------------------------- */
-
-/* A `Well` on `--ob-void`. The items carry **full reading weight** — no
-   strike, no dimming. The most valuable thing this block does is tell you what
-   not to build yet, and the old muted line-through read as a caveat.
-   Strike-through belongs to `--ob-discard` and to discarded evidence (C9). */
-.ob-notinit {
-  background: var(--ob-void);
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-card);
-  padding: 20px;
-  max-width: 64ch;
+.ob-step-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 56px;
+  margin-top: 22px;
 }
-.ob-notinit .ob-meta {
+.ob-step-fact {
+  max-width: 46ch;
+}
+.ob-step-fact-label {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ob-hairline);
   color: var(--ob-dim);
 }
-.ob-notinit ul {
+.ob-step-fact-value {
+  margin-top: 10px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.6;
+  color: var(--ob-muted);
+}
+
+.ob-step-cut {
+  margin-top: 22px;
+  max-width: 62ch;
+}
+.ob-step-cut-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px 32px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.55;
+  color: var(--ob-dim);
+}
+
+.ob-step-noambush {
   margin-top: 12px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.6;
+  color: var(--ob-dim);
+}
+.ob-step-aside .ob-ambush-list {
+  margin-top: 14px;
+}
+
+/* ---- §13b — ambushes. Shared by the steps and the setup list. ---- */
+
+.ob-ambush-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ob-ambush + .ob-ambush {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ob-hairline);
+}
+.ob-ambush-tag {
+  margin-bottom: 6px;
+  color: var(--ob-dim);
+}
+/* The two run-sourced ambushes are the only researched facts on this page. */
+.ob-ambush[data-source="run"] .ob-ambush-tag {
+  color: var(--ob-muted);
+}
+.ob-ambush-text {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.65;
+  color: var(--ob-muted);
+}
+
+/* ---- §13c — open questions ---- */
+
+.ob-oq-list {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  max-width: 900px;
+}
+
+.ob-oq-row {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  padding: 22px 0;
+  border-top: 1px solid var(--ob-hairline);
+}
+.ob-oq-row:last-child {
+  border-bottom: 1px solid var(--ob-hairline);
+}
+
+.ob-oq-num {
+  padding-top: 5px;
+  color: var(--ob-dim);
+}
+
+.ob-oq-q {
+  font-size: 19px;
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.45;
+  color: var(--ob-text);
+}
+.ob-oq-why {
+  margin-top: 10px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.65;
+  color: var(--ob-muted);
+}
+/* Only ever rendered on a question that also floated to the top — the tag and
+   the promotion share one trigger. */
+.ob-oq-promoted {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 4px 9px;
+  border: 1px solid var(--ob-hairline-strong);
+  border-radius: var(--ob-r-tag);
+  color: var(--ob-dim);
+}
+
+/* ---- §13d — before you start ---- */
+
+.ob-setup-list {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 26px 56px;
+}
+
+.ob-setup-item {
+  padding-top: 20px;
+  border-top: 1px solid var(--ob-hairline);
+}
+/* A queue is not a task, and the row says so before the reader has read a
+   word of it. */
+.ob-setup-item[data-queue] {
+  border-top-color: var(--ob-hairline-strong);
+}
+
+.ob-setup-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.ob-setup-name {
+  font-size: 17px;
+  font-weight: var(--ob-weight);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.3;
+  color: var(--ob-text);
+}
+
+.ob-setup-wait {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  text-align: right;
 }
-.ob-notinit-item {
-  font-size: var(--ob-body);
-  line-height: var(--ob-leading-body);
-  color: var(--ob-text);
-  text-decoration: none;
-}
-
-/* --- the tripwire, off the axis (D13) ------------------------------------ */
-
-/* A full-width hairline and 64px of padding separate it from the four step
-   blocks — the floor for two distinct sections. Capped at 920 to sit on A11's
-   question measure. */
-.ob-tripwire {
-  margin-top: 64px;
-  background: var(--ob-surface);
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-lg);
-  padding: 40px;
-  max-width: 920px;
-}
-.ob-tripwire > * + * {
-  margin-top: 16px;
-}
-.ob-tripwire[data-pulse] {
-  animation: ob-app-pulse 600ms var(--ob-ease) 1;
-}
-/* Thin only. The emphasis the lead bar would have taken, moved here — because
-   under thin there is no lead bar, and naming a first thing to build the
-   evidence can't support is the one judgement this product refuses to make. */
-.ob-tripwire[data-lead] {
-  margin-top: 0;
-  margin-bottom: 64px;
-}
-.ob-tripwire[data-lead] .ob-tripwire-label {
-  background: var(--ob-text);
-  color: var(--ob-canvas);
-  border-radius: var(--ob-r-tag);
-  padding: 3px 9px;
-}
-.ob-tripwire-label {
-  display: inline-block;
+.ob-setup-wait-tag {
+  font-family: var(--ob-font-mono);
+  font-size: 10px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-dim);
 }
-.ob-tripwire-thin {
-  font-size: var(--ob-body);
-  line-height: var(--ob-leading-body);
+.ob-setup-wait-value {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+.ob-setup-band {
+  flex-shrink: 0;
+}
+
+.ob-setup-detail {
+  margin-top: 12px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.65;
   color: var(--ob-muted);
-  max-width: 64ch;
+}
+.ob-setup-when {
+  margin-top: 10px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.6;
+  color: var(--ob-dim);
+}
+.ob-setup-ambushes {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ob-hairline);
+}
+/* Supporting detail in this section, not the point of the row — the steps
+   above are where an ambush is the headline. */
+.ob-setup-ambushes .ob-ambush-text {
+  font-size: 13px;
+  color: var(--ob-dim);
+}
+
+.ob-setup-total {
+  max-width: 62ch;
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ob-hairline-strong);
+  font-size: var(--ob-body);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.6;
+  color: var(--ob-text);
+}
+
+/* ---- §13e — what it costs ---- */
+
+.ob-money {
+  margin-top: 36px;
+}
+.ob-money-headline {
+  max-width: 68ch;
+  font-size: var(--ob-lead);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.5;
+  color: var(--ob-text);
+}
+.ob-money-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 72px;
+  margin-top: 36px;
+}
+.ob-money-label {
+  margin-top: 36px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ob-hairline);
+  color: var(--ob-dim);
+}
+.ob-money-col > .ob-money-label:first-child {
+  margin-top: 0;
+}
+.ob-money-note {
+  margin-top: 12px;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.65;
+  color: var(--ob-muted);
+}
+.ob-money-calibration {
+  color: var(--ob-text);
+}
+.ob-money-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ob-money-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  column-gap: 16px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ob-hairline);
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+}
+.ob-money-band {
+  font-family: var(--ob-font-mono);
+  font-size: var(--ob-sm);
+  letter-spacing: 0.06em;
+  color: var(--ob-text);
+}
+.ob-money-band[data-band="free"] {
+  color: var(--ob-dim);
+}
+.ob-money-name {
+  color: var(--ob-text);
+}
+.ob-money-when {
+  text-align: right;
+  color: var(--ob-dim);
+}
+.ob-money-legend {
+  margin: 0;
+}
+.ob-money-legend-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ob-hairline);
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+}
+.ob-money-legend-row dd {
+  margin: 0;
+}
+
+/* ---- §13f — what would change all of this ---- */
+
+.ob-tripwire {
+  margin-top: 78px;
+  padding-top: 28px;
+  border-top: 1px solid var(--ob-hairline-strong);
+}
+.ob-tripwire-label {
+  font-size: var(--ob-h3);
+  font-weight: var(--ob-weight);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
 }
 .ob-tripwire-note {
-  font-size: var(--ob-sm);
-  line-height: 1.55;
+  max-width: 68ch;
+  margin-top: 12px;
+  font-size: var(--ob-body);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.6;
   color: var(--ob-muted);
 }
+.ob-tripwire-list {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px 72px;
+}
+.ob-tripwire-item {
+  padding-top: 20px;
+  border-top: 1px solid var(--ob-hairline);
+}
+.ob-tripwire-if,
+.ob-tripwire-then {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.65;
+}
+.ob-tripwire-if {
+  color: var(--ob-text);
+}
+.ob-tripwire-then {
+  margin-top: 10px;
+  color: var(--ob-muted);
+}
+.ob-tripwire-if .ob-meta,
+.ob-tripwire-then .ob-meta {
+  margin-right: 8px;
+  color: var(--ob-dim);
+}
 
-/* --- the exit band ------------------------------------------------------- */
+/* ---- §13g — the exit band ---- */
 
 .ob-exit {
-  margin-top: 96px;
-  padding-top: 96px;
+  margin-top: 78px;
+  padding-top: 28px;
   border-top: 1px solid var(--ob-hairline);
 }
 .ob-exit-label {
   color: var(--ob-dim);
 }
 .ob-exit-line {
+  max-width: 48ch;
   margin-top: 20px;
+  font-size: var(--ob-body);
+  letter-spacing: var(--ob-tracking-snug);
+  line-height: 1.6;
   color: var(--ob-muted);
-  max-width: 40ch;
 }
 .ob-exit-actions {
   display: flex;
@@ -4205,7 +4429,6 @@ main:has(> .ob-define) {
   gap: 20px;
   margin-top: 32px;
 }
-
 /* ============================================================
    14. EVIDENCE EXPLORER                              [owner: A13]
    ============================================================ */
@@ -4743,7 +4966,7 @@ main:has(> .ob-define) {
   position: absolute;
   inset: 0;
   z-index: -1;
-  content: '';
+  content: "";
   background: var(--ob-void);
   opacity: 0.62;
 }
@@ -5012,9 +5235,10 @@ main:has(> .ob-define) {
   border-bottom: 1px solid var(--ob-hairline);
 }
 
-/* Mirrors a shipped label/value grid — the roadmap's `.ob-oq-grid` and the
-   report's aside both land here. The columns are set by the caller so this
-   never drifts from the grid it stands in for. */
+/* Mirrors a shipped label/value grid — the report's aside lands here. The
+   columns are set by the caller so this never drifts from the grid it stands
+   in for. (It used to serve the roadmap's `.ob-oq-grid` too; that card was
+   deleted in A17 and the roadmap's own skeleton no longer uses this.) */
 .ob-skel-grid {
   display: grid;
   column-gap: 32px;
@@ -5154,30 +5378,33 @@ main:has(> .ob-define) {
     opacity: 1;
   }
 
-  /* A11 — the roadmap's landing pulse. A hard on/off that still confirms where
-     you landed without moving. The JS half is `scrollIntoView({ behavior:
-     'auto' })`. */
-  .ob-oq[data-pulse] {
-    animation: none;
-    border-color: var(--ob-hairline-accent);
-  }
-  .ob-oq-body {
+  /* A17 — the journey chart. **Resolves to the end state, does not merely
+     stop**: a bar left at `scaleX(0)` under reduce is five invisible steps and
+     an empty chart, which is the "resolve, don't freeze" failure rule 16 exists
+     to prevent.
+
+     **The first selector is not redundant** — same trap as A10's
+     `.ob-rfig-slot .ob-fig-bar` above, and it bites harder here.
+     §12's `.ob-rm-bar[data-shown='true'] .ob-rm-bar-fill` is (0,3,0) and
+     out-specifies a bare `.ob-rm-bar-fill` (0,1,0) regardless of source order,
+     so with only the short selector every bar stays collapsed under reduce. It
+     would *look* fine in a casual check only because obsidian.css §16's
+     universal blanket crushes the duration to 0.001ms — assert
+     `animationName`/computed transform, never the eventual visual.
+
+     **No JS branch is required** — the reveal sets a data attribute and CSS
+     does the animating. The one JS motion left on this page is the bar's
+     `scrollIntoView({ behavior: 'smooth' })`, which the browser already
+     downgrades under an OS-level reduce preference. */
+  .ob-rm-bar[data-shown="true"] .ob-rm-bar-fill,
+  .ob-rm-bar-fill {
+    transform: scaleX(1);
     transition: none;
   }
-
-  /* A12 — the build plan. The lane stagger is `.ob-reveal`, whose end state
-     obsidian.css §16 already resolves; these are the two landing pulses, which
-     resolve to a held accent hairline rather than merely stopping. **There is
-     no JS branch on this half** — the reveal sets a data attribute and CSS does
-     the animating, and `scrollIntoView({ behavior: 'auto' })` under reduce is
-     already `RoadmapProvider`'s (A11's). */
-  .ob-plan-step[data-pulse] {
-    animation: none;
-    border-top-color: var(--ob-hairline-accent);
-  }
-  .ob-tripwire[data-pulse] {
-    animation: none;
-    border-color: var(--ob-hairline-accent);
+  /* The milestone tooltip. Visibility is a state, not a movement — it still
+     appears, it just stops fading. */
+  .ob-rm-tip {
+    transition: none;
   }
 
   /* A13 — the explorer's row stagger. **Resolves to the end state, does not

@@ -1,6 +1,6 @@
 import { APP_BRAND, DEFINE, REPORT, ROADMAP, SOURCES } from '@/lib/content/app';
 import { getBrief, getRoadmap, getRunSummary } from '@/lib/db/queries';
-import { isOnAxis, planHorizon } from '@/lib/run-plan';
+import { waitWeeks } from '@/lib/run-plan';
 
 export const metadata = {
   title: 'OG cards',
@@ -125,9 +125,8 @@ export default async function OgCardsPage() {
     getBrief(SLUG),
   ]);
 
-  const buildSteps = roadmap.steps.filter(isOnAxis).length;
-  const tripwires = roadmap.steps.length - buildSteps;
-  const weeks = planHorizon(roadmap);
+  const steps = roadmap.phases.length;
+  const wait = waitWeeks(roadmap);
   const answered = Object.values(brief).filter(
     (field) => typeof field === 'object' && field !== null && 'status' in field,
   ).length;
@@ -160,11 +159,12 @@ export default async function OgCardsPage() {
       name: 'roadmap',
       eyebrow: 'ROADMAP',
       headline: ROADMAP.h1,
+      /* `OPEN QUESTIONS` used to appear twice in this array — a copy/paste
+         that survived A15 because the card still looked plausible. */
       meta: [
+        `${steps} STEPS`,
         `${roadmap.open_questions.length} OPEN QUESTIONS`,
-        `${buildSteps} BUILD STEPS`,
-        `${tripwires} TRIPWIRE`,
-        `${weeks} WEEKS`,
+        `${wait.low}–${wait.high} WEEKS OF WAITING`,
       ],
     },
     {

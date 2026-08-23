@@ -1,51 +1,50 @@
-'use client';
-
 import { ROADMAP } from '@/lib/content/app';
-import { ROADMAP_PHASE_LABEL, type RoadmapStep } from '@/lib/schemas/roadmap';
-import { DependencyChips } from './dependency-chip';
-import { useRoadmapNav } from './roadmap-context';
+import type { Tripwire } from '@/lib/schemas/roadmap';
 
 /**
- * D13, made into a component: `WHAT WOULD CHANGE THIS PLAN` lifts off the week
- * axis into its own band.
+ * Where "no verdict" lives.
  *
- * **It sat on the same spine as three real build steps, with a dot and a
- * position in a sequence. A risk tripwire with a week number attached is a lie
- * about what it is** — it is not scheduled, it does not finish, and nothing
- * downstream waits on it. Off the axis, with its own label, it reads as the
- * thing it is.
+ * A tripwire never says the idea is weak. It names a thing that could come back
+ * false and states the *different plan* that follows — which is the only useful
+ * form this information can take for someone who has not built anything before.
+ * "Risky" tells them nothing they can act on; "then the first thing to build is
+ * the waitlist, not the messaging" tells them exactly what changes.
  *
- * The heading is `<h3>` **level** at `--ob-h3` **size** (C17): it is one of the
- * route's eleven h3s, not a section heading. Level is structure, size is a
- * class.
+ * Off the chart on purpose. A tripwire has no start, no duration and no place
+ * in a sequence; giving it a bar would assert a schedule for something that is
+ * a condition rather than a step.
  *
- * Keeps `id="step-WHAT_WOULD_CHANGE_THIS_PLAN"` and `data-pulse`, so A11's
- * reverse `ChangesLink` wiring needed no change at all.
- *
- * Under thin evidence it renders **above** the axis and takes the emphasis the
- * lead bar would otherwise have — there is no lead bar under thin, because
- * naming a first thing to build the evidence can't support is the one
- * judgement this product refuses to make.
+ * **A server component again after A17.** It held `useRoadmapNav` only to
+ * render dependency chips back into the open questions; those chips went with
+ * the rest of the cross-section wiring, and with them the last reason this
+ * needed to be a client component.
  */
-export function TripwirePanel({ step, thin = false }: { step: RoadmapStep; thin?: boolean }) {
-  const { isPulsing } = useRoadmapNav();
-  const pulsing = isPulsing(`step-${step.phase}`);
-
+export function TripwirePanel({
+  tripwires,
+  thin = false,
+}: {
+  tripwires: Tripwire[];
+  thin?: boolean;
+}) {
   return (
-    <div
-      id={`step-${step.phase}`}
-      className="ob-tripwire"
-      data-lead={thin ? '' : undefined}
-      data-pulse={pulsing ? '' : undefined}
-    >
-      {thin ? <p className="ob-tripwire-thin">{ROADMAP.tripwire.thinNote}</p> : null}
-      <p className="ob-tripwire-label ob-meta">{ROADMAP.tripwire.label}</p>
-      <h3 className={thin ? 'ob-plan-name ob-plan-name--lead' : 'ob-plan-name'}>
-        {ROADMAP_PHASE_LABEL[step.phase]}
-      </h3>
-      <p className="ob-plan-desc">{step.description}</p>
-      <p className="ob-tripwire-note">{ROADMAP.tripwire.note}</p>
-      <DependencyChips questionIds={step.dependencies} />
-    </div>
+    <section className="ob-tripwire" aria-labelledby="tripwire-h" data-thin={thin || undefined}>
+      <h2 className="ob-tripwire-label" id="tripwire-h">
+        {ROADMAP.tripwire.label}
+      </h2>
+      <p className="ob-tripwire-note">{thin ? ROADMAP.tripwire.thinNote : ROADMAP.tripwire.note}</p>
+
+      <ul className="ob-tripwire-list">
+        {tripwires.map((tripwire) => (
+          <li key={tripwire.id} className="ob-tripwire-item">
+            <p className="ob-tripwire-if">
+              <span className="ob-meta">{ROADMAP.tripwire.ifLabel}</span> {tripwire.condition}
+            </p>
+            <p className="ob-tripwire-then">
+              <span className="ob-meta">{ROADMAP.tripwire.thenLabel}</span> {tripwire.consequence}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

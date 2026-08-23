@@ -1,16 +1,13 @@
 import { CapabilityMatrix } from '@/components/figures/capability-matrix';
 import { DimensionStrip } from '@/components/figures/dimension-strip';
 import { DomainConcentration } from '@/components/figures/domain-concentration';
-import { FanOutMeter } from '@/components/figures/fan-out-meter';
 import { FIG_H, Figure } from '@/components/figures/figure';
 import { GapBar } from '@/components/figures/gap-bar';
 import { NumberCallout } from '@/components/figures/number-callout';
-import { PlanBar } from '@/components/figures/plan-bar';
 import { RecencyStrip } from '@/components/figures/recency-strip';
 import { RunFunnel } from '@/components/figures/run-funnel';
 import { StanceBar } from '@/components/figures/stance-bar';
 import { ValueLadder } from '@/components/figures/value-ladder';
-import { WeekAxis } from '@/components/figures/week-axis';
 import {
   domainConcentration,
   recencyTicks,
@@ -24,11 +21,10 @@ import {
   roiGap,
   runFunnel,
 } from '@/lib/analytics/report-figures';
-import { planHorizon, planSpans } from '@/lib/run-plan';
 import type { RunSummary } from '@/lib/run-summary';
 import { DIMENSIONS, type Evidence } from '@/lib/schemas/evidence';
 import type { Report } from '@/lib/schemas/report';
-import { ROADMAP_PHASE_LABEL, type Roadmap } from '@/lib/schemas/roadmap';
+import type { Roadmap } from '@/lib/schemas/roadmap';
 import { Row, Section } from '../section';
 
 const SOURCES_HREF = '/r/sms-rebooking-4f2a/sources';
@@ -59,8 +55,6 @@ export function FiguresSection({
   const gap = roiGap(evidence);
   const funnel = runFunnel(summary);
   const matrix = capabilityMatrix(report);
-  const horizon = planHorizon(roadmap);
-  const spans = planSpans(roadmap);
 
   const callouts = DIMENSIONS.flatMap((d) => numberCallouts(evidence, d));
   const rate = callouts.find((c) => c.findingId === 'EV_02');
@@ -218,18 +212,16 @@ export function FiguresSection({
         </div>
       </Row>
 
-      <Row title="FanOutMeter — fan-out reads as filled mass (D14)">
-        <div className="w-full max-w-[420px]">
-          <FanOutMeter governs={3} tripwire={false} max={3} caption="3 STEPS" />
-        </div>
-      </Row>
+      {/* **`FanOutMeter` was deleted in A17**, along with the open-question
+          card that was its only product consumer. A figure demonstrated here
+          and rendered nowhere else is a component the gallery keeps alive on
+          its own — which is how the previous roadmap accumulated marks nobody
+          could point at a screen for.
 
-      {/* **`WeekAxis` + `PlanBar` moved to the Roadmap section.** A12 made
-          `PlanBar` a real `<button>` with an `onSelect` that scrolls to and
-          pulses its step block, so it can only be composed inside a client
-          subtree with a `RoadmapProvider` above it. Demonstrating it here
-          would have meant a second, inert geometry for the same figure —
-          exactly the drift §13's "no redeclaration" rule exists to stop. */}
+          **The journey chart is not demonstrated here either.** Its bars are
+          real `<button>`s that scroll to a section by DOM id, so an instance
+          in the gallery would be a second, inert geometry for the same figure —
+          exactly the drift §12's "no redeclaration" rule exists to stop. */}
     </Section>
   );
 }

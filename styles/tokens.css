@@ -18,15 +18,26 @@
   --ob-surface: #101012;
   --ob-raised: #17171b;
 
-  /* Hairlines — the structural line work. This IS the layout. */
-  --ob-hairline: #232326;
-  --ob-hairline-strong: #34343c;
+  /* Hairlines — the structural line work. This IS the layout.
+     Lifted from #232326/#34343c so the structure keeps pace with the brighter
+     text below; a hairline that reads as absent turns a carved layout into
+     floating text. */
+  --ob-hairline: #2e2e34;
+  --ob-hairline-strong: #43434d;
   --ob-hairline-accent: rgba(45, 127, 249, 0.42);
 
-  /* Text — three levels and a dim. */
-  --ob-text: #f4f4f5;
-  --ob-muted: #8a8a93;
-  --ob-dim: #5b5b64;
+  /* Text — three levels and a dim.
+
+     **All three greys were measured up.** The old values were `#8a8a93`
+     (5.8:1 on `--ob-canvas`) and `#5b5b64` (3.2:1) — and `--ob-dim` is not a
+     decorative layer here, it carries the meta lines, the figure captions and
+     the tripwire body on the run pages. At 3.2:1 those fail AA outright at the
+     12–15px they render at, which is exactly the copy that reads as unreadably
+     faint. The three levels still separate cleanly; they now do it in a band
+     that is legible end to end rather than fading out at the bottom. */
+  --ob-text: #f4f4f5; /* 17.1:1 */
+  --ob-muted: #b0b0b8; /*  9.2:1 */
+  --ob-dim: #7c7c86; /*  5.3:1 — AA at every size we use it at */
   --ob-on-accent: #ffffff;
 
   /* Accent — one hue, two jobs: verification, and the single primary CTA.
@@ -38,8 +49,16 @@
   --ob-accent-glow: rgba(45, 127, 249, 0.4);
 
   /* Discard state — the excerpt that failed verification. Never red; it is a
-     non-event, not an error. It simply goes grey and leaves. */
-  --ob-discard: #4a4a52;
+     non-event, not an error. It simply goes grey and leaves. Up from #4a4a52
+     (2.4:1), which had receded past "de-emphasised" into "can't be read at
+     all" — the excerpt still has to be legible while it leaves, or the
+     discard tells the reader nothing. Deliberately still the dimmest text in
+     the system, a step under `--ob-dim` — but only just, because on
+     `/r/[slug]/sources` this colour carries eighteen full 16px excerpts, which
+     is real reading, not a transient animation frame. The state is legible
+     from the `DISCARDED` tag, the reason line and the panel treatment; it does
+     not also need the text to be too faint to read. */
+  --ob-discard: #7a7a84; /* 4.7:1 */
 
   /* Washes */
   --ob-hover-wash: rgba(244, 244, 245, 0.04);
@@ -123,8 +142,8 @@
   /* Figure axes/gridlines, and the contests-stance hatch. Colour values, so
      they may exist nowhere but this file. C12 pins the hatch's one geometry;
      the geometry itself is written in the recipes, not stored here. */
-  --ob-grid: rgba(244, 244, 245, 0.06);
-  --ob-hatch: rgba(244, 244, 245, 0.1);
+  --ob-grid: rgba(244, 244, 245, 0.1);
+  --ob-hatch: rgba(244, 244, 245, 0.15);
 
   /* ------------------------------------------------------------------
      Glass field — pillar 02's floating scene on `/`, and nothing else.
@@ -199,4 +218,73 @@
      the figure. White, and enough of it to be the connection it is. */
   --ob-cone-fill: rgba(244, 244, 245, 0.12);
   --ob-cone-edge: rgba(244, 244, 245, 0.34);
+
+  /* ------------------------------------------------------------------
+     Roadmap chart — the journey card on `/r/[slug]/roadmap`, and nothing
+     else.
+
+     **A second knowing addition to a list C2 declared closed**, made the
+     same way the glass field was: the alternative is colour literals in a
+     component, which the rule at the top of this file forbids outright,
+     and the escape hatch it names is a token. Grouped, prefixed `--ob-rm-`,
+     and referenced by exactly one section of one stylesheet.
+
+     **The card was light for one revision and is not any more.** It read as
+     a spreadsheet dropped into the page — the inversion bought horizontal
+     legibility and paid for it with everything else. Contrast now comes
+     from the system's own vocabulary instead: a surface a hair above the
+     canvas, two ambient blooms lighting it, and bars that are a *dark*
+     tinted slab with a luminous rim. The rim is what makes a row trackable
+     across 800px, and it does it without turning the page inside out.
+
+     **One system rule is still broken on purpose, at the user's direction:
+     `--ob-rm-sky` is blue and is doing none of blue's three jobs.** Here hue
+     means *identity* — five rows need five tints so a bar, its section
+     heading and its jump link are recognisably one step. Sky is one of five
+     and carries no more meaning than clay does.
+
+     Every fill sits well below its edge in luminance. That pairing is the
+     whole treatment: read the slab as mass, the rim as definition.
+     ------------------------------------------------------------------ */
+
+  /* The card. Barely above `--ob-canvas` — the blooms do the lifting, not
+     the surface, or the whole thing reads as a grey box. */
+  --ob-rm-card: #0c0c0f;
+  --ob-rm-card-edge: #26262d;
+  /* Two ambient pools behind the bars, warm at the top-left where the
+     journey starts and cool at the lower-right where it ends. Low enough
+     that neither reads as a colour, high enough that the card stops being
+     flat. */
+  --ob-rm-bloom-warm: rgba(226, 164, 78, 0.15);
+  --ob-rm-bloom-cool: rgba(107, 168, 240, 0.15);
+
+  /* Slab lighting. Every bar is the same solid tint, so depth has to come
+     from a light direction rather than from five hand-picked shades: a thin
+     highlight along the top edge and a shadow pooling at the bottom, applied
+     over whatever `--ob-rm-tint` happens to be. One pair, five bars. */
+  --ob-rm-slab-top: rgba(255, 255, 255, 0.16);
+  --ob-rm-slab-bottom: rgba(0, 0, 0, 0.28);
+
+  /* Chart furniture — the milestone gridlines. */
+  --ob-rm-rule: rgba(244, 244, 245, 0.11);
+  --ob-rm-rule-strong: rgba(244, 244, 245, 0.28);
+
+  /* Five tints, one per row: a dark fill and a bright rim, and nothing else.
+     A per-bar outer glow was tried and removed — five glows on adjacent flush
+     rows bled into each other and turned the chart into a haze. The card's two
+     ambient blooms are the only light in here now. */
+  --ob-rm-amber: #7d4a13;
+  --ob-rm-amber-edge: #e2a44e;
+
+  --ob-rm-sage: #2b5c37;
+  --ob-rm-sage-edge: #71c285;
+
+  --ob-rm-sky: #234a80;
+  --ob-rm-sky-edge: #6ba8f0;
+
+  --ob-rm-lilac: #423372;
+  --ob-rm-lilac-edge: #a491e4;
+
+  --ob-rm-clay: #7a3428;
+  --ob-rm-clay-edge: #e28874;
 }

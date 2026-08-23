@@ -337,70 +337,101 @@ export const REPORT = {
 /* -------------------------------------------------------------- roadmap --- */
 
 export const ROADMAP = {
-  h1: 'What to do next.',
-  lead: "Six things the web can't tell you, and the plan that depends on them.",
+  h1: 'What happens next.',
+  /**
+   * Opens by connecting to the run rather than starting cold, then states the
+   * one lesson the chart exists to teach. The count is typed because copy is
+   * design here and `${n} verified findings` reads like a dashboard readout —
+   * the same exception `SOURCES.lead` takes, and the whole of it.
+   */
+  lead: 'You have 47 verified findings and not one conversation with a dentist. Everything below is ordered to fix that.',
   nav: [
+    { id: 'journey', label: 'The journey' },
+    { id: 'steps', label: 'The five steps' },
     { id: 'open-questions', label: 'Open questions' },
-    { id: 'build-roadmap', label: 'Build roadmap' },
+    { id: 'setup', label: 'Before you start' },
+    { id: 'money', label: 'What it costs' },
   ],
-  /** The seven-label spine, in fixed order. The `QUESTION` row is the trigger
-   *  and renders collapsed *and* expanded, so the landmark never disappears. */
-  labels: {
-    question: 'QUESTION',
-    why_it_matters: 'WHY IT MATTERS',
-    ask: 'ASK',
-    find_them: 'FIND THEM',
-    how_many: 'HOW MANY',
-    script: 'THE SCRIPT',
-    survey: 'THE SURVEY',
-    what_you_learn: 'WHAT YOU LEARN',
-  },
-  askPrefix: 'ASK',
-  fanOut: {
-    steps: (n: number) => `${n} STEP${n === 1 ? '' : 'S'}`,
-    stepsWithTripwire: (n: number) => `${n} STEP${n === 1 ? '' : 'S'} + TRIPWIRE`,
-  },
-  promotedTag: 'FROM YOUR BRIEF',
-  promotedNote: (label: string) => `You marked “${label}” unknown.`,
-  alsoUnknown: {
-    label: 'ALSO UNKNOWN',
-    /**
-     * Nothing in the run wrote a script for these, and fabricating one would
-     * violate "nothing is invented to fill a field". They are worth answering
-     * and the page says so without pretending to know how.
-     */
-    line: (countWord: string, fields: string) =>
-      `${countWord} more thing${fields.includes(META_SEPARATOR) ? 's' : ''} you marked unknown — ${fields} — didn’t turn into research questions. Worth answering; there’s no script for them.`,
-  },
-  /* ---------------------------------------------------- A12: the build plan --- */
+
+  promotedTag: 'YOU MARKED THIS UNKNOWN',
+
+  /* ------------------------------------------------- A17: the journey chart --- */
 
   /**
-   * §02's own strings. **No step names live here** — they render through
-   * `ROADMAP_PHASE_LABEL` in `lib/schemas/roadmap.ts`, sentence-case for the
-   * headings and uppercased by CSS for the bars. One label map, no second one
-   * (C3).
+   * §01's strings. **No phase names live here** — those are fixture data,
+   * because the row list is built out of what an idea requires rather than
+   * fixed in code. What lives here is the vocabulary the chart uses to explain
+   * itself.
    */
-  plan: {
-    /** The subtitle under the lead step's name, and the only one there is. */
-    subtitles: {
-      FIRST_THING_TO_BUILD: 'the smallest version a real user could use',
-    } as Partial<Record<string, string>>,
-    /** Composed from `planSpans`, never typed: `12-WEEK HORIZON · 3 DEFINITE SPANS · 1 OPEN-ENDED`. */
-    axisCaption: (horizon: number, definite: number, open: number) =>
-      `${horizon}-WEEK HORIZON · ${definite} DEFINITE SPAN${definite === 1 ? '' : 'S'} · ${open} OPEN-ENDED`,
-    /** `W1–W2 · 2 WEEKS`, `W12 · ONGOING`. Also composed from `planSpans`. */
-    span: (startWeek: number, endWeek: number | null) =>
-      endWeek === null
-        ? `W${startWeek} · ONGOING`
-        : endWeek === startWeek
-          ? `W${startWeek} · 1 WEEK`
-          : `W${startWeek}–W${endWeek} · ${endWeek - startWeek + 1} WEEKS`,
+  journey: {
+    /**
+     * The lesson the chart exists to teach, composed from `waitWeeks` so the
+     * number can never drift from the setup items it sums. Rewritten in A17:
+     * the waiting is no longer *on* the chart, so the sentence has to point at
+     * where it went, and the fix — start them now — is the whole content.
+     */
+    criticalPath: (low: number, high: number) =>
+      `Five steps, and they overlap. The one that surprises people is that marketing starts before the product is finished. Separately, ${low}–${high} weeks of this plan are queues someone else controls — they cost you nothing if you start them today, and two months if you start them when you need them.`,
+    /** Sits under the chart, explaining what horizontal position does mean. */
+    axisCaption:
+      'Left to right is order and overlap, not dates. The markers are the five things that prove progress.',
+    /** The affordance, stated once, because a clickable bar has to say so. */
+    hint: 'Select a step to read it',
+    milestones: 'MILESTONES',
+    /** Screen-reader-only prefix on a bar button. */
+    barAction: (name: string) => `Read about ${name}`,
+  },
+
+  /** §02's per-step labels. Three rows, and two that appear only when real. */
+  step: {
+    startsWhen: 'START WHEN',
+    cost: 'COSTS',
     notInIt: 'NOT IN IT',
+    ambushes: "WHAT YOU'LL HIT",
+    noAmbush: 'Nothing surprising here. Not every step has an ambush in it.',
+    back: 'Back to the chart',
+  },
+
+  /** The five species, rendered as the tag on an ambush. */
+  ambushSpecies: {
+    lead_time: 'LEAD TIME',
+    threshold: 'THRESHOLD',
+    obligation: 'OBLIGATION',
+    delayed_signal: 'DELAYED SIGNAL',
+    false_generalisation: 'WON’T REPEAT',
+  } as Record<string, string>,
+
+  questions: {
+    label: 'Open questions',
+    /** Names what the list is for, so six questions do not read as six chores. */
+    lead: 'Six things the research could not settle. Each one changes the plan above depending on the answer — which is why they come before the building, not after.',
+  },
+
+  /** §04. The boring list, and the two lines that stop it reading as filler. */
+  setup: {
+    label: 'Before you start',
+    lead: 'None of this is work, and none of it goes on the chart. Two of them are queues you join rather than tasks you finish — start those today and they run alongside everything else for free.',
+    waitLabel: 'WAIT',
+    queueTag: 'A QUEUE, NOT A TASK',
+    /** The one number worth repeating, composed from the same helper. */
+    total: (low: number, high: number, count: number) =>
+      `${low}–${high} weeks of waiting, across ${count} of the five. None of it moves faster because you asked.`,
+  },
+
+  money: {
+    label: 'What it costs to run',
+    /** The bands mean nothing until this line defines them in real money. */
+    legendLabel: 'WHAT THE BANDS MEAN',
+    creditsLabel: 'FREE CREDIT',
+    calibrationLabel: 'THE NUMBER TO LOOK AT',
+    itemsLabel: 'RUNNING COSTS',
   },
 
   tripwire: {
-    label: 'NOT A STEP · A TRIPWIRE',
-    note: 'Two answers could invalidate this plan before you write any of it.',
+    label: 'What would change all of this',
+    note: 'None of this is a verdict. Each one is a different plan, not a worse idea.',
+    ifLabel: 'IF',
+    thenLabel: 'THEN',
     /** Thin only. Naming a "first thing to build" the evidence can't support is
      *  the one judgement this product refuses to make. */
     thinNote:
@@ -415,52 +446,11 @@ export const ROADMAP = {
     restart: 'Start another idea →',
   },
 
-  copyScript: 'Copy script',
-  copySurvey: 'Copy survey',
-  copyAll: 'Copy all scripts',
   copied: '✓ Copied',
   copyFailed: 'Press ⌘C',
-  dependsOn: '◂ depends on',
-  changes: 'Changes:',
-  noCommunities:
-    'We didn’t find specific communities for this — start with the general ones and ask who else to talk to.',
-  surveyStanding: 'Surveys are for counting things after interviews have told you what to count.',
-  /**
-   * The clipboard text: **clean plain text, the numbered questions only.** No
-   * markdown, no labels, no attribution footer. The numbering lives in CSS on
-   * screen (`counter-increment`) and is rebuilt here for the paste — a `"1. "`
-   * baked into the data is presentation leaking into the fixture.
-   */
-  fieldwork: {
-    headline: 'None of the answers are online.',
-    lead: 'Everything above is a question the web has already declined to answer. Everything below assumes you went and asked.',
-    panels: [
-      {
-        id: 'conversation',
-        caption: '01 · 8–10 CONVERSATIONS',
-        brief:
-          'Two people at a small table in a back office, three-quarter from behind and to one side. One is mid-sentence with a hand half-raised; the other is writing in a notebook and not looking up. A paper cup, a folder, a chair pushed out. Cramped, fluorescent-adjacent, not a meeting room. Near-monochrome, single hard key light, deep shadow. 12s, almost no camera move.',
-      },
-      {
-        id: 'expo',
-        caption: '02 · ONE REGIONAL EXPO',
-        brief:
-          'A trade-hall aisle photographed down its length, wide open and mostly empty. Backs of two or three figures far away. Booth frames visible only as dark geometry, no legible signage. Overhead light in hard pools with black between them — the first hour of the first day, before anyone arrives. 12s, almost no camera move.',
-      },
-      {
-        id: 'front-desk',
-        caption: '03 · ONE PILOT PRACTICE, ~200 PATIENTS',
-        brief:
-          'A reception counter after hours, shot low and close along the countertop. A desk phone handset, a paper appointment book left open, a pen. One screen present but angled away and completely out of focus. No people. A single hard key light from off-frame left, dying within a metre. 12s, almost no camera move.',
-      },
-    ],
-  },
 } as const;
 
-/** The numbered questions only — the paste a person actually wants. */
-export function buildScriptText(lines: readonly string[]): string {
-  return lines.map((line, index) => `${index + 1}. ${line}`).join('\n');
-}
+/* `buildScriptText` was deleted in A16 with the interview scripts it formatted. */
 
 /* -------------------------------------------------------------- sources --- */
 
@@ -702,8 +692,11 @@ export const REPORT_SECTIONS: readonly SectionEntry[] = [
 ] as const;
 
 export const ROADMAP_SECTIONS: readonly SectionEntry[] = [
-  { index: '01', label: 'OPEN QUESTIONS', id: 'open-questions' },
-  { index: '02', label: 'BUILD ROADMAP', id: 'build-roadmap' },
+  { index: '01', label: 'THE JOURNEY', id: 'journey' },
+  { index: '02', label: 'THE FIVE STEPS', id: 'steps' },
+  { index: '03', label: 'OPEN QUESTIONS', id: 'open-questions' },
+  { index: '04', label: 'BEFORE YOU START', id: 'setup' },
+  { index: '05', label: 'WHAT IT COSTS', id: 'money' },
 ] as const;
 
 export const SOURCES_SECTIONS: readonly SectionEntry[] = [

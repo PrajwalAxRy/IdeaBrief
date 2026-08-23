@@ -57,7 +57,27 @@ schema, and fill its params from the `Format:` and `Deliver to:` fields below.
 
 ---
 
-## 1. The fieldwork band — 3 panels `[HIGH PRIORITY]`
+## 1. The fieldwork band — 3 panels `[REMOVED FROM THE PAGE — A17]`
+
+> **The band no longer exists.** A17 rebuilt the roadmap for readability and the
+> user chose, explicitly, to drop this section. `FieldworkBand` and
+> `FieldworkMedia` are deleted, `ROADMAP.fieldwork` is deleted, and the
+> `.ob-fieldwork-*` recipes went with §12.
+>
+> **The three stills are still on disk and are still paid work.** They are
+> `public/media/roadmap/conversation.webp`, `expo.webp` and `front-desk.webp`,
+> shipped 2026-08-22. Nothing references them. They have **not** been deleted,
+> because deleting a generated asset to tidy a diff is how paid work gets
+> re-commissioned six weeks later — and the art direction below is still good.
+> If an editorial human band ever returns to this product, these three and this
+> brief are what it starts from.
+>
+> **Do not generate the optional image-to-video step for these.** Batch 1 in
+> [`higgsfield_generation_queue.md`](higgsfield_generation_queue.md) is now
+> pointless for the roadmap: there is nowhere to play a clip.
+>
+> Everything below this line is preserved as the record of what the band was
+> and why, not as a live instruction.
 
 **This entry leads the file even though the band sits mid-page**, because it is
 the only real generated asset the roadmap has and everything else here is

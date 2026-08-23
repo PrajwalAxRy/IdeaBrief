@@ -36,10 +36,13 @@ describe('every fixture parses through its schema', () => {
     expect(confidences).toEqual(new Set(['solid', 'mixed', 'thin']));
   });
 
-  it('roadmap — 6 open questions, 5 steps, dependencies resolve', () => {
+  it('roadmap — 6 open questions, 5 phases, 5 setup items, references resolve', () => {
     const roadmap = RoadmapSchema.parse(roadmapFixture);
     expect(roadmap.open_questions).toHaveLength(6);
-    expect(roadmap.steps).toHaveLength(5);
+    expect(roadmap.phases).toHaveLength(5);
+    expect(roadmap.setup).toHaveLength(5);
+    expect(roadmap.milestones).toHaveLength(5);
+    expect(roadmap.tripwires).toHaveLength(4);
   });
 
   it('conversation — turns plus the closing lines the script ends on', () => {
@@ -129,9 +132,9 @@ describe('schemas reject malformed payloads', () => {
     expect(() => ReportSchema.parse(malformed)).toThrow();
   });
 
-  it('rejects a roadmap step whose dependency does not exist', () => {
+  it('rejects a tripwire naming an open question that does not exist', () => {
     const malformed = structuredClone(roadmapFixture);
-    malformed.steps[0].dependencies = ['Q99'];
+    malformed.tripwires[0].questions = ['Q99'];
     expect(() => RoadmapSchema.parse(malformed)).toThrow();
   });
 
@@ -172,27 +175,109 @@ describe('schemas reject malformed payloads', () => {
     expect(() => ReportSchema.parse(ok)).not.toThrow();
   });
 
-  it('rejects a tripwire step carrying a week span', () => {
+  /* The rule the journey model rests on. A wait is a pair or it is nothing:
+     half a range is a number nobody can act on, and a `wait_low` with no
+     `wait_high` is exactly how "about two weeks" creeps back in. */
+  it('rejects half a wait range', () => {
     const malformed = structuredClone(roadmapFixture);
-    malformed.steps[4].start_week = 12;
+    const queue = malformed.setup.find((item) => item.wait_low !== null);
+    if (!queue) throw new Error('fixture has no queue');
+    queue.wait_high = null;
     expect(() => RoadmapSchema.parse(malformed)).toThrow();
   });
 
-  it('rejects a build step missing start_week', () => {
+  it('rejects a wait that ends before it starts', () => {
     const malformed = structuredClone(roadmapFixture);
-    malformed.steps[0].start_week = null;
+    const queue = malformed.setup.find((item) => item.wait_low !== null);
+    if (!queue) throw new Error('fixture has no queue');
+    queue.wait_low = 6;
+    queue.wait_high = 2;
     expect(() => RoadmapSchema.parse(malformed)).toThrow();
   });
 
-  it('accepts a build step with a null duration', () => {
+  it('accepts an open-ended phase, which dissolves rather than inventing an end', () => {
     const ok = structuredClone(roadmapFixture);
-    ok.steps[2].duration_weeks = null;
+    expect(ok.phases.some((phase) => phase.end === null)).toBe(true);
     expect(() => RoadmapSchema.parse(ok)).not.toThrow();
   });
 
-  it('rejects duplicate step ids', () => {
+  it('rejects a phase that ends before it starts', () => {
     const malformed = structuredClone(roadmapFixture);
-    malformed.steps[1].id = malformed.steps[0].id;
+    malformed.phases[0].end = 0;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  /* Six rows is where a Gantt stops being readable, which is the whole reason
+     A17 exists. The cap is a schema rule so it cannot be argued back up. */
+  it('rejects a seventh phase', () => {
+    const malformed = structuredClone(roadmapFixture);
+    const extra = structuredClone(malformed.phases[4]);
+    malformed.phases.push({ ...extra, id: 'P6', ambushes: [] });
+    malformed.phases.push({ ...extra, id: 'P7', ambushes: [] });
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  /* Tint is how a bar tells the reader which section it belongs to. Two rows
+     sharing one defeats the only job it has. */
+  it('rejects two phases sharing a tint', () => {
+    const malformed = structuredClone(roadmapFixture);
+    malformed.phases[1].tint = malformed.phases[0].tint;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects phases authored out of start order', () => {
+    const malformed = structuredClone(roadmapFixture);
+    const [first, second] = malformed.phases;
+    malformed.phases[0] = second;
+    malformed.phases[1] = first;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  /* Only a run-sourced ambush may cite. An `idea` or `universal` ambush with a
+     citation is claiming research the run never did. */
+  it('rejects a non-run ambush carrying a citation', () => {
+    const malformed = structuredClone(roadmapFixture);
+    const owner = malformed.phases.find((p) => p.ambushes.some((a) => a.source !== 'run'));
+    if (!owner) throw new Error('fixture has no non-run ambush');
+    const ambush = owner.ambushes.find((a) => a.source !== 'run');
+    if (!ambush) throw new Error('unreachable');
+    ambush.citation_id = 46;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects a run-sourced ambush with no citation', () => {
+    const malformed = structuredClone(roadmapFixture);
+    const owner = malformed.setup.find((s) => s.ambushes.some((a) => a.source === 'run'));
+    if (!owner) throw new Error('fixture has no run ambush');
+    const ambush = owner.ambushes.find((a) => a.source === 'run');
+    if (!ambush) throw new Error('unreachable');
+    ambush.citation_id = undefined;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects a cost item using a band the legend never defines', () => {
+    const malformed = structuredClone(roadmapFixture);
+    malformed.money.legend = malformed.money.legend.filter((entry) => entry.band !== '$$$');
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects milestones authored out of journey order', () => {
+    const malformed = structuredClone(roadmapFixture);
+    const [first, second] = malformed.milestones;
+    malformed.milestones[0] = second;
+    malformed.milestones[1] = first;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects duplicate phase ids', () => {
+    const malformed = structuredClone(roadmapFixture);
+    malformed.phases[1].id = malformed.phases[0].id;
+    expect(() => RoadmapSchema.parse(malformed)).toThrow();
+  });
+
+  it('rejects an ambush id reused across a phase and a setup item', () => {
+    const malformed = structuredClone(roadmapFixture);
+    malformed.setup[1].ambushes[0].id = malformed.phases[1].ambushes[0].id;
     expect(() => RoadmapSchema.parse(malformed)).toThrow();
   });
 

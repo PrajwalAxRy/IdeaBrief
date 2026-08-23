@@ -1,67 +1,101 @@
-import type { Roadmap, RoadmapStep } from './schemas/roadmap';
+import type { Ambush, Phase, Roadmap, SetupItem } from './schemas/roadmap';
 
 /**
- * The roadmap's week model (C5, D13).
+ * The roadmap's journey model (A17, superseding A16's track/bar model).
  *
- * **No `leftPct` / `widthPct`, no `planLanes`, no `buildRunPlan`.** Pixel and
- * percentage geometry belongs to the CSS grid A12 builds; a percentage
- * returned from a pure module is a layout decision smuggled into the data
- * layer.
+ * Geometry here is a fraction-to-percentage conversion and nothing more —
+ * `Phase.start` / `Phase.end` are already fractions of the journey in the
+ * fixture, so there is no layout decision being smuggled into the data layer.
+ *
+ * What this module does own is every number the page prints, so a count can
+ * never be authored in two places and drift.
  */
 
-export interface PlanSpan {
-  step: RoadmapStep;
-  startWeek: number;
-  /** null when the step is open-ended. */
-  endWeek: number | null;
+export interface PhaseSpan {
+  /** Left edge, as a percentage of the chart width. */
+  leftPct: number;
+  /** Width, as a percentage of the chart width. Open phases run to the edge. */
+  widthPct: number;
   openEnded: boolean;
 }
 
-/**
- * The single place D13's "the tripwire is not a phase" becomes code. A step
- * that is not on the axis gets no bar — it lifts out into `TripwirePanel`.
- */
-export function isOnAxis(step: RoadmapStep): boolean {
-  return step.kind === 'build';
-}
-
-export function planSpans(roadmap: Roadmap): PlanSpan[] {
-  return roadmap.steps.filter(isOnAxis).map((step) => {
-    if (step.start_week === null) {
-      throw new Error(`${step.id} is on the axis but has no start_week.`);
-    }
-    const openEnded = step.duration_weeks === null;
-    return {
-      step,
-      startWeek: step.start_week,
-      endWeek: openEnded ? null : step.start_week + (step.duration_weeks as number) - 1,
-      openEnded,
-    };
-  });
+export function phaseSpan(phase: Phase): PhaseSpan {
+  const openEnded = phase.end === null;
+  const end = phase.end ?? 1;
+  return {
+    leftPct: phase.start * 100,
+    widthPct: (end - phase.start) * 100,
+    openEnded,
+  };
 }
 
 /**
- * The visible `W1…W12` horizon. An open-ended step contributes only its start
- * week — it runs to the edge of the axis and dissolves rather than inventing
- * an end.
- */
-export function planHorizon(roadmap: Roadmap): number {
-  return planSpans(roadmap).reduce((max, span) => Math.max(max, span.endWeek ?? span.startWeek), 0);
-}
-
-/**
- * Question id → the steps naming it, in axis order, **tripwire included** —
- * the tripwire genuinely does depend on its questions.
+ * `"2–3 weeks"` · `"2 weeks"` · `null` when there is no queue to wait in.
  *
- * Returns the edges rather than a count because A11 needs to partition them
- * with `isOnAxis`; a count is `.length`. There is no `fanOutMax` — the meter's
- * denominator is the max over these lengths (3), and the caption's denominator
- * is the step count (5): `Q06 governs 3 of 5`.
+ * Formatted here rather than in the component, because nothing downstream of
+ * the seam formats a number. An en dash, not a hyphen.
  */
-export function fanOut(roadmap: Roadmap): Record<string, RoadmapStep[]> {
-  const out: Record<string, RoadmapStep[]> = {};
-  for (const question of roadmap.open_questions) {
-    out[question.id] = roadmap.steps.filter((step) => step.dependencies.includes(question.id));
+export function waitLabel(item: SetupItem): string | null {
+  if (item.wait_low === null || item.wait_high === null) return null;
+  if (item.wait_low === item.wait_high) {
+    return `${item.wait_low} ${item.wait_low === 1 ? 'week' : 'weeks'}`;
   }
-  return out;
+  return `${item.wait_low}–${item.wait_high} weeks`;
+}
+
+export interface WaitTotal {
+  low: number;
+  high: number;
+  /** How many setup items are a queue rather than an errand. */
+  count: number;
+}
+
+/**
+ * The headline insight, derived rather than asserted: how many weeks of this
+ * plan belong to a carrier, a software vendor and the state.
+ *
+ * **After A17 this sums `setup` alone**, and the number went down — the two
+ * phase-level waits it used to include (interview scheduling, waiting for real
+ * cancellations to happen) are real, but they are not queues anyone can join
+ * early, so counting them alongside a carrier registration blurred the one
+ * actionable point. What is left is the number a founder can actually do
+ * something about: start these now and they cost nothing, start them when you
+ * need them and they cost two months.
+ */
+export function waitWeeks(roadmap: Roadmap): WaitTotal {
+  return roadmap.setup.reduce<WaitTotal>(
+    (acc, item) => {
+      if (item.wait_low === null || item.wait_high === null) return acc;
+      return {
+        low: acc.low + item.wait_low,
+        high: acc.high + item.wait_high,
+        count: acc.count + 1,
+      };
+    },
+    { low: 0, high: 0, count: 0 },
+  );
+}
+
+/** Every ambush on the page, flattened — phases first, then setup. */
+export function allAmbushes(roadmap: Roadmap): Ambush[] {
+  return [...roadmap.phases, ...roadmap.setup].flatMap((owner) => owner.ambushes);
+}
+
+/**
+ * The ambushes that came out of the research run and therefore carry a chip.
+ * On this fixture there are exactly two, because the run's `PRACTICAL`
+ * dimension is `thin` — which is the honest number, not a shortfall.
+ */
+export function citedAmbushes(roadmap: Roadmap): Ambush[] {
+  return allAmbushes(roadmap).filter((ambush) => ambush.source === 'run');
+}
+
+/** Phase id → phase, for the chart's jump links. */
+export function phaseById(roadmap: Roadmap, id: string): Phase | undefined {
+  return roadmap.phases.find((phase) => phase.id === id);
+}
+
+/** The DOM id of a phase's section. One definition, used by both directions. */
+export function phaseAnchor(phaseId: string): string {
+  return `step-${phaseId.toLowerCase()}`;
 }

@@ -89,7 +89,7 @@ reopen them.
 | D10 | **Don't-Know Button** | **Fully functional.** The brief becomes live client state layered over the fixture; pressing it marks that field `unknown → open question`, the count updates, and the roadmap's open-question set reflects it. |
 | D11 | **Transcript** | **Typeset, and actually differentiated** — no bubbles (blueprint rule), but differentiated by measure, colour, indentation and a hairline. Today AI and user turns are pixel-identical because the two differentiating classes don't exist. |
 | D12 | **Approve gating** | Appears once the **core fields** are filled (~turn 5–6), with a live `n unanswered → open questions` **`ConsequenceLine`** beside it. Talking past that point is optional. |
-| D13 | **Roadmap timeline** | **Time-scaled horizontal plan** on a shared week axis. `WHAT WOULD CHANGE THIS PLAN` lifts out below the axis as a **`TripwirePanel`** — it is a tripwire, not a build phase. |
+| D13 | ~~**Roadmap timeline**~~ **SUPERSEDED by A16.** | ~~Time-scaled horizontal plan on a shared week axis.~~ The week axis is **deleted**: it could not express overlap (a bar started on an integer track or not at all), and overlap is the whole point of the journey chart. Replaced by continuous 0–1 fractions, **no axis and no scale**, and two bar treatments carrying the honesty rule. **The half of D13 that survives** is the tripwire: still off the chart, still not a phase, for exactly the reason D13 gave. |
 | D14 | **Dependencies** | Build the missing pulse **and** show **fan-out as weight** — a question that governs three steps reads heavier than one that governs one. No separate graph diagram. |
 | D15 | **Sources** | Becomes a full-width **`EvidenceExplorer`**: facet rail (dimension · stance · cited · domain · recency) with live counts, dense rows, a funnel strip on top, and the **18 discards as real records with reasons** in their own facet. |
 | D16 | **Evidence navigation** | The three-pillar `StageRail` stays intact. A persistent **`EvidenceButton`** in the run chrome opens the explorer from any page. Evidence is a layer available everywhere, not a fifth destination. |
@@ -515,7 +515,32 @@ export function writeBriefPatch(slug: string, patch: BriefPatch): void;
 
 ---
 
-### C5 — The roadmap week model: `lib/run-plan.ts`
+### C5 — ~~The roadmap week model~~ → the journey model: `lib/run-plan.ts`
+
+> **SUPERSEDED by A16.** Everything below described a twelve-week integer axis
+> that no longer exists. The replacement, in `lib/run-plan.ts` and
+> `lib/schemas/roadmap.ts`:
+>
+> - **`tracks[] → bars[]`, not `steps[]`.** Tracks are data so the chart can be
+>   built out of what an idea requires; a closed enum could not carry a
+>   marketplace's supply-seeding track or a hardware idea's tooling lead time.
+> - **Positions are fractions of the journey (`0`–`1`), not weeks.** `barSpan()`
+>   converts to percentages — which is *not* the "geometry smuggled into the data
+>   layer" C5 forbade, because the fractions are already the model. The thing C5
+>   actually banned was a module *inventing* geometry from week integers, and
+>   there are no week integers left to invent from.
+> - **A bar carries `weeks_low`/`weeks_high` only when `clock: 'theirs'`.** The
+>   schema makes the other combination unrepresentable, which is what stops build
+>   estimates creeping back one edit at a time.
+> - API: `barsByTrack` · `barSpan` · `durationLabel` · `externalWeeks` ·
+>   `clockSplit` · `allAmbushes` · `citedAmbushes` · `barById`. No `planSpans`,
+>   no `planHorizon`, no `isOnAxis`.
+> - **The count is `14 STEPS · 10–13 WEEKS NOT YOURS`, everywhere** — the run
+>   header meta, the page meta, and the OG description, all from `externalWeeks`.
+>   "12 weeks" and "4 build steps · 1 tripwire" are now false.
+>
+> The geometry note below is still true of `.ob-container` and still the reason
+> every assertion about the chart is a **ratio, never a pixel**.
 
 Three horizons were proposed (17 / 14 / 12). **The answer is 12**, because that
 is what D13's visible `W1…W12` axis and A11's header line depend on.
@@ -866,7 +891,7 @@ heading *level* is structure. Nothing on any route skips a level.
 | `/define` | 1 — `What are you building?` | 1 — `THE BRIEF` | 0 | 0 |
 | `/validate` Mode A | 1 — `Reading the web about your idea.` | 0 | 0 | 0 |
 | `/validate` Mode B | 1 — `What the web already says.` | **6** — the numbered sections | **11** — 5 dimensions + 3 surprises + 3 competitors | 0 |
-| `/roadmap` | 1 — `What to do next.` | **2** — `01 OPEN QUESTIONS`, `02 BUILD ROADMAP` | **11** — 6 questions + 4 step names + 1 tripwire | 0 |
+| `/roadmap` | 1 — `What happens next.` | **3** — `01 THE JOURNEY`, `02 OPEN QUESTIONS`, `03 WHAT IT COSTS TO RUN` | **12** — 6 track names + 6 questions | 0 |
 | `/sources` | 1 — `Everything we checked.` | **2** — `How the evidence was gathered.`, `Every record, verified and discarded.` | **6** — the facet legends | 0 |
 
 Each `<section>` still takes its accessible name from `aria-labelledby`
@@ -953,6 +978,9 @@ empty states, no confetti · the report ends pointing forward into the roadmap.
 | A13 | Sources — the Evidence Explorer | `DONE` | 2026-08-21 |
 | A14 | Supporting surfaces + the state matrix | `DONE` | 2026-08-21 |
 | A15 | Sweep — motion, a11y, deletion, DoD | `DONE` | 2026-08-21 |
+| A16 | Roadmap — rebuilt as the journey (supersedes A12) | `DONE` | 2026-08-23 |
+| A17 | Roadmap — rebuilt for readability (supersedes A16) | `DONE` | 2026-08-24 |
+| A18 | Legibility — the grey ramp measured up, app-wide | `DONE` | 2026-08-24 |
 
 Status values: `TODO` · `IN PROGRESS` · `PARTIAL` · `DONE`
 
@@ -5338,6 +5366,340 @@ now asserts the new floor: it must outlast the second ring (180ms stagger +
 **Toolchain:** `npx tsc --noEmit` clean · `npm test` **199/199** · `npm run
 build` clean · biome clean across my line range. No browser verification, by
 request.
+
+---
+
+### A16 — 2026-08-23 — Roadmap, rebuilt as the journey
+
+Reworked `/r/[slug]/roadmap` from first principles, at the user's request, for
+the reader it actually has. Supersedes **A12** wholesale and half of **A11**.
+
+**The frame that changed everything.** The old page answered "what do I build,
+in what order". The reader arriving on it has just watched a research run tell
+them three companies already do this and charge $300 — and their live questions
+are *can I actually do this*, *what does doing it consist of*, *what will ambush
+me*, and *what will it cost*. The page is now the whole road from here to a
+paying customer, not the build half of it.
+
+**The reader, settled.** *Technically capable, commercially naive* — an engineer
+with an idea. That closes `executive_summary.md` open decision #4 (no
+technical-ability question in Pillar 1, no no-code branch) and it sharpens the
+content: the ambushes skew legal, commercial and operational, never "how to
+deploy". *Prove it by hand* survives but is re-motivated — not "you can't code"
+but "don't write the automation until you know the rate it's automating".
+
+**The one rule the model rests on:** *estimate the clocks you don't control,
+milestone the ones you do.* Carrier registration takes 2–3 weeks whether you are
+brilliant or slow; "build the MVP" is unknowable, and a number on it is a lie
+that becomes shame when it slips. `BarSchema.refine` makes the wrong combination
+**unrepresentable** — a `theirs` bar must carry a week range, a `yours` bar must
+not — because this is exactly the rule that erodes one well-meaning edit at a
+time. Two bar treatments carry it visually: solid and hard-edged versus soft and
+open-ended, so the reader learns it from the picture.
+
+**Why the week axis had to go (superseding D13/C5).** Every realisation the user
+asked the page to produce is about *overlap* — marketing starting at ~80% built,
+the partner application starting before the build ends. A discrete integer-week
+grid cannot express any of them: a bar started on a track or not at all. Bars
+now anchor to *each other* (`starts_when`), positions are 0–1 fractions, and
+**there is no axis, no scale and no gridline** — drawing a "month 4" rule
+promises a date the model cannot keep. The tripwire stays off the chart, which is
+the half of D13 that was right.
+
+**The headline is derived, not authored.** `externalWeeks()` sums the bars on
+other people's clocks: *10–13 of these weeks are not yours, and they run
+alongside your build only if you start them early.* The founder who applies to a
+partner programme after finishing the build loses two months for nothing. That
+number, the page meta, the run-header meta and the OG description all come from
+the one helper.
+
+**Ambushes are generated, not brainstormed.** Five species (lead time ·
+threshold · obligation · delayed signal · won't-repeat) asked of one idea. An
+entry must name a proper noun or a threshold and must cost time, money or
+legality — "that sounds great means nothing" and "a gmail address gets no
+replies" were both drafted and both cut, the first as advice the reader
+half-knows, the second because its worst outcome is embarrassment. **No per-bar
+quota** — 5 of 14 bars carry none; a quota is precisely what manufactures filler.
+`source: 'run'` ambushes must cite and nothing else may, so exactly two carry
+chips (`[46]`, `[47]`) — the honest number, because the run's `PRACTICAL`
+dimension came back `thin` with two findings. `universal` is capped at three by
+a refinement.
+
+**Costs are bands, not prices** (`$` / `$$` / `$$$` / `free`), defined once in
+real money in the legend and never again. Prices rot: a fixture asserting a
+per-message rate is wrong within a year and makes every other number on the page
+suspect. Two sanctioned exceptions where a figure *is* the insight — the legend,
+and "at $200 a month, 42 practices is $100,000 a year".
+
+**The interview scripts and surveys are deleted**, from the schema, the fixture,
+the content file and the CSS, along with `ScriptBlock`, `SurveyBlock` and
+`buildScriptText`. They were roughly half the old page's height. This is a
+product decision, not a tidy-up — `executive_summary.md:273` promised a
+copy-pasteable script as a rule of Pillar 3a, so that file was amended in the
+same change and `roadmap-integrity.test.ts` now *asserts the absence* so a
+well-meaning restoration re-inflates nothing.
+
+**Two bugs found by measuring, both of the "CSS applied but not on screen"
+class:**
+
+1. **The backdrop paints over every static word on the page.** `AppBackdrop`
+   renders as a *sibling* of the page container inside `main` and is
+   `position: fixed; z-index: 0`. A positioned element paints at step 6 of its
+   stacking context; static in-flow text at step 5. So the h1, the lead, the
+   track labels and the bar names were all invisible, while the bars and
+   milestone flags survived *because they are absolutely positioned and later in
+   tree order* — which is what made it look like a font or colour problem. It is
+   invisible until the backdrop asset exists: with `/media/roadmap/backdrop.webp`
+   missing the `<img>` painted nothing, which is why it shipped. Fixed with
+   `position: relative; z-index: 1` on `.ob-roadmap`. **`z-index: -1` on the
+   backdrop is not the alternative** — `globals.css` records that it must stay
+   above the body background or it disappears entirely. Diagnosis took four
+   wrong hypotheses; what settled it was injecting a red background that also
+   did not paint, which separated *paint* from *layout* and *colour*.
+   **`.ob-report`, `.ob-define`, `.ob-sources` and `.ob-explorer` have the same
+   latent defect and are NOT fixed here** — same one-line rule, left out of scope
+   deliberately rather than swept in.
+2. **Replacing §13 wholesale dropped four still-live rules.** `.ob-exit`,
+   `.ob-exit-label`, `.ob-exit-line` and `.ob-exit-actions` belong to
+   `RoadmapExit`, which survived the rewrite; without them its three links
+   collapsed into one run-on line. Caught by diffing the old section's selector
+   list against the new one — worth doing on any wholesale section replacement.
+
+**One React rule worth writing down, because it took three passes to state
+correctly.** Passing a **client** component as a pre-built element prop from a
+server page produces *"Each child in a list should have a unique key"* — an
+RSC-serialised client element rendered in children position arrives without the
+positional key static JSX would have given it. **Server** component element props
+are fine. So:
+
+- `Journey` and `TripwirePanel` are client components → they now take **data**
+  (`groups`/`milestones`/`journeyCaption`, `tripwires`/`thin`) and
+  `RoadmapSections` renders them. Both are already client-side, so this costs no
+  bundle.
+- `FieldworkBand` and `MoneyBlock` are server components → they **stay** element
+  props, which is what keeps them off the client bundle.
+- `RoadmapExit` moved out of the provider entirely and is rendered by the page
+  after `<RoadmapSections/>`. It reads no roadmap navigation state, so being
+  inside the provider was never buying anything.
+
+I initially recorded that server-component element props were the exception
+*and* that `RoadmapExit` was fine where it was; the first half is right, the
+second was wrong — it was still inside the provider's children array. Verified
+by clean reload, not by reasoning: zero console errors, zero warnings.
+
+**Also swept:** an emitted-but-undefined class audit over every `ob-` class the
+new components emit (found and declared `.ob-journey-cap` and `.ob-money`, the
+R2 failure class); the milestone `end`-anchor threshold moved 0.75 → 0.5 after
+measuring a 2px label overlap in lane 0; the `TAKES` row stopped appending the
+track's note, which read as if it described the duration.
+
+**Files.** Rewritten: `lib/schemas/roadmap.ts`, `lib/fixtures/roadmap.ts`,
+`lib/run-plan.ts`, `app/r/[slug]/roadmap/{page,loading}.tsx`,
+`components/roadmap/{open-question-card,dependency-chip,tripwire-panel}.tsx`,
+`tests/unit/{run-plan,roadmap-integrity}.test.ts`, `styles/obsidian-app.css` §4
+and §13. New: `components/roadmap/{journey,bar-detail,ambush-line,money-block,
+roadmap-sections}.tsx`, `components/figures/{journey-bar,milestone-rail}.tsx`.
+Deleted: `components/roadmap/{script-block,survey-block,roadmap-timeline,
+roadmap-step,not-in-it-list,open-questions-section}.tsx`,
+`components/figures/{plan-bar,week-axis}.tsx`.
+
+**Verification.** `npx tsc --noEmit` clean · `npm test` **208/208** ·
+`npm run build` clean · biome clean. Browser-verified at **1440px and 1280px**
+via Playwright MCP: zero console errors; heading outline h1×1 · h2×3 · h3×12
+with no level skips; milestone labels collision-free in both lanes at both
+widths; no bar tail overflowing its track; **no `yours` bar rendering a week
+number anywhere in the DOM** (the model's core rule asserted against rendered
+output, not just the fixture); no `background-image` behind any bar track.
+
+**Not done, and deliberately.** The empty/thin case (`executive_summary.md`'s
+open decision #3) still leans on the run for its opening line and its
+find-them citations; `?thin=1` swaps the tripwire note but the page has no
+genuine second mode. The three other run pages keep the backdrop defect.
+
+---
+
+### A17 — 2026-08-24 — Roadmap, rebuilt for readability
+
+Reworked `/r/[slug]/roadmap` again, at the user's request. Supersedes **A16**
+wholesale, and with it the last of **A11** and **A12**.
+
+**The complaint.** *"Too much information and highly cramped, hard to read and
+follow through and not intuitive."* A16's page was accurate and unreadable:
+fourteen bars across six tracks in 18px rows with two fill treatments and a
+legend explaining them, six full-height open-question cards, a photo band, a
+cost table and a tripwire grid — 7,247px at 1440. Every individual decision in
+it was defensible. That is the point worth recording: **the defect was not in
+any one component, so no component-level fix could have reached it.**
+
+**The frame.** This page is an *overview that makes someone think critically
+about the journey*. It is not a research brief they execute from, and it is not
+a build plan. Everything that survived had to earn its place against that
+sentence; the deep dive is theirs to do.
+
+**Decisions, taken with the user before any code.**
+
+| | |
+|---|---|
+| Rows | **Five**, one level, no sub-steps: Talk to customers · Test it by hand · Build the product · Get found · Win your first customers. Schema caps it at six. |
+| Setup | **Off the chart entirely**, into a flat list with no timeline. |
+| Canvas | Chart on a **light card**; the rest of the page stays `--ob-canvas`. |
+| Axis | **Milestone markers M1–M5**, name and proof on hover/focus. No months, no dates. |
+| Step detail | **Trimmed** — what it is · when to start · what you'll hit. Cost and cut-list only where real. |
+| Questions | **Question and consequence only.** |
+| Kept | What it costs · What would change all of this. |
+| Dropped | The fieldwork photo band. |
+
+**Why the setup items came off the chart.** A domain purchase takes ten minutes
+and a carrier registration is three weeks of *waiting*. Drawing them as bars
+next to "build the product" asserted they were comparable efforts, and it cost
+five of the fourteen rows. As a flat list they read in twenty seconds.
+
+**The wait number moved, and got better.** `externalWeeks` summed every `theirs`
+bar and reported 10–13 weeks. `waitWeeks` sums `setup` alone and reports **6–8**.
+The two phase-level waits it dropped (interview scheduling, waiting for real
+cancellations) were real but are not queues anyone can join early, so counting
+them alongside a carrier registration blurred the one actionable point. The
+number is smaller and now supports a specific instruction: start these today and
+they cost nothing; start them when you need them and they cost two months.
+
+**What the axis solved.** A16 argued for *no axis at all* — a "month 4" rule
+promises a date the model cannot keep. That reasoning still holds and the
+conclusion still cost the reader any sense of scale. Marking the axis with the
+five unfakeable milestones gives somewhere to stand without inventing a
+calendar: horizontal position means **progress**, and progress is measured in
+things that happened. `MilestoneSchema` was already exactly the right shape for
+this; nothing about it changed.
+
+**Three system rules broken on purpose, at the user's direction** (*"don't focus
+on maintaining the theme for this page"*). All three are documented at the
+token, not the call site:
+
+1. **The card is light.** The one figure/ground inversion in the app. A five-row
+   Gantt is the only object on the app side a reader tracks horizontally, and
+   dark-on-light is easier to track across.
+2. **`--ob-rm-sky` is blue and is doing none of blue's three jobs.** Here hue
+   means *identity* — five rows need five tints so a bar, its section heading
+   and its jump link are recognisably one step. It is ~30% lighter than
+   `--ob-accent` and never appears on the dark canvas.
+3. **Ten new tokens in a list C2 declared closed.** Same escape hatch the glass
+   field took: the alternative is colour literals in a component, which
+   `tokens.css` forbids outright.
+
+**Navigation is a scroll, not a swap.** A16's bar filled a fixed detail panel;
+A17's bar scrolls to that step's own section. The reader's position in the
+document now always matches what they asked to see, `--ob-anchor-inset` puts it
+below the sticky nav (measured: 136px, nav bottom 125px), and there is nothing
+to remember about which bar is "selected". It also deleted `RoadmapProvider`
+entirely — the cross-section wiring it existed for is gone.
+
+**Two bugs found by measuring, not by looking.**
+
+- **`transform` creates a stacking context.** `.ob-rm-mark` carries
+  `translateX(-50%)`, which trapped `.ob-rm-tip`'s `z-index: 3` inside the
+  marker — against the lane rules below it counted for nothing, and those are
+  positioned elements later in tree order, so a gridline painted straight
+  through the tooltip's text. The fix is a `z-index` on the *marker*; raising
+  the tip's own does nothing at any value. Recorded in §12 next to the rule.
+  (Corollary worth knowing: `elementFromPoint` is **not** a paint-order test on
+  an element with `pointer-events: none` — it skips it and reports what is
+  behind. That produced one false negative while verifying the fix.)
+- **`.ob-roadmap-head .ob-meta-line` matched nothing.** The class is
+  `ob-metaline`. A silent no-op that left the run's meta line 4px under a
+  paragraph — pitfalls §1, again, and again only visible when measured.
+
+**Deleted.** `journey.tsx` · `bar-detail.tsx` · `roadmap-sections.tsx` ·
+`roadmap-context.tsx` · `dependency-chip.tsx` · `open-question-card.tsx` ·
+`find-them-row.tsx` · `fieldwork-band.tsx` · `fieldwork-media.tsx` ·
+`figures/journey-bar.tsx` · `figures/milestone-rail.tsx` ·
+`figures/fan-out-meter.tsx`. The last one had no product consumer left and was
+alive only in the style-guide gallery — which is how the previous roadmap
+accumulated marks nobody could point at a screen for. Schema drops `tracks`,
+`bars`, `Clock`, `FindThemItem`, `barsForQuestion` and four `OpenQuestion`
+fields; adds `Phase`, `SetupItem` and `PhaseTint`.
+
+**Also fixed while in the file.** `/style-guide/og`'s roadmap card listed
+`OPEN QUESTIONS` twice — a copy/paste that shipped in A15 because the card still
+looked plausible.
+
+**Verification.** `npx tsc --noEmit` clean · `npm test` 213 passing across 19
+files · `npm run build` clean · biome clean. Browser-verified at **1440px and
+1280px** via Playwright MCP: zero console errors across three consecutive cold
+loads; bar click and keyboard `Enter` both land the target section at 136px with
+the nav bottom at 125px; every bar and marker takes a visible `--ob-accent`
+focus ring; marker tooltip opens on **focus** as well as hover; no element
+overflows the viewport at 1280; reduced motion **resolves** bars to `scaleX(1)`
+rather than freezing them at 0.
+
+**The honest number.** 7,402px, against 7,247px before — the page is *not*
+shorter. Density per screen is down roughly 40% and every section is now
+scannable, which is what the complaint was actually about, but five expanded
+step sections cost more height than the one swap-in-place panel they replaced.
+That is the price of "clicking a bar takes me to its own section", which was
+asked for explicitly. Three further cuts were identified and **not** taken,
+because they remove content the user did not ask to lose: the ten-row cost table
+(~400px), the setup ambushes (~260px), and the third ambush on P5 (~110px).
+
+**Not done, and deliberately.** The fieldwork detail an open question used to
+carry — who to ask, where to find them, how many conversations — is gone with
+its cards. It was real and useful and it is not what an overview is for. If it
+comes back it belongs somewhere else, not here. `?thin=1` still only swaps the
+tripwire note; the page has no genuine second mode. The three other run pages
+keep the `AppBackdrop` z-index defect; `.ob-roadmap` still lifts itself clear.
+
+---
+
+### A18 — 2026-08-24 — Legibility: the grey ramp measured up
+
+**The complaint, verbatim:** the meta lines, the figure captions and the tripwire
+body "are quite hard to read as they are very dim… make all the elements easy to
+read and brighten them up. This website is supposed to be easily readable." The
+three strings named were `5 STEPS · 6 OPEN QUESTIONS · 6–8 WEEKS OF WAITING`,
+the roadmap axis caption, and the `DELAYED SIGNAL` ambush on P1 — all `--ob-dim`.
+
+**Diagnosis.** `--ob-dim` was `#5b5b64`: **3.2:1** on `--ob-canvas`. It is not a
+decorative layer — 200 of its usages are in `obsidian-app.css` alone, and it
+carries every meta line, figure caption and ambush body on the run pages, at
+12–15px. It failed AA outright at exactly the sizes it renders at. `--ob-muted`
+was `#8a8a93` (5.8:1), passing but with no headroom above dim once dim moved.
+`--ob-discard` was the worst at `#4a4a52`, **2.4:1**, and on `/sources` it
+carries eighteen full 16px excerpts — real reading, not an animation frame.
+
+**Fixed at the token layer, which is the whole point of having one.** Three
+values in `tokens.css` lifted the entire app at once: `--ob-muted` → `#b0b0b8`
+(9.2:1), `--ob-dim` → `#7c7c86` (5.3:1), `--ob-discard` → `#7a7a84` (4.7:1).
+The three levels still separate cleanly; they now do it inside a band that is
+legible end to end rather than fading out at the bottom. Discard sits only just
+under dim now — deliberate, because its state is already carried by the
+`line-through`, the `DISCARDED` tag and the panel treatment, none of which need
+the text to be too faint to read. Hairlines went with them (`#232326` → `#2e2e34`,
+`#34343c` → `#43434d`) plus `--ob-grid`, `--ob-hatch` and both `--ob-rm-rule`s:
+in a system where 1px lines *are* the layout, leaving the structure behind while
+the text brightens turns a carved page into floating text.
+
+**Three places stacked two de-emphasis mechanisms on one string** — a dim colour
+token *and* an opacity multiplier — which is what put them far below the token's
+own floor. `.ob-phase-item[data-state="pending"]` (`--ob-dim` × 0.5 ≈ 2.6:1) and
+`.ob-qglyph[data-state="queued"]` (× 0.55) lost the opacity; the token is the one
+that stays. `.ob-discard-panel` went 0.62 → 0.8. The roadmap fork's hover
+de-emphasis went 0.34 → 0.55 (branch) and 0.30 → 0.45 (rail): the branch the
+cursor is *not* on is still a thing you are meant to read while comparing.
+
+**Verified by measurement, not by eye.** A composite-contrast sweep run in the
+Playwright MCP over `/`, `/define`, `/validate`, `/roadmap` and `/sources` —
+walking to the first opaque ancestor background and multiplying the full
+ancestor opacity chain, so a doubly-dimmed string is scored as it actually
+paints. Landing was scrolled to the bottom first so every reveal had fired.
+**Every text node on all five pages now clears 4.5:1**, with one exception below.
+
+**One finding left open, deliberately: white on `--ob-accent` is 3.81:1.**
+`.ob-btn-primary` and `.ob-badge-tag`. Fixing it means darkening `#2D7FF9`, which
+(a) is pinned by name in the skill and in `CLAUDE.md`, and (b) makes the page
+*less* bright — the opposite of the request — to fix the one element nobody said
+was hard to read. Flagged for the user rather than taken silently.
+
+**Not touched.** A pre-existing Biome formatting error on a `.ob-rm-bar-fill`
+`transition` — confirmed present on the stashed tree, so it is A17's, not this
+change's, and sweeping it in would have hidden it in an unrelated diff.
 
 ---
 

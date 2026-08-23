@@ -241,11 +241,16 @@ findings land. No fake percentages.
 
 Two parts, generated together from the brief plus the verified findings.
 
+> **Revised August 2026.** The roadmap was rebuilt from first principles for the
+> reader it actually has: someone who may be perfectly able to build the thing
+> and has never run a business. What changed, and why, is recorded inline below.
+> The one-line version: the page stopped being a build plan and became **the
+> whole journey**, and the interview scripts were cut to make room.
+
 ### 3a — Open questions for real people
 
 The web cannot tell you whether someone will pay you. This section names exactly
-what's still unknown and hands over the material to go find out — written, not
-described.
+what's still unknown and who to go ask.
 
 Each open question renders as:
 
@@ -259,64 +264,97 @@ FIND THEM   Dental office manager Facebook groups; r/dentistry; local practices
             you can walk into; the 40+ named people in dental forum threads
             we found (links below)
 HOW MANY    6-8 conversations is enough to see the pattern
-THE SCRIPT  1. Walk me through what happens when a patient misses their recall.
-            2. How do you know who's overdue right now?
-            3. When was the last time you chased one? What happened?
-            4. What would have to be true for you to not need to think about it?
-WHAT YOU    If most of them can pull the list in under a minute → automation.
-LEARN       If most say "we don't really know" → the list is the product.
 ```
 
 Rules for this section:
 
-- **The script is written out and copy-pasteable.** Open-ended, behavior-focused
-  questions — what they did last time, not what they would do.
 - **Where to find people is specific**, and pulled from the research run. If the
   run found three active communities where this customer talks, name them with
-  links. That is a real output of Pillar 2 and it costs nothing extra.
-- **Survey material where a survey fits**, with the actual question wording and
-  answer options. Surveys are for counting things after interviews have told you
-  what to count — the doc should say that in one line.
+  links. That is a real output of Pillar 2 and it costs nothing extra, and it is
+  **the only place on the roadmap that cites** — everything else here is plan,
+  not evidence.
 - **Between four and seven questions, ordered by how much they'd change the
   plan.** Not fifteen.
-- Each one says what a yes and a no would mean for the build roadmap below.
+- Each one names the steps it unblocks, and the tripwires it could trip.
+- **The written-out interview script and the survey material are cut.** They
+  were the largest thing on the page — roughly half its height — and they bought
+  none of the orientation the reader actually arrives needing. A script is also
+  the part of this a capable person can write themselves once they know the
+  question and who to ask; the sequencing and the ambushes are not. This is a
+  deliberate reduction in scope, not an oversight.
+- The open questions are **no longer a peer of the plan.** They are what the
+  plan's first track expands into: the chart links into them and they link back.
 
-### 3b — Build roadmap
+### 3b — The journey
 
-How to actually make this thing, specific to this idea. Not generic lean startup
-advice.
+Not a build plan. **The whole road from here to a paying customer**, specific to
+this idea. Still not generic lean startup advice — the rule that keeps it honest
+is that nothing appears in generic form: the skeleton is universal, but every
+line is instantiated against this idea, with this idea's numbers.
 
-```text
-BEFORE YOU BUILD
-  The 6-8 conversations above. Two weeks. Nothing here is expensive to change
-  yet, and question #1 changes what you build first.
+It renders as a chart of overlapping bars on **tracks** — talk, prove, build, get
+found, sell, and the administrative track — with **milestones** flagged above it.
+Tracks are data, not a fixed list: a marketplace needs a supply-seeding track
+before demand, a hardware idea needs manufacturing lead time, a consumer app
+needs store review.
 
-FIRST THING TO BUILD  (the smallest version that a real user could use)
-  A single-clinic tool: paste in a CSV of overdue patients, it drafts and sends
-  the messages, you watch what comes back.
-  Not in it: the PMS integration, the dashboard, multi-user, billing.
-  Roughly 2-3 weeks. You'd run it manually for the first clinic.
+Four rules make it work, and each one exists because the obvious alternative
+lies to the reader:
 
-THEN
-  Only after a clinic uses it twice: the practice management integration for
-  whichever system your interviews said they use — that answer decides which one.
+**1. Estimate the clocks you don't control. Milestone the ones you do.**
+Carrier registration takes two to three weeks whether the founder is brilliant
+or slow. "Build the MVP" is unknowable, and a number printed on it is a lie that
+becomes a source of shame when it slips. So a bar carries a week range **only**
+when someone else owns the clock, and the two kinds of bar look different — solid
+and hard-edged versus soft and open-ended. The reader learns the rule from the
+picture.
 
-LATER, AND ONLY IF
-  Dashboard and reporting — only once someone asks for it.
-  Self-serve signup — only once you've sold three manually.
+**2. Bars anchor to each other, never to dates.** "Starts at ~80% built, not
+after" is a real, observable trigger. This is the only way to state *overlap*
+without inventing a schedule — and overlap is the point. The realisations the
+page exists to produce are all of the form *marketing starts before the product
+is finished*, *the partner application starts before the build ends*.
 
-WHAT WOULD CHANGE THIS PLAN
-  If the interviews say clinics don't have the overdue list, the first build
-  becomes finding overdue patients, not messaging them. That's a bigger product;
-  stop and rethink scope before writing code.
-```
+**3. There is no axis, no scale and no gridline.** Drawing a "month 4" rule
+promises a date the model cannot keep.
 
-The roadmap is explicitly wired to 3a: it names which open question would change
-which step. That link is the whole reason both halves are in one product.
+**4. The critical path is not the code.** Summing the external clocks yields the
+single most useful sentence available: *ten to thirteen of these weeks are not
+yours, and they run alongside your build only if you start them early.* The
+founder who applies to a partner programme after finishing the build loses two
+months for nothing.
+
+Alongside the chart, three things the reader cannot get anywhere else:
+
+- **What you'll hit that you're not expecting.** The highest-value content on the
+  page and the easiest to fill with slop, so it is generated rather than
+  brainstormed: five species (a hidden lead time, a threshold where free stops
+  being free, an obligation that starts with the first customer, a signal that
+  arrives later than you'd think, an early success that won't repeat) asked of
+  one idea. An entry must name a proper noun or a threshold, and must cost time,
+  money or legality — if the worst outcome is embarrassment it is a tip, not an
+  ambush. **There is no per-bar quota**; most bars carry none, because a quota is
+  exactly what manufactures filler. Ambushes that came out of the research run
+  carry a citation; ones merely implied by the idea do not, and the ones true of
+  any first business are capped at three.
+- **What it costs**, in bands — `$` / `$$` / `$$$` — defined once in real money
+  and never as a price. Prices rot; a fixture asserting a per-message rate is
+  wrong within a year and makes every other number suspect. Bands are also what
+  the reader needs: nobody decides differently between $18 and $24 a month. The
+  block carries the free-credit programmes *and the caveat that makes them
+  useful* — apply once the company exists, because the clock starts on
+  acceptance.
+- **What would change all of this** — the tripwires. This is where "no verdict"
+  lives. Never *your idea is risky*; always *if this comes back false, here is
+  the different plan*.
+
+The journey is explicitly wired to 3a: each bar names the open questions it
+unblocks, and each question names the bars it would change. That link is the
+whole reason both halves are in one product.
 
 It should be honest about sequencing and aggressive about cutting. The most
 valuable thing this section can do for an early-stage person is tell them what
-*not* to build yet.
+*not* to build yet — and when to start the things that are not building at all.
 
 ---
 
@@ -359,8 +397,11 @@ report
   run_id, summary_json, dimensions_json, competitors_json, surprises_json
 
 roadmap
-  run_id, open_questions_json, build_plan_json
+  run_id, open_questions_json, journey_json
 ```
+
+`journey_json` carries the tracks, the bars, the milestones, the cost model and
+the tripwires. It replaced `build_plan_json` when 3b stopped being a build plan.
 
 `runs.id` is a long random slug. That is the entire access model for v1 — no
 accounts, no sessions, no permissions. Anyone with the link has the run.
@@ -413,9 +454,9 @@ render from fields; only the summary and the surprises are model-written.
 Streaming progress on screen.
 
 **Week 4 — Pillar 3**
-Open questions with written scripts and community links, and the build roadmap
-wired to them. Then polish the whole path end to end and put a real idea through
-it.
+Open questions with community links, and the journey wired to them — tracks,
+bars, milestones, the ambushes and the cost bands. Then polish the whole path end
+to end and put a real idea through it.
 
 **Then:** put ten real ideas through it, from ten real people, and watch where
 the output is thin. Fix that before adding anything from the list below.
@@ -452,7 +493,17 @@ Not now. Recorded so it doesn't get re-litigated.
    very little, and that isn't evidence against your idea" — and Pillar 3 becomes
    the whole product for that user. Worth designing before it happens by accident.
 
-4. **Does the build roadmap need to know the user's technical ability?** A
-   non-technical founder's first build is a no-code tool or a manual service, not
-   a codebase. This might be one question in the conversation, or it might be
-   scope creep. Decide after the first ten real users.
+4. ~~**Does the build roadmap need to know the user's technical ability?**~~
+   **Decided, August 2026: no — assume they can build it or will find someone.**
+   The reader we are actually designing for is *technically capable and
+   commercially naive*: an engineer with an idea. They do not need "how to
+   deploy"; they need to know that carrier registration exists, that a company
+   has to exist before Stripe will pay them, and that $200 a month means 42
+   customers for $100k. Asking a technical-ability question in Pillar 1 was the
+   scope creep this decision was worried about, and the branch it would have fed
+   (no-code, hire-someone) is gone.
+
+   One thing survived the decision: the *prove it by hand* stage. It is no
+   longer justified by "you can't code" — it is justified by "don't write the
+   automation until you know the conversion rate it's automating", which is the
+   version a capable builder respects rather than resents.

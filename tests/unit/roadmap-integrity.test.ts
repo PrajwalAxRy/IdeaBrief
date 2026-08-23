@@ -1,41 +1,48 @@
-import { buildScriptText } from '@/lib/content/app';
 import { evidenceFixture } from '@/lib/fixtures/evidence';
 import { roadmapFixture } from '@/lib/fixtures/roadmap';
-import { fanOut, isOnAxis } from '@/lib/run-plan';
+import { allAmbushes, waitWeeks } from '@/lib/run-plan';
 import { BriefSchema } from '@/lib/schemas/brief';
+import { MAX_UNIVERSAL_AMBUSHES } from '@/lib/schemas/roadmap';
 import { describe, expect, it } from 'vitest';
 
 const questions = roadmapFixture.open_questions;
+const findingIds = new Set(evidenceFixture.map((finding) => finding.id));
+const resolves = (citation: number) => findingIds.has(`EV_${String(citation).padStart(2, '0')}`);
 
 /**
- * `RoadmapSchema.refine` checks step → question ids and nothing else. A typo'd
- * `citation_id` renders `[99]` and falls silently through `CitationChip`'s
- * not-found branch — the sort of failure that ships. These are the checks that
- * catch it.
+ * `RoadmapSchema.refine` checks structural relations — ids are unique, bands
+ * are defined, a wait is a pair. It cannot check that a `citation_id` points at
+ * a finding that exists, because the schema has no access to the evidence
+ * fixture. A typo'd citation renders `[99]` and falls silently through
+ * `CitationChip`'s not-found branch — the sort of failure that ships. These are
+ * the checks that catch it, plus the content rules no schema can express.
  */
 describe('roadmap integrity', () => {
-  it('every find_them citation_id resolves to a real finding', () => {
-    const ids = new Set(evidenceFixture.map((finding) => finding.id));
-    for (const question of questions) {
-      for (const item of question.find_them) {
-        if (item.citation_id === undefined) continue;
-        expect(ids.has(`EV_${String(item.citation_id).padStart(2, '0')}`)).toBe(true);
-      }
+  /**
+   * The citation rule for ambushes, end to end: a run-sourced ambush must point
+   * at a finding that exists AND that finding must actually be from the
+   * PRACTICAL dimension. Citing a MONEY finding for a lead-time warning would
+   * resolve, render a chip, and be wrong.
+   */
+  it('run-sourced ambushes cite real PRACTICAL findings', () => {
+    const practical = new Set(
+      evidenceFixture.filter((f) => f.dimension === 'PRACTICAL').map((f) => f.id),
+    );
+    const cited = allAmbushes(roadmapFixture).filter((a) => a.source === 'run');
+    expect(cited.length).toBeGreaterThan(0);
+    for (const ambush of cited) {
+      const id = `EV_${String(ambush.citation_id).padStart(2, '0')}`;
+      expect(resolves(ambush.citation_id as number)).toBe(true);
+      expect(practical.has(id)).toBe(true);
     }
   });
 
-  it('every link item carries a citation and no item carries a url', () => {
-    for (const question of questions) {
-      for (const item of question.find_them) {
-        if (item.type === 'link') expect(item.citation_id).toBeDefined();
-        /* There is no `url` on the schema and none in the fixture: the href is
-           derived from the cited finding, so the two can never disagree. */
-        expect(item).not.toHaveProperty('url');
-      }
-    }
+  it('holds the universal-ambush cap, which is what keeps the page off the listicle path', () => {
+    const universal = allAmbushes(roadmapFixture).filter((a) => a.source === 'universal');
+    expect(universal.length).toBeLessThanOrEqual(MAX_UNIVERSAL_AMBUSHES);
   });
 
-  it('every non-null brief_field is a key of BriefSchema', () => {
+  it('every brief_field is a real key of the brief schema', () => {
     const keys = new Set(Object.keys(BriefSchema.shape));
     for (const question of questions) {
       if (question.brief_field === null) continue;
@@ -43,61 +50,72 @@ describe('roadmap integrity', () => {
     }
   });
 
-  it('priority is a permutation of 1..6 and equals C6', () => {
-    const byId = Object.fromEntries(questions.map((q) => [q.id, q.priority]));
-    expect(byId).toEqual({ Q06: 1, Q01: 2, Q04: 3, Q02: 4, Q05: 5, Q03: 6 });
-    expect([...questions.map((q) => q.priority)].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6]);
-  });
-
-  it('fan-out computed from the fixture edges equals C6', () => {
-    const counts = Object.fromEntries(
-      Object.entries(fanOut(roadmapFixture)).map(([id, steps]) => [id, steps.length]),
-    );
-    expect(counts).toEqual({ Q01: 2, Q02: 1, Q03: 1, Q04: 2, Q05: 1, Q06: 3 });
-  });
-
   /**
-   * The assertion that keeps `FanOutMeter` and the card order honest without a
-   * second source of truth: if these two ever disagree, the meter is showing a
-   * weight the ordering doesn't act on.
+   * The interview script and survey were deleted in A16; the fieldwork detail
+   * (who to ask, where to find them, how many) in A17. Both were deliberate,
+   * and both are asserted rather than trusted, because "put the script back" is
+   * exactly the sort of well-meaning restoration that would re-inflate the
+   * page. A question here is a question and a consequence, and nothing else.
    */
-  it('sorting by fan-out desc, ties by priority, reproduces the authored order', () => {
-    const edges = fanOut(roadmapFixture);
-    const bySort = [...questions]
-      .sort((a, b) => edges[b.id].length - edges[a.id].length || a.priority - b.priority)
-      .map((q) => q.id);
-    const byPriority = [...questions].sort((a, b) => a.priority - b.priority).map((q) => q.id);
-    expect(bySort).toEqual(byPriority);
-    expect(byPriority).toEqual(['Q06', 'Q01', 'Q04', 'Q02', 'Q05', 'Q03']);
-  });
-
-  it('Q01 and Q04 are the two the tripwire also names', () => {
-    const edges = fanOut(roadmapFixture);
-    const withTripwire = Object.entries(edges)
-      .filter(([, steps]) => steps.some((step) => !isOnAxis(step)))
-      .map(([id]) => id)
-      .sort();
-    expect(withTripwire).toEqual(['Q01', 'Q04']);
-  });
-
-  it('buildScriptText numbers the lines and the fixture does not', () => {
+  it('carries no fieldwork brief on an open question', () => {
     for (const question of questions) {
-      for (const line of question.script.lines) {
-        /* Presentation in a data field: un-restylable, wrong the moment a line
-           is inserted, and needing a strip before any other use. */
-        expect(line).not.toMatch(/^\d+\.\s/);
+      for (const gone of ['script', 'survey', 'what_you_learn', 'ask', 'find_them', 'how_many']) {
+        expect(question).not.toHaveProperty(gone);
       }
-      expect(buildScriptText(question.script.lines).startsWith('1. ')).toBe(true);
     }
   });
 
-  it('Q04 links to assumptions and ships the three-question survey', () => {
-    const q04 = questions.find((q) => q.id === 'Q04');
-    expect(q04?.brief_field).toBe('assumptions');
-    expect(q04?.survey?.questions).toHaveLength(3);
-    expect(q04?.survey?.note.startsWith('Three-question')).toBe(true);
-    for (const question of q04?.survey?.questions ?? []) {
-      expect(question.options.length).toBeGreaterThan(0);
+  /**
+   * Every question states a consequence, not a restatement. The cheap failure
+   * mode of a two-line question card is a `why_it_matters` that says "this is
+   * important to know" — long enough to look written, empty enough to skip.
+   */
+  it('every question says what changes depending on the answer', () => {
+    for (const question of questions) {
+      expect(question.question.endsWith('?')).toBe(true);
+      expect(question.why_it_matters.length).toBeGreaterThan(60);
+      expect(question.why_it_matters).not.toBe(question.question);
+    }
+  });
+
+  it('milestones describe an outcome, never a date or a week', () => {
+    for (const milestone of roadmapFixture.milestones) {
+      expect(milestone.label).not.toMatch(/\bweek\b|\bW\d/i);
+      expect(milestone.proof.length).toBeGreaterThan(20);
+    }
+  });
+
+  /**
+   * A17's central content rule, asserted rather than trusted: **the only week
+   * numbers on this page are queues somebody else controls.** A phase is work
+   * the founder does, its duration is unknowable, and a number printed on it is
+   * a lie that turns into shame when it slips. The schema gives a phase no
+   * field to hold one — this catches the prose route, which is how it would
+   * actually come back.
+   */
+  it('no phase mentions a duration in its prose', () => {
+    for (const phase of roadmapFixture.phases) {
+      const prose = `${phase.summary} ${phase.starts_when} ${phase.tagline}`;
+      expect(prose).not.toMatch(/\b\d+\s*(–|-|to\s)?\s*\d*\s*(week|month|day)s?\b/i);
+    }
+  });
+
+  /* Every wait belongs to somebody with a name — a carrier, a vendor, a filing
+     office. A queue with no owner is an estimate wearing a queue's clothes. */
+  it('every setup wait belongs to a queue the founder cannot compress', () => {
+    const queues = roadmapFixture.setup.filter((item) => item.wait_low !== null);
+    expect(queues.length).toBe(waitWeeks(roadmapFixture).count);
+    for (const item of queues) {
+      expect(`${item.detail} ${item.when}`.length).toBeGreaterThan(40);
+    }
+  });
+
+  /* Bands replaced prices so the page cannot rot. The two sanctioned places a
+     real figure may appear are the legend, which defines what a band means, and
+     the calibration line, whose number IS the insight. */
+  it('no cost item quotes a price', () => {
+    for (const item of roadmapFixture.money.items) {
+      expect(`${item.label} ${item.when}`).not.toMatch(/\$\d/);
     }
   });
 });

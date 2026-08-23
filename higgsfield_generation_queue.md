@@ -55,17 +55,28 @@ and Batch 3 motion.**
 |---|---|---|---|---|
 | **0** | **App mark / favicon — SHIPPED** | — | **0** | Branded SVG, 16/32px ICO, 180px Apple icon and 512px app icon shipped 2026-08-22. |
 | **C** | **Captures of the real app** | 1–3 | **0** | **C2 came back as a coded interaction, not a capture — read Batch C before scheduling C1 or C3.** Planning may run in parallel; any final capture waits for frozen surfaces and fixtures. C1 is on hold. |
-| **1** | Fieldwork band — **stills SHIPPED** | 3 | **≤7 video calls** | Three WebPs wired 2026-08-22. Optional i2v only; stills alone capture most of the value. |
+| **1** | ~~Fieldwork band~~ — **BAND DELETED (A17)** | — | **0 — do not generate** | The roadmap's photo band was removed in A17. The three stills are still on disk and unreferenced; there is nowhere to play a clip. See the section below. |
 | **2** | Console cold start | 1 | **BLOCKED** | No source still exists and none is queued — see the batch. Decide it before budgeting it. |
 | **3** | Hero collage | 5 / **2** | **≤5 video calls** | The local stills are retained; motion is an optional second pass. |
 | — | **↓ GATE B ↓** | | | *Stay at or below 15 paid calls; this buys essentially all available gain.* |
 
-### Why batch 1 motion still outranks batch 3
+### ~~Why batch 1 motion still outranks batch 3~~ — retired 2026-08-24
 
-The three fieldwork stills shipped on 2026-08-22. Optional image-to-video on
-that band is still the largest visible motion upgrade left — the hinge between
-`01 OPEN QUESTIONS` and `02 BUILD ROADMAP` is now photography, and subtle motion
-there reads as editorial polish rather than *assets pending*.
+**Batch 1 is closed. Do not generate it.** A17 rebuilt the roadmap for
+readability and the user chose to drop the fieldwork band; `FieldworkBand`,
+`FieldworkMedia` and the `.ob-fieldwork-*` recipes are deleted. The hinge this
+paragraph argued from — `01 OPEN QUESTIONS` → `02 BUILD ROADMAP` — no longer
+exists either; the page is now five steps, an open-question list, a setup list
+and the costs.
+
+The three stills (`public/media/roadmap/conversation.webp`, `expo.webp`,
+`front-desk.webp`, shipped 2026-08-22) are **retained on disk and referenced by
+nothing**. They are paid work and the art direction behind them is still good,
+so they stay against the possibility that an editorial human band returns
+somewhere in this product. The brief that produced them is preserved in
+[`higgsfieldPlan_roadmap.md`](higgsfieldPlan_roadmap.md) §1.
+
+Batch 3 (the hero collage) is now the largest visible motion upgrade left.
 
 ### Why the hero collage is worth doing anyway — and it isn't the pixels
 

@@ -31,7 +31,8 @@ describe('lib/db/queries — the fake-but-typed seam', () => {
     expect(report.competitors[2].moat).toBeUndefined();
 
     expect(roadmap.open_questions).toHaveLength(6);
-    expect(roadmap.steps).toHaveLength(5);
+    expect(roadmap.phases).toHaveLength(5);
+    expect(roadmap.setup).toHaveLength(5);
   });
 
   it('getDiscarded resolves 18 Zod-validated records', async () => {
