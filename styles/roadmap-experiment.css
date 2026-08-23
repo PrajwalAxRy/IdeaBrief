@@ -1,0 +1,646 @@
+/* ============================================================================
+   ROADMAP EXPERIMENT — recipes for the two candidate replacements for pillar
+   03's static fragment, shown side by side on `/experiment`.
+
+   **Experiment-only.** Prefixed `rx-` rather than `ob-` so the whole file is
+   one grep away from deletion, and so nothing here can be mistaken for a
+   shipped Obsidian recipe. When a concept wins, its half moves into
+   `styles/obsidian.css` under an `ob-` prefix and this file goes.
+
+   Imported into `@layer components` from `globals.css`, like every other
+   recipe stylesheet — see `references/pitfalls.md` §1. Unlayered, the
+   `margin: 0` in `.rx-steps` alone would silently beat every Tailwind spacing
+   utility on the same element.
+
+   Colour values: none. Every one is a token from `tokens.css`.
+   ============================================================================ */
+
+/* ============================================================
+   Shared — the caption row under both scenes, and the page shell.
+   ============================================================ */
+
+.rx-scene {
+  /* Neither concept is clipped: concept A bleeds 88px past the column on the
+     right, the way pillar 02's volume does. */
+  position: relative;
+}
+
+.rx-caption {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 26px;
+  padding-top: 15px;
+  border-top: 1px solid var(--ob-hairline);
+  /* One line, always — a wrapped caption grows upward into the figure. */
+  white-space: nowrap;
+}
+
+.rx-footnote {
+  margin-right: auto;
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-dim);
+}
+
+.rx-stage {
+  animation: rx-label var(--ob-base) var(--ob-ease) both;
+}
+
+@keyframes rx-label {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+/* The settled counterpart to `.ob-dot` — same 6px circle, dim and still. */
+.rx-rest-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ob-dim);
+}
+
+/* `line-height: 1` is load-bearing: `.ob-btn` inherits the body's 1.6, which
+   makes a 12px label a 19px line and drops the caption row out of alignment
+   with the dot beside it. Same fix as `.ob-vf-replay`. */
+.rx-replay {
+  line-height: 1;
+  color: var(--ob-dim);
+}
+
+.rx-replay:hover:not(:disabled) {
+  color: var(--ob-text);
+}
+
+/* ============================================================
+   Concept A — the fork.
+
+   A hairline blueprint on bare canvas. No card, no glass, no bloom, no
+   ambient drift: 01 is a living card and 02 is a lit volume, so this one is
+   deliberately the dry, drawn thing.
+   ============================================================ */
+
+.rx-fork {
+  position: relative;
+  /* Bleeds past the text column so the diagram does not read as contained.
+     **Asymmetric, for the reason `.ob-vf` is:** the left overhang runs into the
+     96px gap between the pinned heading and this column, which always exists;
+     the right one runs into the page gutter, which is only 40px at 1280 — a
+     symmetric bleed puts a horizontal scrollbar on the whole document. 60 left
+     and 16 right clears every width this site is read at.
+
+     Nothing between here and the page container may set `overflow: hidden`. */
+  width: calc(100% + 76px);
+  margin-left: -60px;
+}
+
+/* The fork's caption has to start where the fork starts, or the diagram reads
+   as nudged out of its own column. */
+.rx-caption-bleed {
+  width: calc(100% + 76px);
+  margin-left: -60px;
+}
+
+.rx-fork-plane {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---- the question ---- */
+
+.rx-ask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding-right: 26px;
+
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(6px);
+  transition: opacity var(--ob-enter) var(--ob-ease), transform var(--ob-enter) var(--ob-ease),
+    filter var(--ob-enter) var(--ob-ease);
+}
+
+.rx-fork[data-asked="true"] .rx-ask {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.rx-ask-question {
+  font-size: var(--ob-h3);
+  line-height: 1.24;
+  letter-spacing: var(--ob-tracking-h2);
+  color: var(--ob-text);
+}
+
+.rx-ask-band {
+  color: var(--ob-muted);
+}
+
+/* Sans, not mono: four words with an implied verb is a sentence fragment, and
+   the metadata layer never carries one. */
+.rx-ask-hinge {
+  font-size: 13px;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-dim);
+}
+
+/* ---- the rails ---- */
+
+.rx-connector {
+  position: absolute;
+  top: 0;
+  overflow: visible;
+}
+
+.rx-rail {
+  fill: none;
+  stroke: var(--ob-hairline-strong);
+  stroke-width: 1;
+  /* `pathLength="1"` on the element, so one dash covers the whole path
+     regardless of its real length and the two rails draw at the same rate
+     despite being different lengths. */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset var(--ob-enter) var(--ob-ease), stroke var(--ob-base) var(--ob-ease),
+    opacity var(--ob-base) var(--ob-ease);
+}
+
+.rx-fork[data-railed="true"] .rx-rail {
+  stroke-dashoffset: 0;
+}
+
+/* The second rail leaves the fork a beat after the first, so the split reads
+   as one line becoming two rather than as a single symmetrical shape. */
+.rx-rail[data-answer="no"] {
+  transition-delay: 150ms, 0ms, 0ms;
+}
+
+.rx-node {
+  fill: var(--ob-hairline-strong);
+  opacity: 0;
+  transition: opacity var(--ob-base) var(--ob-ease);
+}
+
+.rx-fork[data-railed="true"] .rx-node {
+  opacity: 1;
+}
+
+/* ---- the two futures ---- */
+
+.rx-branch {
+  position: absolute;
+  left: 400px;
+  right: 0;
+  /* Hover emphasis lives on the OUTER node at `--ob-base`; the entrance lives
+     on the inner at `--ob-enter`. One node for both makes the hover inherit
+     900ms and read as lag. */
+  transition: opacity var(--ob-base) var(--ob-ease);
+}
+
+.rx-branch-in {
+  opacity: 0;
+  transform: translateX(16px);
+  filter: blur(6px);
+  transition: opacity var(--ob-enter) var(--ob-ease), transform var(--ob-enter) var(--ob-ease),
+    filter var(--ob-enter) var(--ob-ease);
+}
+
+.rx-branch[data-in="true"] .rx-branch-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* The branch the cursor is not on. Two attributes deep on the scene plus one
+   on the branch, so it outranks `[data-in='true']` without `!important`. */
+.rx-fork[data-hot="yes"] .rx-branch[data-answer="no"],
+.rx-fork[data-hot="no"] .rx-branch[data-answer="yes"] {
+  /* Up from 0.34. De-emphasis, not erasure — the branch the cursor is not on
+     is still a thing you are meant to be able to read while comparing the two. */
+  opacity: 0.55;
+}
+
+/* One line, always. The rails terminate at `HEAD_H / 2`, computed in the
+   component — a head that wrapped to two lines would leave its own rail
+   attached above its centre. */
+.rx-branch-head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  white-space: nowrap;
+}
+
+/* Blue's third job — the live/active branch — and the only blue in the figure.
+   At rest nothing here is accented, because an unanswered question is not an
+   action, a verification or a live state. */
+.rx-answer {
+  flex: none;
+  padding: 3px 9px;
+  border: 1px solid var(--ob-hairline-strong);
+  border-radius: var(--ob-r-tag);
+  font-family: var(--ob-font-mono);
+  font-size: 11px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  color: var(--ob-text);
+  transition: border-color var(--ob-base) var(--ob-ease), color var(--ob-base) var(--ob-ease);
+}
+
+.rx-fork[data-hot="yes"] .rx-branch[data-answer="yes"] .rx-answer,
+.rx-fork[data-hot="no"] .rx-branch[data-answer="no"] .rx-answer {
+  border-color: var(--ob-hairline-accent);
+  color: var(--ob-accent);
+}
+
+.rx-fork[data-hot="yes"] .rx-rail[data-answer="yes"],
+.rx-fork[data-hot="no"] .rx-rail[data-answer="no"] {
+  stroke: var(--ob-accent);
+}
+
+.rx-fork[data-hot="yes"] .rx-rail[data-answer="no"],
+.rx-fork[data-hot="no"] .rx-rail[data-answer="yes"] {
+  opacity: 0.45;
+}
+
+.rx-reading {
+  font-size: 15px;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+
+.rx-cost {
+  flex: none;
+  margin-left: auto;
+  color: var(--ob-dim);
+}
+
+.rx-steps {
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rx-step {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  height: 22px;
+
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
+  transition-delay: calc(var(--i) * 90ms + 240ms);
+}
+
+.rx-branch[data-in="true"] .rx-step {
+  opacity: 1;
+  transform: none;
+}
+
+.rx-step-span {
+  color: var(--ob-dim);
+}
+
+.rx-step-label {
+  font-size: var(--ob-sm);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+}
+
+/* ---- the week ruler: the one place the two futures are measured ---- */
+
+.rx-ruler {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 3px;
+  margin-top: 14px;
+  /* Stops at the cost label's column so the two rulers share a scale — a full
+     bleed would make the four-week branch's cells wider than the twelve-week
+     branch's and destroy the comparison. */
+  max-width: 300px;
+}
+
+.rx-cell {
+  height: 9px;
+  border: 1px solid var(--ob-hairline);
+  transform: scaleY(0.35);
+  opacity: 0;
+  transition: transform var(--ob-base) var(--ob-ease), opacity var(--ob-base) var(--ob-ease),
+    background-color var(--ob-base) var(--ob-ease), border-color var(--ob-base) var(--ob-ease);
+  transition-delay: calc(var(--i) * 34ms + 420ms);
+}
+
+.rx-branch[data-in="true"] .rx-cell {
+  transform: none;
+  opacity: 1;
+}
+
+.rx-cell[data-on="true"] {
+  background: var(--ob-hover-wash);
+  border-color: var(--ob-hairline-strong);
+}
+
+.rx-verdict {
+  margin-top: 14px;
+  font-size: var(--ob-sm);
+  line-height: 1.5;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+  transition: color var(--ob-base) var(--ob-ease);
+}
+
+.rx-fork[data-hot="yes"] .rx-branch[data-answer="yes"] .rx-verdict,
+.rx-fork[data-hot="no"] .rx-branch[data-answer="no"] .rx-verdict {
+  color: var(--ob-text);
+}
+
+/* ============================================================
+   Concept B — the sort.
+
+   A list that arrives in the order the run produced it, measures itself,
+   reorders, and then opens the winner.
+   ============================================================ */
+
+.rx-sort-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ob-hairline);
+}
+
+.rx-sort-axis {
+  color: var(--ob-dim);
+}
+
+.rx-sort-list {
+  position: relative;
+  margin-top: 10px;
+}
+
+/* `--from` is where the run produced it; `--to` is the travel to where it
+   belongs. DOM order never changes — re-sorting the array would move real
+   nodes, which cannot be animated and would re-fire every entrance. */
+.rx-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 52px;
+  transform: translateY(calc(var(--from) + var(--to)));
+  transition: transform 720ms var(--ob-ease);
+}
+
+.rx-row-inner {
+  position: relative;
+  display: grid;
+  /* Rank · question · bar · band. The band column is sized to the longest
+     label at 12px mono with `+0.10em` — one line each, or the rows stop
+     sharing a baseline. */
+  grid-template-columns: 26px minmax(0, 1fr) 80px 152px;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  padding-left: 16px;
+  border-bottom: 1px solid var(--ob-hairline);
+
+  opacity: 0;
+  transform: translateY(12px);
+  filter: blur(6px);
+  transition: opacity var(--ob-enter) var(--ob-ease), transform var(--ob-enter) var(--ob-ease),
+    filter var(--ob-enter) var(--ob-ease);
+  transition-delay: calc(var(--i) * 110ms);
+}
+
+.rx-sort[data-landed="true"] .rx-row-inner {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* The winner. A left rule and brighter type — not an accent, because being
+   first to ask is not an action, a verification or a live state. */
+.rx-row[data-top="true"] .rx-row-inner::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 1px;
+  background: var(--ob-text);
+}
+
+.rx-rank {
+  color: var(--ob-dim);
+  transition: color var(--ob-base) var(--ob-ease);
+}
+
+.rx-row[data-top="true"] .rx-rank {
+  color: var(--ob-text);
+}
+
+.rx-row-text {
+  font-size: 15px;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+  transition: color var(--ob-base) var(--ob-ease);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rx-row[data-top="true"] .rx-row-text {
+  color: var(--ob-text);
+}
+
+/* Squared, not rounded: at 5px tall any radius above 2 reads as a pill, and
+   pills belong to buttons alone. */
+.rx-bar {
+  position: relative;
+  height: 5px;
+  background: var(--ob-hover-wash);
+}
+
+.rx-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--ob-hairline-strong);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--ob-enter) var(--ob-ease);
+  transition-delay: calc(var(--i) * 90ms);
+}
+
+.rx-sort[data-measured="true"] .rx-bar-fill {
+  transform: none;
+}
+
+.rx-row[data-top="true"] .rx-bar-fill {
+  background: var(--ob-text);
+}
+
+.rx-band {
+  color: var(--ob-dim);
+  text-align: right;
+}
+
+/* ---- the winner opens ---- */
+
+/* Space is reserved from first paint, so the script arriving moves nothing. */
+.rx-script {
+  min-height: 152px;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ob-hairline);
+}
+
+.rx-script-label {
+  color: var(--ob-dim);
+}
+
+.rx-script-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rx-script-line {
+  display: flex;
+  gap: 14px;
+  font-size: 15px;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
+  transition-delay: calc(var(--i) * 130ms + 120ms);
+}
+
+.rx-script[data-open="true"] .rx-script-line {
+  opacity: 1;
+  transform: none;
+}
+
+.rx-script-num {
+  flex: none;
+  padding-top: 3px;
+  color: var(--ob-dim);
+}
+
+.rx-script-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  opacity: 0;
+  transition: opacity var(--ob-base) var(--ob-ease);
+  transition-delay: 520ms;
+}
+
+.rx-script[data-open="true"] .rx-script-meta {
+  opacity: 1;
+}
+
+/* The label above the script is the only part present before the beat, so the
+   panel reads as reserved space rather than as an empty gap. */
+.rx-script-label {
+  opacity: 0.5;
+  transition: opacity var(--ob-base) var(--ob-ease);
+}
+
+.rx-script[data-open="true"] .rx-script-label {
+  opacity: 1;
+}
+
+/* ============================================================
+   The experiment page's own chrome. Not part of either concept.
+   ============================================================ */
+
+.rx-page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-block: 72px 40px;
+}
+
+.rx-variant {
+  padding-block: 96px;
+  border-top: 1px solid var(--ob-hairline);
+}
+
+.rx-variant-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px;
+  border: 1px solid var(--ob-hairline-strong);
+  border-radius: var(--ob-r-tag);
+  font-family: var(--ob-font-mono);
+  font-size: 11px;
+  font-weight: var(--ob-weight-meta);
+  letter-spacing: var(--ob-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ob-text);
+}
+
+.rx-note {
+  max-width: 62ch;
+  font-size: var(--ob-sm);
+  line-height: 1.65;
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-dim);
+}
+
+/* ============================================================
+   Reduced motion. The CSS half only — both components branch in JS as well,
+   rendering their complete resting state rather than a frozen partial one.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .rx-stage {
+    animation: none;
+  }
+
+  .rx-ask,
+  .rx-branch-in,
+  .rx-step,
+  .rx-cell,
+  .rx-row-inner,
+  .rx-script-line,
+  .rx-script-meta {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .rx-rail {
+    stroke-dashoffset: 0;
+  }
+
+  .rx-node {
+    opacity: 1;
+  }
+
+  .rx-bar-fill {
+    transform: none;
+  }
+}

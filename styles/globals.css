@@ -25,6 +25,13 @@
 @import "./obsidian.css" layer(components);
 @import "./obsidian-app.css" layer(components);
 
+/* Experiment-only, and last so it can lean on the two above. `/experiment`
+   compares two candidate replacements for pillar 03's static fragment; when
+   one wins, its recipes move into `obsidian.css` under an `ob-` prefix and
+   this line and its file go. Nothing outside `/experiment` uses an `rx-`
+   class. */
+@import "./roadmap-experiment.css" layer(components);
+
 /* Everything below MUST stay inside `@layer base`. Unlayered rules beat every
    layered rule regardless of specificity — an unlayered `body` once silently
    zeroed out every Tailwind spacing utility in the app. */
