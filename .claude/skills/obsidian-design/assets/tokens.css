@@ -68,15 +68,41 @@
   --ob-font: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
   --ob-font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* --- Type scale — authority from scale and negative tracking, not weight */
+  /* --- Type scale — authority from scale and negative tracking, not weight.
+
+     Sixteen steps in four tiers, and there is no seventeenth: a size that is
+     not one of these is a bug. The four steps below marked NEW are the ones a
+     scale of this shape always turns out to need — omit them and they come
+     back as hardcoded 15px/17px/19px values scattered through the recipes,
+     which is exactly how a set of screens stops looking like one system. */
+
+  /* Display tier — sans, weight 400, hard negative tracking. Headings only. */
   --ob-display: clamp(58px, 7.2vw, 104px);
   --ob-h1: clamp(42px, 4.6vw, 68px);
   --ob-h2: clamp(30px, 3vw, 44px);
   --ob-h3: 23px;
   --ob-lead: 21px;
+
+  /* Text tier — sans, weight 400, --ob-tracking-snug. */
+  --ob-sub: 18px; /* NEW: the step between body and lead */
   --ob-body: 16px;
   --ob-sm: 14px;
+  --ob-xs: 13px; /* NEW: the dense step */
+
+  /* Meta tier — mono, weight 500, --ob-tracking-meta, uppercase.
+     The two below 12px are for labels sitting INSIDE another element. Never
+     set a line that has to be read at 10 or 11px. */
   --ob-meta: 12px;
+  --ob-meta-sm: 11px; /* NEW */
+  --ob-meta-xs: 10px; /* NEW */
+
+  /* Figure numerals — mono, weight 400, --ob-tracking-fig, leading 1.
+     A separate tier because a number is not a heading: mono so digits are
+     tabular, and never the display tier's tracking. */
+  --ob-fig-xl: clamp(40px, 4vw, 56px);
+  --ob-fig-lg: 44px;
+  --ob-fig-md: 33px;
+  --ob-fig-sm: 28px;
 
   /* Tracking. The slight negative on body is deliberate — it keeps the UI
      feeling related to the headline. Do not push past -0.02em. */
@@ -84,11 +110,19 @@
   --ob-tracking-h1: -0.03em;
   --ob-tracking-h2: -0.025em;
   --ob-tracking-snug: -0.015em;
+  --ob-tracking-fig: -0.02em;
   --ob-tracking-meta: 0.1em;
 
-  --ob-leading-display: 0.98;
-  --ob-leading-tight: 1.08;
-  --ob-leading-body: 1.6;
+  /* Leading — seven values, and no eighth. A stray 1.55 or 1.65 in a recipe
+     is how one size ends up rendering at four different leadings on a single
+     page, with every individual screen still looking fine. */
+  --ob-leading-display: 0.98; /* display only */
+  --ob-leading-flat: 1; /* figure numerals, single-line buttons */
+  --ob-leading-tight: 1.08; /* h1, h2 */
+  --ob-leading-snug: 1.25; /* h3, sub-lead headings */
+  --ob-leading-meta: 1.4; /* the mono meta layer */
+  --ob-leading-lead: 1.5; /* leads, dense rows, table cells */
+  --ob-leading-body: 1.6; /* running prose */
 
   /* Weight — 400 everywhere is the point. 500 is the mono metadata layer only. */
   --ob-weight: 400;

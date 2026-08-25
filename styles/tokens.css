@@ -69,25 +69,83 @@
   --ob-font: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
   --ob-font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Type scale — authority from scale and negative tracking, not weight. */
+  /* ------------------------------------------------------------------
+     Type scale — authority from scale and negative tracking, not weight.
+
+     **A third knowing addition to a list C2 declared closed** (after the
+     glass field and the roadmap chart), and the largest. It closes the scale
+     rather than extending it.
+
+     The eight steps below the rule were the whole documented scale, and the
+     tree did not fit in them. A measured sweep of every rendered text node
+     found **15 distinct sizes on `/` and 38 distinct size+leading pairs on
+     `/r/[slug]/validate`** — the app carrying roughly twice the typographic
+     variety of the landing at the same level of content. The overflow was
+     not expressive; it was 67 hardcoded pixel values spread across three
+     stylesheets plus six `text-[15px]` Tailwind escapes in components, each
+     one a local decision nobody could see from anywhere else.
+
+     Three things had genuinely earned a step and never got one — an 18px
+     sub-lead, a 13px dense step, and the 11/10px mono micro-labels — so they
+     are named here. Everything else snapped to its nearest neighbour. The
+     casualties worth knowing: **15px is gone** (it existed only as those
+     Tailwind escapes and five app rules, never as a landing recipe; it is
+     `--ob-sm` now), 17px and 19px both became `--ob-sub`, and 34px became
+     `--ob-fig-md`.
+
+     The rule from here: **a size that is not one of these tokens is a bug.**
+     ------------------------------------------------------------------ */
+
+  /* Display tier — sans, weight 400, hard negative tracking. */
   --ob-display: clamp(58px, 7.2vw, 104px);
   --ob-h1: clamp(42px, 4.6vw, 68px);
   --ob-h2: clamp(30px, 3vw, 44px);
   --ob-h3: 23px;
   --ob-lead: 21px;
+
+  /* Text tier — sans, weight 400, `--ob-tracking-snug`.
+     `--ob-sub` is the step between body and lead: the wordmark, the pulled
+     excerpt, the composer, a card title too small for `--ob-h3`. `--ob-xs`
+     is the dense step: figure notes, small buttons, tooltip proof lines. */
+  --ob-sub: 18px;
   --ob-body: 16px;
   --ob-sm: 14px;
+  --ob-xs: 13px;
+
+  /* Meta tier — mono, weight 500, `--ob-tracking-meta`, uppercase.
+     12px is the layer's home size; the two below it are for micro-labels
+     that sit inside another element (chips, citation superscripts, tags),
+     never for anything that has to be read as a line. */
   --ob-meta: 12px;
+  --ob-meta-sm: 11px;
+  --ob-meta-xs: 10px;
+
+  /* Figure numerals — mono, weight 400, `-0.02em`, leading 1. A separate
+     tier because a number is not a heading: it is set in mono so digits are
+     tabular, and it never carries the display tier's tracking. */
+  --ob-fig-xl: clamp(40px, 4vw, 56px);
+  --ob-fig-lg: 44px;
+  --ob-fig-md: 33px;
+  --ob-fig-sm: 28px;
 
   --ob-tracking-display: -0.035em;
   --ob-tracking-h1: -0.03em;
   --ob-tracking-h2: -0.025em;
   --ob-tracking-snug: -0.015em;
+  --ob-tracking-fig: -0.02em;
   --ob-tracking-meta: 0.1em;
 
-  --ob-leading-display: 0.98;
-  --ob-leading-tight: 1.08;
-  --ob-leading-body: 1.6;
+  /* Leading — seven values, and no eighth.
+     The sweep found 1.1, 1.15, 1.2, 1.3, 1.45, 1.55, 1.65 and 1.7 in the
+     tree alongside these, which is how the same size came to render at four
+     different leadings on one page. They all snap to the nearest below. */
+  --ob-leading-display: 0.98; /* display only */
+  --ob-leading-flat: 1; /* figure numerals, single-line buttons */
+  --ob-leading-tight: 1.08; /* h1, h2 */
+  --ob-leading-snug: 1.25; /* h3, sub-lead headings */
+  --ob-leading-meta: 1.4; /* the mono meta layer */
+  --ob-leading-lead: 1.5; /* leads, dense rows, table cells */
+  --ob-leading-body: 1.6; /* running prose */
 
   /* Weight — 400 everywhere is the point. 500 exists for the meta layer only. */
   --ob-weight: 400;
@@ -287,4 +345,80 @@
 
   --ob-rm-clay: #7a3428;
   --ob-rm-clay-edge: #e28874;
+}
+
+/* ============================================================================
+   WARM — the light inversion, scoped to a band.
+
+   **A fourth knowing addition to a list C2 declared closed**, made at the
+   user's direction: `/` alternates, and section 01 is a warm light band on the
+   near-black page.
+
+   **It is a remap, not a second system.** Every value below overwrites an
+   `--ob-*` token that already exists, so every recipe in `styles/obsidian.css`
+   — `.ob-frag`, `.ob-bubble`, `.ob-composer`, `.ob-seed`, `.ob-btn-primary`,
+   the whole type scale — works inside `.ob-warm` with no new selector and no
+   duplicated rule. Nothing here is a `--ob-warm-*` name on purpose: a second
+   parallel namespace is how two systems start drifting apart, and this must
+   stay one system rendered on paper instead of on slate.
+
+   Three things it deliberately does NOT change:
+
+   - **The type scale, the leading, the radii, the motion.** Only colour
+     inverts. A light band that also resizes its type is a different design,
+     not the same design lit differently.
+   - **The direction of the surface steps.** `--ob-void` is still the surface
+     meant to read as *deeper* than the page, so on paper it goes DARKER while
+     `--ob-surface` and `--ob-raised` go lighter. That is what keeps a fragment
+     card's header bar reading as a header bar in both modes.
+   - **The accent's three jobs.** Blue becomes burnt orange because blue on
+     warm paper reads as a link and fights the ground; the hue changes, what it
+     is allowed to mean does not. Action, verification, live state. Nothing
+     else in the band is permitted to be orange.
+
+   Every grey below was picked against `--ob-canvas` for AA at the size it
+   carries, the same way the dark greys were measured up: text 15.3:1, muted
+   6.7:1, dim 4.6:1, accent-as-text 5.0:1, white-on-accent 6.0:1. `#8b7d6b` was
+   the first `--ob-dim` and came in at 3.4:1 — fine as decoration, and this
+   layer carries the transcript label, the seed row and the composer hint.
+   ============================================================================ */
+
+.ob-warm {
+  /* Surfaces. Void is *deeper* paper, not lighter — see above. */
+  --ob-canvas: #f4ede2;
+  --ob-void: #eae0d1;
+  --ob-surface: #fdfaf5;
+  --ob-raised: #ffffff;
+
+  /* Hairlines — still the layout. Warm stone, never a neutral grey: a cool
+     hairline on warm paper is the single fastest way to make this read as a
+     white card dropped onto a beige page. */
+  --ob-hairline: #ddd0bc;
+  --ob-hairline-strong: #bca88b;
+  --ob-hairline-accent: rgba(176, 60, 10, 0.42);
+
+  /* Text — three levels and a dim, warm-biased the same way. */
+  --ob-text: #191410;
+  --ob-muted: #5a4f42;
+  --ob-dim: #756757;
+  --ob-on-accent: #ffffff;
+
+  /* Accent. Burnt orange, and it hovers DARKER — on a light ground "brighter"
+     means lower contrast, so the token keeps its name and inverts its
+     direction. */
+  --ob-accent: #b03c0a;
+  --ob-accent-bright: #8f2f06;
+  --ob-accent-wash: rgba(176, 60, 10, 0.1);
+  --ob-accent-ring: rgba(176, 60, 10, 0.28);
+  --ob-accent-glow: rgba(176, 60, 10, 0.26);
+
+  /* Discard — still not red, still a non-event. */
+  --ob-discard: #8b8073;
+
+  /* Washes. `--ob-hover-wash` is white-alpha in the dark system and would be
+     invisible here; it inverts to ink-alpha. */
+  --ob-hover-wash: rgba(25, 20, 16, 0.05);
+  --ob-scrim: rgba(244, 237, 226, 0.72);
+  --ob-grid: rgba(25, 20, 16, 0.1);
+  --ob-hatch: rgba(25, 20, 16, 0.15);
 }

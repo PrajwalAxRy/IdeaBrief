@@ -118,7 +118,7 @@ main [id],
   max-width: var(--ob-report-prose);
   color: var(--ob-muted);
   font-size: var(--ob-body);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
 }
 
 /* Obsidian headings default to --ob-text, so the *bright* half of a split
@@ -205,7 +205,7 @@ main [id],
    unchanged. Only the small size is new. */
 .ob-btn-sm {
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--ob-xs);
 }
 
 /* Focus rings on anything that is not a `.ob-btn` use `outline`, never
@@ -277,7 +277,7 @@ main [id],
   padding: 6px 12px;
   border: 1px solid var(--ob-hairline);
   border-radius: var(--ob-r-tag);
-  font-size: 13px;
+  font-size: var(--ob-xs);
   color: var(--ob-muted);
   transition: color var(--ob-fast) var(--ob-ease), border-color var(--ob-fast) var(--ob-ease);
 }
@@ -296,7 +296,7 @@ main [id],
 }
 .ob-toggle-count {
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   font-variant-numeric: tabular-nums;
   color: var(--ob-dim);
 }
@@ -403,7 +403,7 @@ main [id],
 }
 .ob-conf-word {
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
 }
@@ -499,13 +499,13 @@ main [id],
 
 /* One honest sentence, at most one action. Still no illustration anywhere. */
 .ob-empty {
-  font-size: 15px;
+  font-size: var(--ob-sm);
   color: var(--ob-muted);
 }
 
 .ob-ambient {
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-dim);
 }
@@ -631,7 +631,7 @@ main [id],
   background: var(--ob-raised);
   border: 1px solid var(--ob-hairline);
   border-radius: var(--ob-r-tag);
-  font-size: 12px;
+  font-size: var(--ob-meta);
   color: var(--ob-text);
   z-index: 52;
 }
@@ -663,8 +663,8 @@ main [id],
   letter-spacing: var(--ob-tracking-snug);
 }
 .ob-slot-brief {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: var(--ob-xs);
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
   max-width: 52ch;
 }
@@ -723,8 +723,8 @@ main [id],
   gap: 6px;
 }
 .ob-fig-note {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: var(--ob-xs);
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
   max-width: 56ch;
 }
@@ -853,25 +853,25 @@ main [id],
   gap: 8px;
 }
 .ob-callout-value {
-  font-size: clamp(40px, 4vw, 56px);
+  font-size: var(--ob-fig-xl);
   font-weight: var(--ob-weight);
-  letter-spacing: -0.02em;
-  line-height: 1;
+  letter-spacing: var(--ob-tracking-fig);
+  line-height: var(--ob-leading-flat);
 }
 .ob-callout-lead .ob-callout-value {
   font-size: var(--ob-h1);
 }
 .ob-callout-compact .ob-callout-value {
-  font-size: 28px;
+  font-size: var(--ob-fig-sm);
 }
 .ob-callout-unit {
   font-family: var(--ob-font-mono);
-  font-size: 16px;
+  font-size: var(--ob-body);
   color: var(--ob-muted);
 }
 .ob-callout-label {
-  font-size: 15px;
-  line-height: 1.4;
+  font-size: var(--ob-sm);
+  line-height: var(--ob-leading-meta);
   color: var(--ob-muted);
   max-width: 34ch;
 }
@@ -920,7 +920,7 @@ main [id],
   display: flex;
   justify-content: space-between;
   margin-top: 3px;
-  line-height: 1.2;
+  line-height: var(--ob-leading-snug);
 }
 
 .ob-ladder {
@@ -974,13 +974,13 @@ main [id],
   border-radius: var(--ob-r-tag);
 }
 .ob-ladder-label {
-  font-size: 13px;
+  font-size: var(--ob-xs);
   color: var(--ob-muted);
   background: var(--ob-canvas);
   padding-inline: 4px;
 }
 .ob-ladder-value {
-  font-size: 14px;
+  font-size: var(--ob-sm);
   background: var(--ob-canvas);
   padding-inline: 4px;
 }
@@ -996,7 +996,7 @@ main [id],
   gap: 6px;
 }
 .ob-gap-label {
-  font-size: 15px;
+  font-size: var(--ob-sm);
   color: var(--ob-muted);
 }
 .ob-gap-track {
@@ -1017,13 +1017,13 @@ main [id],
   background: var(--ob-hairline-strong);
 }
 .ob-gap-value {
-  font-size: 14px;
+  font-size: var(--ob-sm);
   white-space: nowrap;
 }
 .ob-gap-ratio {
-  font-size: 28px;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: var(--ob-fig-sm);
+  line-height: var(--ob-leading-flat);
+  letter-spacing: var(--ob-tracking-fig);
 }
 
 .ob-funnel {
@@ -1073,7 +1073,7 @@ main [id],
   border-bottom: 1px solid var(--ob-hairline);
   font-weight: var(--ob-weight);
   font-size: var(--ob-sm);
-  line-height: 1.2;
+  line-height: var(--ob-leading-snug);
   color: var(--ob-muted);
   vertical-align: middle;
 }
@@ -1211,8 +1211,8 @@ button.ob-domain-row[aria-pressed="true"] .ob-domain-track {
   gap: 6px;
 }
 .ob-dimstrip-count .ob-fig-value {
-  font-size: 28px;
-  letter-spacing: -0.02em;
+  font-size: var(--ob-fig-sm);
+  letter-spacing: var(--ob-tracking-fig);
 }
 
 /* ============================================================
@@ -1307,7 +1307,7 @@ button.ob-domain-row[aria-pressed="true"] .ob-domain-track {
    is obsidian.css's and is not redeclared — this is an attribute-scoped
    variant that only ever matches inside the run header. */
 .ob-wordmark[data-size="sm"] {
-  font-size: 16px;
+  font-size: var(--ob-body);
   flex: none;
 }
 
@@ -1384,7 +1384,7 @@ button.ob-domain-row[aria-pressed="true"] .ob-domain-track {
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
 }
 
 .ob-stage[data-state="done"] .ob-stage-node {
@@ -1452,7 +1452,7 @@ button.ob-domain-row[aria-pressed="true"] .ob-domain-track {
   font-size: var(--ob-meta);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
   white-space: nowrap;
   cursor: pointer;
   transition: border-color var(--ob-fast) var(--ob-ease), color var(--ob-fast) var(--ob-ease),
@@ -1619,10 +1619,10 @@ main[data-chrome="surface"] ~ .ob-run-footer {
    bracketed number inside running prose (C12). */
 .ob-cite {
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   font-weight: var(--ob-weight-meta);
   letter-spacing: 0.04em;
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
   color: var(--ob-accent);
   padding: 1px 3px;
   margin-inline: 1px;
@@ -1679,7 +1679,7 @@ main[data-chrome="surface"] ~ .ob-run-footer {
 
 .ob-cite-pop-excerpt {
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   color: var(--ob-text);
 }
 
@@ -1696,7 +1696,7 @@ main[data-chrome="surface"] ~ .ob-run-footer {
    chip mid-paragraph and landed on the following line of body text. 13px sans,
    not mono — mono carries no sentences. */
 .ob-cite-hint {
-  font-size: 13px;
+  font-size: var(--ob-xs);
   color: var(--ob-dim);
   border-left: 1px solid var(--ob-hairline);
   padding-left: 12px;
@@ -1733,7 +1733,7 @@ main[data-chrome="surface"] ~ .ob-run-footer {
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
   color: var(--ob-dim);
 }
 
@@ -1762,7 +1762,7 @@ main[data-chrome="surface"] ~ .ob-run-footer {
    Space for free (R12). */
 .ob-finding-claim {
   font-size: var(--ob-body);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
   text-align: left;
@@ -1789,7 +1789,7 @@ button.ob-finding-claim:focus-visible {
 
 .ob-finding-excerpt {
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
   border-left: 1px solid var(--ob-hairline);
   padding-left: 14px;
@@ -1801,7 +1801,7 @@ button.ob-finding-claim:focus-visible {
   border: 1px solid var(--ob-hairline);
   border-radius: var(--ob-r-tag);
   padding: 2px 6px;
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
 }
 
 .ob-finding-source {
@@ -1993,8 +1993,8 @@ button.ob-finding-claim:focus-visible {
 }
 
 .ob-discard-excerpt {
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: var(--ob-sub);
+  line-height: var(--ob-leading-lead);
   color: var(--ob-discard);
   text-decoration: line-through;
   text-decoration-thickness: 1px;
@@ -2098,7 +2098,7 @@ main:has(> .ob-define) {
   border-radius: var(--ob-r-pill);
   background: var(--ob-raised);
   color: var(--ob-muted);
-  font-size: 13px;
+  font-size: var(--ob-xs);
   letter-spacing: var(--ob-tracking-snug);
   transition: color var(--ob-fast) var(--ob-ease), border-color var(--ob-fast) var(--ob-ease);
 }
@@ -2305,7 +2305,7 @@ main:has(> .ob-define) {
   gap: 12px;
   width: 100%;
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   color: var(--ob-text);
   text-align: left;
   background: transparent;
@@ -2380,7 +2380,7 @@ main:has(> .ob-define) {
   border-radius: var(--ob-r-tag);
   padding: 1px 6px;
   font-family: var(--ob-font-mono);
-  font-size: 10px;
+  font-size: var(--ob-meta-xs);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
@@ -2392,7 +2392,7 @@ main:has(> .ob-define) {
    both it and the key from `patch.edited`. */
 .ob-tag-edited {
   font-family: var(--ob-font-mono);
-  font-size: 10px;
+  font-size: var(--ob-meta-xs);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-dim);
@@ -2443,7 +2443,7 @@ main:has(> .ob-define) {
   color: var(--ob-text);
   font-family: var(--ob-font);
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   resize: vertical;
 }
 
@@ -2464,7 +2464,7 @@ main:has(> .ob-define) {
 
 .ob-consequence {
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
   max-width: 36ch;
 }
@@ -2680,7 +2680,7 @@ main:has(> .ob-define) {
   grid-column: 1 / -1;
   min-height: 17px;
   font-size: var(--ob-sm);
-  line-height: 17px;
+  line-height: var(--ob-leading-meta);
   color: var(--ob-dim);
 }
 .ob-phase[data-state="complete"] .ob-phase-note {
@@ -2749,7 +2749,7 @@ main:has(> .ob-define) {
    in the aria-live summary. */
 .ob-qrow-text {
   font-family: var(--ob-font-mono);
-  font-size: 12px;
+  font-size: var(--ob-meta);
   text-transform: none;
   letter-spacing: 0;
   white-space: nowrap;
@@ -2768,8 +2768,8 @@ main:has(> .ob-define) {
 .ob-qglyph {
   width: 14px;
   text-align: center;
-  font-size: 11px;
-  line-height: 1;
+  font-size: var(--ob-meta-sm);
+  line-height: var(--ob-leading-flat);
 }
 .ob-qglyph[data-state="queued"] {
   /* Token only — same stacked-de-emphasis fix as `.ob-phase-item`. */
@@ -2836,7 +2836,7 @@ main:has(> .ob-define) {
   grid-column: 3;
   justify-self: start;
   font-family: var(--ob-font-mono);
-  font-size: 10px;
+  font-size: var(--ob-meta-xs);
   text-transform: lowercase;
   letter-spacing: 0.04em;
   color: var(--ob-dim);
@@ -2866,7 +2866,7 @@ main:has(> .ob-define) {
 
 .ob-discard-count {
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
 }
 
@@ -2887,7 +2887,7 @@ main:has(> .ob-define) {
   font-size: var(--ob-meta);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
-  line-height: 17px;
+  line-height: var(--ob-leading-meta);
   color: var(--ob-discard);
 }
 
@@ -2896,13 +2896,13 @@ main:has(> .ob-define) {
    not be set in it. */
 .ob-discard-last-reason {
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
 }
 
 .ob-discard-done {
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
 }
 
@@ -3132,7 +3132,7 @@ main:has(> .ob-define) {
 }
 /* No bold anywhere: weight is 400, and the mono key layer is the only 500. */
 .ob-estate-value {
-  font-size: 23px;
+  font-size: var(--ob-h3);
   line-height: var(--ob-leading-tight);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
@@ -3215,8 +3215,8 @@ main:has(> .ob-define) {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  font-size: 15px;
-  line-height: 1.45;
+  font-size: var(--ob-sm);
+  line-height: var(--ob-leading-lead);
 }
 .ob-erail-row .ob-meta:last-child {
   grid-column: 2;
@@ -3250,8 +3250,8 @@ main:has(> .ob-define) {
 /* A field, not a meta line. This is the single most decision-relevant value on
    the card and `white-space: nowrap` used to clip it (R21). */
 .ob-comp-price {
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: var(--ob-sm);
+  line-height: var(--ob-leading-lead);
   color: var(--ob-text);
 }
 /* No accordion: hiding four fields behind a per-card click is a barrier over
@@ -3314,7 +3314,7 @@ main:has(> .ob-define) {
 .ob-unans-why {
   margin-top: 8px;
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
   max-width: 68ch;
 }
@@ -3457,7 +3457,7 @@ main:has(> .ob-define) {
    overflows its 96px mark — caught by the height replay, and the mark is what
    gets fixed, never the reservation. The two bars are the comparison. */
 .ob-rfig-transition .ob-callout-value {
-  font-size: 34px;
+  font-size: var(--ob-fig-md);
 }
 /* PRACTICAL's three compact rows, hairline-ruled: **28px mono value left,
    `.ob-meta` label right** — one row, not a stacked pair, which is what keeps
@@ -3481,7 +3481,7 @@ main:has(> .ob-define) {
   gap: 6px;
 }
 .ob-rfig-rows .ob-callout-label {
-  font-size: 12px;
+  font-size: var(--ob-meta);
   text-align: right;
   max-width: 26ch;
   color: var(--ob-dim);
@@ -3556,7 +3556,7 @@ main:has(> .ob-define) {
   margin-top: 28px;
   font-size: var(--ob-body);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.7;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 
@@ -3588,7 +3588,7 @@ main:has(> .ob-define) {
   margin-top: 24px;
   font-size: var(--ob-body);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.7;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 
@@ -3699,7 +3699,7 @@ main:has(> .ob-define) {
   border: 1px solid var(--ob-rm-rule-strong);
   border-radius: var(--ob-r-tag);
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-muted);
@@ -3758,9 +3758,9 @@ main:has(> .ob-define) {
 }
 .ob-rm-tip-proof {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: var(--ob-xs);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
 }
 
@@ -3790,9 +3790,9 @@ main:has(> .ob-define) {
 
 .ob-rm-row-name {
   padding-right: 28px;
-  font-size: 17px;
+  font-size: var(--ob-sub);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.25;
+  line-height: var(--ob-leading-snug);
   color: var(--ob-text);
   transition: color var(--ob-fast) var(--ob-ease);
 }
@@ -3863,8 +3863,8 @@ main:has(> .ob-define) {
   /* Never `width`: transform, opacity and filter only. */
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform var(--ob-enter) var(--ob-ease) var(--ob-reveal-delay, 0ms),
-    filter var(--ob-fast) var(--ob-ease);
+  transition: transform var(--ob-enter) var(--ob-ease) var(--ob-reveal-delay, 0ms), filter
+    var(--ob-fast) var(--ob-ease);
 }
 .ob-rm-bar[data-shown="true"] .ob-rm-bar-fill {
   transform: scaleX(1);
@@ -3939,7 +3939,7 @@ main:has(> .ob-define) {
   margin-top: 18px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-dim);
 }
 
@@ -4008,7 +4008,7 @@ main:has(> .ob-define) {
   font-size: var(--ob-h3);
   font-weight: var(--ob-weight);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.15;
+  line-height: var(--ob-leading-snug);
   color: var(--ob-text);
 }
 .ob-step-tagline {
@@ -4016,7 +4016,7 @@ main:has(> .ob-define) {
   margin-top: 8px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   color: var(--ob-dim);
 }
 
@@ -4040,7 +4040,7 @@ main:has(> .ob-define) {
   max-width: 62ch;
   font-size: var(--ob-body);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.7;
+  line-height: var(--ob-leading-body);
   color: var(--ob-text);
 }
 
@@ -4062,7 +4062,7 @@ main:has(> .ob-define) {
   margin-top: 10px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 
@@ -4079,7 +4079,7 @@ main:has(> .ob-define) {
   gap: 6px 32px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   color: var(--ob-dim);
 }
 
@@ -4087,7 +4087,7 @@ main:has(> .ob-define) {
   margin-top: 12px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-dim);
 }
 .ob-step-aside .ob-ambush-list {
@@ -4117,7 +4117,7 @@ main:has(> .ob-define) {
 .ob-ambush-text {
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.65;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 
@@ -4146,16 +4146,16 @@ main:has(> .ob-define) {
 }
 
 .ob-oq-q {
-  font-size: 19px;
+  font-size: var(--ob-sub);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.45;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-text);
 }
 .ob-oq-why {
   margin-top: 10px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.65;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 /* Only ever rendered on a question that also floated to the top — the tag and
@@ -4198,10 +4198,10 @@ main:has(> .ob-define) {
 }
 
 .ob-setup-name {
-  font-size: 17px;
+  font-size: var(--ob-sub);
   font-weight: var(--ob-weight);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.3;
+  line-height: var(--ob-leading-snug);
   color: var(--ob-text);
 }
 
@@ -4215,7 +4215,7 @@ main:has(> .ob-define) {
 }
 .ob-setup-wait-tag {
   font-family: var(--ob-font-mono);
-  font-size: 10px;
+  font-size: var(--ob-meta-xs);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-dim);
@@ -4233,14 +4233,14 @@ main:has(> .ob-define) {
   margin-top: 12px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.65;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 .ob-setup-when {
   margin-top: 10px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-dim);
 }
 .ob-setup-ambushes {
@@ -4251,7 +4251,7 @@ main:has(> .ob-define) {
 /* Supporting detail in this section, not the point of the row — the steps
    above are where an ambush is the headline. */
 .ob-setup-ambushes .ob-ambush-text {
-  font-size: 13px;
+  font-size: var(--ob-xs);
   color: var(--ob-dim);
 }
 
@@ -4262,7 +4262,7 @@ main:has(> .ob-define) {
   border-top: 1px solid var(--ob-hairline-strong);
   font-size: var(--ob-body);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-text);
 }
 
@@ -4275,7 +4275,7 @@ main:has(> .ob-define) {
   max-width: 68ch;
   font-size: var(--ob-lead);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-text);
 }
 .ob-money-cols {
@@ -4297,7 +4297,7 @@ main:has(> .ob-define) {
   margin-top: 12px;
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.65;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 .ob-money-calibration {
@@ -4370,7 +4370,7 @@ main:has(> .ob-define) {
   margin-top: 12px;
   font-size: var(--ob-body);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 .ob-tripwire-list {
@@ -4389,7 +4389,7 @@ main:has(> .ob-define) {
 .ob-tripwire-then {
   font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.65;
+  line-height: var(--ob-leading-body);
 }
 .ob-tripwire-if {
   color: var(--ob-text);
@@ -4419,7 +4419,7 @@ main:has(> .ob-define) {
   margin-top: 20px;
   font-size: var(--ob-body);
   letter-spacing: var(--ob-tracking-snug);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 .ob-exit-actions {
@@ -4498,7 +4498,7 @@ main:has(> .ob-define) {
 }
 .ob-run-note {
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
 }
 
@@ -4529,7 +4529,7 @@ main:has(> .ob-define) {
    the feature (C9). */
 .ob-discard-reason-label {
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
 }
 .ob-discard-reason-count {
@@ -4673,7 +4673,7 @@ main:has(> .ob-define) {
 .ob-facet-note {
   margin-top: 10px;
   color: var(--ob-dim);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
 }
 
 /* --- sort and the count line --------------------------------------------- */
@@ -4821,7 +4821,7 @@ main:has(> .ob-define) {
 
 .ob-src-text {
   font-size: var(--ob-body);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-text);
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -4835,7 +4835,7 @@ main:has(> .ob-define) {
 /* The full verbatim excerpt now lives in the drawer, which the row opens. */
 .ob-src-excerpt {
   font-size: var(--ob-sm);
-  line-height: 1.6;
+  line-height: var(--ob-leading-body);
   color: var(--ob-muted);
   border-left: 1px solid var(--ob-hairline-strong);
   padding-left: 12px;
@@ -4909,7 +4909,7 @@ main:has(> .ob-define) {
 /* Sans, `--ob-muted`; only the prefix is mono `--ob-discard` (C9). */
 .ob-src-reason {
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-muted);
 }
 .ob-src-reason-prefix {
@@ -4923,7 +4923,7 @@ main:has(> .ob-define) {
    that assertion becomes visible. */
 .ob-src-query {
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   color: var(--ob-dim);
   white-space: nowrap;
   overflow: hidden;

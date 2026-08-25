@@ -17,15 +17,20 @@ const COLOR_GROUPS: { title: string; vars: string[] }[] = [
   { title: 'Figures', vars: ['--ob-grid', '--ob-hatch'] },
 ];
 
-const TYPE_SCALE = [
-  '--ob-display',
-  '--ob-h1',
-  '--ob-h2',
-  '--ob-h3',
-  '--ob-lead',
-  '--ob-body',
-  '--ob-sm',
-  '--ob-meta',
+/** All sixteen steps, in the four tiers A19 closed the scale into. The gallery
+ *  shows every one so a missing step is visible here before it becomes a
+ *  hardcoded pixel value in a recipe. */
+const TYPE_SCALE: { tier: string; vars: string[] }[] = [
+  {
+    tier: 'Display — sans, hard negative tracking',
+    vars: ['--ob-display', '--ob-h1', '--ob-h2', '--ob-h3', '--ob-lead'],
+  },
+  { tier: 'Text — sans, snug tracking', vars: ['--ob-sub', '--ob-body', '--ob-sm', '--ob-xs'] },
+  { tier: 'Meta — mono, uppercase, wide', vars: ['--ob-meta', '--ob-meta-sm', '--ob-meta-xs'] },
+  {
+    tier: 'Figure numerals — mono, tabular, flat leading',
+    vars: ['--ob-fig-xl', '--ob-fig-lg', '--ob-fig-md', '--ob-fig-sm'],
+  },
 ];
 
 const LAYOUT = [
@@ -74,25 +79,37 @@ export function FoundationsSection() {
         </Row>
       ))}
 
-      <Row title="Type scale — weight 400 throughout">
-        <div className="flex w-full flex-col gap-4">
-          {TYPE_SCALE.map((v) => (
-            <div key={v} className="flex items-baseline gap-6">
-              <code className="ob-meta w-40 shrink-0">{v}</code>
-              <span
-                style={{
-                  fontSize: `var(${v})`,
-                  color: 'var(--ob-text)',
-                  fontWeight: 'var(--ob-weight)',
-                  letterSpacing: 'var(--ob-tracking-snug)',
-                }}
-              >
-                Groundwork
-              </span>
-            </div>
-          ))}
-        </div>
-      </Row>
+      {TYPE_SCALE.map((tier) => (
+        <Row key={tier.tier} title={`Type scale — ${tier.tier}`}>
+          <div className="flex w-full flex-col gap-4">
+            {tier.vars.map((v) => {
+              const isMeta = v.startsWith('--ob-meta');
+              const isFig = v.startsWith('--ob-fig');
+              return (
+                <div key={v} className="flex items-baseline gap-6">
+                  <code className="ob-meta w-40 shrink-0">{v}</code>
+                  <span
+                    style={{
+                      fontSize: `var(${v})`,
+                      color: 'var(--ob-text)',
+                      fontFamily: isMeta || isFig ? 'var(--ob-font-mono)' : 'var(--ob-font)',
+                      fontWeight: isMeta ? 'var(--ob-weight-meta)' : 'var(--ob-weight)',
+                      letterSpacing: isMeta
+                        ? 'var(--ob-tracking-meta)'
+                        : isFig
+                          ? 'var(--ob-tracking-fig)'
+                          : 'var(--ob-tracking-snug)',
+                      textTransform: isMeta ? 'uppercase' : 'none',
+                    }}
+                  >
+                    {isFig ? '2 480' : 'Groundwork'}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </Row>
+      ))}
 
       <Row title="Layout">
         <div className="flex w-full flex-col gap-2">

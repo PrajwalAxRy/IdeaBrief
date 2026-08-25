@@ -981,6 +981,7 @@ empty states, no confetti · the report ends pointing forward into the roadmap.
 | A16 | Roadmap — rebuilt as the journey (supersedes A12) | `DONE` | 2026-08-23 |
 | A17 | Roadmap — rebuilt for readability (supersedes A16) | `DONE` | 2026-08-24 |
 | A18 | Legibility — the grey ramp measured up, app-wide | `DONE` | 2026-08-24 |
+| A19 | Type scale — closed at 16 steps, app-wide | `DONE` | 2026-08-24 |
 
 Status values: `TODO` · `IN PROGRESS` · `PARTIAL` · `DONE`
 
@@ -5700,6 +5701,85 @@ was hard to read. Flagged for the user rather than taken silently.
 **Not touched.** A pre-existing Biome formatting error on a `.ob-rm-bar-fill`
 `transition` — confirmed present on the stashed tree, so it is A17's, not this
 change's, and sweeping it in would have hidden it in an unrelated diff.
+
+---
+
+### A19 — 2026-08-24 — Type scale: closed at 16 steps
+
+**The ask:** read the landing page's typography, write down the actual format,
+and put the rest of the site on it — then update the skill.
+
+**The landing turned out not to have one format either.** The documented scale
+was eight steps. A computed-style sweep in the Playwright MCP over every text
+node found **15 distinct sizes on `/`** and, worse, **38 distinct size+leading
+pairs on `/r/[slug]/validate`** — the app carrying roughly twice the typographic
+variety of the landing at the same level of content. Source: **67 hardcoded
+pixel `font-size` values across three stylesheets** (20 in `obsidian.css`, 41 in
+`obsidian-app.css`, 6 in `roadmap-experiment.css`) plus **six `text-[15px]`
+Tailwind escapes in landing components**. Leading was worse than size: `1.1`,
+`1.15`, `1.2`, `1.3`, `1.45`, `1.55`, `1.65`, `1.7` and two `17px` literals were
+all in the tree, so the *same size rendered at three or four different leadings
+on one page*. Weight was the one thing already clean — 400/500 throughout.
+
+**Read the direction of the drift:** it lived almost entirely in the app, not
+the landing. Marketing pages get designed; product pages get extended, one
+`font-size: 15px` at a time, each a local decision nobody could see from
+anywhere else.
+
+**Three things had genuinely earned a step and never got one** — an 18px
+sub-lead (`.ob-wordmark`, `.ob-excerpt`, the composer), a 13px dense step (six
+landing sites, eight app), and the 11/10px mono micro-labels (chips, `.ob-cite`,
+tags). Those are now `--ob-sub`, `--ob-xs`, `--ob-meta-sm`, `--ob-meta-xs`.
+Figure numerals got their own tier (`--ob-fig-xl/lg/md/sm` + `--ob-tracking-fig`)
+because a number is not a heading: mono for tabular digits, flat leading, and
+never the display tier's tracking. Everything else snapped to its nearest
+neighbour.
+
+**Casualties worth knowing.** `15px` is gone — it existed only as those six
+Tailwind escapes and five app rules, never as a landing recipe, and is `--ob-sm`
+now (28 elements on `/validate` shrank 1px). `17px` and `19px` both became
+`--ob-sub` (±1px, on `.ob-rm-row-name`, `.ob-setup-name`, `.ob-oq-q`). `34px`
+became `--ob-fig-md` (33). Leading collapsed to seven values; `1.55`/`1.65`/`1.7`
+all became `--ob-leading-body`.
+
+**A third knowing addition to the token list C2 declared closed**, after the
+glass field and the roadmap chart, and by far the largest. Same justification as
+both: the alternative is literals in the recipes, and the escape hatch the rule
+names is a token. It *closes* the scale rather than extending it — the header on
+the block states the rule as "a size that is not one of these tokens is a bug".
+
+**`.ob-sub` / `.ob-sm` / `.ob-xs` recipe classes were added to `obsidian.css`
+§3** so a component always has a token-backed way to name a size. Without them
+the next "slightly smaller than body" need becomes another `text-[15px]`, which
+is precisely how 15px got in. The six escapes were replaced with these; there is
+now **zero** Tailwind typography anywhere in `components/` or `app/`.
+
+**Three deliberate exceptions, all commented in place**, all in `obsidian.css`:
+`.ob-footer-mark`'s `clamp(80px, 15vw, 220px)` stroked watermark (its leading and
+tracking are tuned so the baseline clip lands, and it must never get a second
+consumer), and the two `em`-relative fragments `.ob-vf-num-unit` / `.ob-vf-num-per`
+(proportions of their own numeral, not steps). `.ob-wordmark` keeps a `-0.02em`
+literal on purpose — `--ob-tracking-fig` holds the same value but means "figure
+numeral", and reading it there would say something untrue about the element.
+
+**Verified by measurement, per route.** The sweep was re-run on `/`, `/define`,
+`/validate`, `/roadmap` and `/sources`: **zero off-scale sizes and zero
+off-scale leadings on all five**. Pair counts fell — validate 38 → 28, roadmap
+24 → 17. `npm run build` passes; `npx tsc --noEmit` clean; Biome clean on all
+four stylesheets and the four components touched.
+
+**One thing found and deliberately not fixed: `/validate`, `/define` and
+`/sources` currently render their body text invisible.** This is the
+`AppBackdrop` z-index defect already documented in `CLAUDE.md` — the backdrop is
+a `position: fixed; z-index: 0` sibling, so it paints above static in-flow text,
+and only `.ob-roadmap` lifts itself clear. It was dormant because the assets did
+not exist; **the untracked `public/media/validate/report-field.webp` now does**,
+which switched it on. Confirmed pre-existing by stashing this change and
+re-screenshotting — identical. Out of scope for a typography phase, and it wants
+its own fix (lift `.ob-report`, `.ob-define`, `.ob-sources`, `.ob-explorer` to
+`position: relative; z-index: 1` the way A16 did for `.ob-roadmap` — **not**
+`z-index: -1` on the backdrop, which `globals.css` records must stay above the
+body background).
 
 ---
 

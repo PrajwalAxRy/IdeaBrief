@@ -128,7 +128,7 @@ body {
 .ob-h3 {
   font-size: var(--ob-h3);
   font-weight: var(--ob-weight);
-  line-height: 1.25;
+  line-height: var(--ob-leading-snug);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
   margin: 0;
@@ -137,9 +137,23 @@ body {
 .ob-lead {
   font-size: var(--ob-lead);
   font-weight: var(--ob-weight);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-muted);
+  margin: 0;
+}
+
+/* The three text-tier steps below .ob-lead. Ship these on day one even if
+   nothing uses them yet. They exist so a component always has a token-backed
+   way to name a size — without them, the first "slightly smaller than body"
+   need becomes a `text-[15px]` Tailwind escape, and that one escape is how
+   an off-scale size gets into the system permanently. */
+.ob-sub {
+  font-size: var(--ob-sub);
+  font-weight: var(--ob-weight);
+  line-height: var(--ob-leading-lead);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
   margin: 0;
 }
 
@@ -150,8 +164,35 @@ body {
   margin: 0;
 }
 
+.ob-sm {
+  font-size: var(--ob-sm);
+  line-height: var(--ob-leading-body);
+  letter-spacing: var(--ob-tracking-snug);
+  margin: 0;
+}
+
+.ob-xs {
+  font-size: var(--ob-xs);
+  line-height: var(--ob-leading-body);
+  letter-spacing: var(--ob-tracking-snug);
+  margin: 0;
+}
+
 .ob-body-bright {
   color: var(--ob-text);
+}
+
+/* Figure numerals. Mono for tabular digits, flat leading so a numeral sits on
+   its own baseline, and the figure tracking rather than the display tier's. */
+.ob-fig {
+  font-family: var(--ob-font-mono);
+  font-size: var(--ob-fig-lg);
+  font-weight: var(--ob-weight);
+  line-height: var(--ob-leading-flat);
+  letter-spacing: var(--ob-tracking-fig);
+  color: var(--ob-text);
+  font-variant-numeric: tabular-nums;
+  margin: 0;
 }
 
 /* Inline emphasis. Not blue — blue is action/verification/live only. */
@@ -166,9 +207,19 @@ body {
   font-size: var(--ob-meta);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
-  line-height: 1.4;
+  line-height: var(--ob-leading-meta);
   text-transform: uppercase;
   color: var(--ob-dim);
+}
+
+/* The two micro sizes. For a label sitting INSIDE another element — a chip, a
+   citation superscript, a tag. Never for a line that has to be read. */
+.ob-meta-sm {
+  font-size: var(--ob-meta-sm);
+}
+
+.ob-meta-xs {
+  font-size: var(--ob-meta-xs);
 }
 
 .ob-meta-bright {

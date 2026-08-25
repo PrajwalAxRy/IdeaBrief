@@ -67,7 +67,7 @@
    makes a 12px label a 19px line and drops the caption row out of alignment
    with the dot beside it. Same fix as `.ob-vf-replay`. */
 .rx-replay {
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
   color: var(--ob-dim);
 }
 
@@ -137,7 +137,7 @@
 
 .rx-ask-question {
   font-size: var(--ob-h3);
-  line-height: 1.24;
+  line-height: var(--ob-leading-snug);
   letter-spacing: var(--ob-tracking-h2);
   color: var(--ob-text);
 }
@@ -149,7 +149,7 @@
 /* Sans, not mono: four words with an implied verb is a sentence fragment, and
    the metadata layer never carries one. */
 .rx-ask-hinge {
-  font-size: 13px;
+  font-size: var(--ob-xs);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-dim);
 }
@@ -249,7 +249,7 @@
   border: 1px solid var(--ob-hairline-strong);
   border-radius: var(--ob-r-tag);
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-text);
@@ -273,7 +273,7 @@
 }
 
 .rx-reading {
-  font-size: 15px;
+  font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
 }
@@ -356,7 +356,7 @@
 .rx-verdict {
   margin-top: 14px;
   font-size: var(--ob-sm);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-muted);
   transition: color var(--ob-base) var(--ob-ease);
@@ -453,7 +453,7 @@
 }
 
 .rx-row-text {
-  font-size: 15px;
+  font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-muted);
   transition: color var(--ob-base) var(--ob-ease);
@@ -525,7 +525,7 @@
 .rx-script-line {
   display: flex;
   gap: 14px;
-  font-size: 15px;
+  font-size: var(--ob-sm);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
 
@@ -595,7 +595,7 @@
   border: 1px solid var(--ob-hairline-strong);
   border-radius: var(--ob-r-tag);
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
@@ -605,7 +605,7 @@
 .rx-note {
   max-width: 62ch;
   font-size: var(--ob-sm);
-  line-height: 1.65;
+  line-height: var(--ob-leading-body);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-dim);
 }

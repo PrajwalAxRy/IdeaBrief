@@ -1,6 +1,6 @@
 ---
 name: obsidian-design
-description: Design and build screens in the "Obsidian" style — a near-black canvas where 1px hairlines carve the entire layout, oversized weight-400 display type with hard negative tracking, one electric-blue accent that only ever means action/verification/live, code-drawn product UI instead of screenshots, and scroll-driven motion. Inspired by Hyperstudio crossed with vev/pageTheme. This is THE default design system — use it for ANY work that produces visible pixels — new pages, restyling, adding a section, picking a colour, sizing type, laying out a grid, choosing what animates, briefing an image or video, or verifying a screen in the browser. Triggers on "design", "restyle", "make it look", "overhaul the UI", "add a section", "hero", "landing page", "the look", "obsidian", "dark theme", or any request that will produce visible pixels. Do NOT design from memory or default styling — read this first.
+description: Design and build screens in the "Obsidian" style — a near-black canvas where 1px hairlines carve the entire layout, oversized weight-400 display type with hard negative tracking, one electric-blue accent that only ever means action/verification/live, code-drawn product UI instead of screenshots, and scroll-driven motion. Inspired by Hyperstudio crossed with vev/pageTheme. This is the default design system for everything at the REPO ROOT — `app/`, `components/`, `styles/` — use it for ANY work that produces visible pixels there: new pages, restyling, adding a section, picking a colour, sizing type, laying out a grid, choosing what animates, briefing an image or video, or verifying a screen in the browser. Triggers on "design", "restyle", "make it look", "overhaul the UI", "add a section", "hero", "landing page", "the look", "obsidian", "dark theme", or any request that will produce visible pixels in the root app. Do NOT design from memory or default styling — read this first. EXCEPTION: `experimentalFrontend/` is a separate light-theme app owned entirely by the riley-design skill — use that instead for anything under that directory, and never mix `--ob-*` and `--rl-*` tokens across the boundary.
 ---
 
 # Obsidian
@@ -141,6 +141,12 @@ headline at weight 400.
 
 ### Scale
 
+**Sixteen steps in four tiers, and there is no seventeenth.** A size that is
+not one of these tokens is a bug — see "Closing the scale" below for why this
+is stated so bluntly.
+
+**Display tier** — sans, weight 400, hard negative tracking. Headings only.
+
 | Token | Value | Use |
 |---|---|---|
 | `--ob-display` | `clamp(58px, 7.2vw, 104px)` | Hero headline. One per page. |
@@ -148,9 +154,37 @@ headline at weight 400.
 | `--ob-h2` | `clamp(30px, 3vw, 44px)` | Sub-section, panel title. |
 | `--ob-h3` | `23px` | Card title. |
 | `--ob-lead` | `21px` | Hero subcopy and section intros only. |
+
+**Text tier** — sans, weight 400, `--ob-tracking-snug`.
+
+| Token | Value | Use |
+|---|---|---|
+| `--ob-sub` | `18px` | The step between body and lead: wordmark, pulled excerpt, composer, a card title too small for `--ob-h3`. |
 | `--ob-body` | `16px` | Running prose. |
-| `--ob-sm` | `14px` | Dense UI, buttons, chat. |
-| `--ob-meta` | `12px` | Mono metadata. |
+| `--ob-sm` | `14px` | Dense UI, buttons, chat, secondary copy. |
+| `--ob-xs` | `13px` | The dense step: figure notes, small buttons, tooltip proof lines. |
+
+**Meta tier** — mono, weight 500, `+0.10em`, uppercase.
+
+| Token | Value | Use |
+|---|---|---|
+| `--ob-meta` | `12px` | The layer's home size. |
+| `--ob-meta-sm` | `11px` | Micro-label inside another element. |
+| `--ob-meta-xs` | `10px` | Chips, citation superscripts, tags. |
+
+The two below 12px are for labels that sit *inside* another element. Never set
+a line that has to be read at 10 or 11px.
+
+**Figure numerals** — mono, weight 400, `--ob-tracking-fig` (`-0.02em`),
+leading `1`. A separate tier because a number is not a heading: mono so digits
+are tabular, and never the display tier's tracking.
+
+| Token | Value |
+|---|---|
+| `--ob-fig-xl` | `clamp(40px, 4vw, 56px)` |
+| `--ob-fig-lg` | `44px` |
+| `--ob-fig-md` | `33px` |
+| `--ob-fig-sm` | `28px` |
 
 ### Tracking and leading
 
@@ -158,10 +192,91 @@ headline at weight 400.
 - h1: `-0.03em` · h2: `-0.025em`, leading `1.08`.
 - Body and UI: `-0.015em`, leading `1.6`.
 - Mono metadata: `+0.10em`, uppercase, leading `1.4`.
+- Figure numerals: `-0.02em`, leading `1`.
 
 The slight negative tracking on body (`-0.015em`) is deliberate and unusual —
 it's what keeps the UI feeling related to the headline. Do not take it further;
 past `-0.02em` body copy starts to lose word spacing.
+
+**Leading is seven values, same as sizes are sixteen.** `--ob-leading-display`
+`0.98` · `--ob-leading-flat` `1` · `--ob-leading-tight` `1.08` ·
+`--ob-leading-snug` `1.25` · `--ob-leading-meta` `1.4` · `--ob-leading-lead`
+`1.5` · `--ob-leading-body` `1.6`. Nothing between them. A 1.55 or a 1.65 in a
+recipe is how one size ends up rendering at four different leadings on one
+page — which is the single most common way a set of screens stops looking like
+one system while every individual screen still looks fine.
+
+### Closing the scale
+
+A scale that lists eight steps and silently tolerates a ninth is not a scale.
+This one was audited by measuring every rendered text node in a real product
+built on it, and the measurement is worth repeating on yours:
+
+```js
+// In the Playwright MCP, per route. Anything in offScale/offLead is a bug.
+// Resolve the tokens THROUGH THE BROWSER rather than hardcoding pixel values:
+// three steps are clamp()s, so their real value depends on the viewport. A
+// hardcoded list plus a tolerance band gets this wrong in both directions —
+// --ob-h1 sits 1.8px under its own max at 1440px and reads as off-scale, while
+// a genuine stray 17px hides inside the band around --ob-sub.
+const TOKENS = ['--ob-display','--ob-h1','--ob-h2','--ob-h3','--ob-lead','--ob-sub',
+  '--ob-body','--ob-sm','--ob-xs','--ob-meta','--ob-meta-sm','--ob-meta-xs',
+  '--ob-fig-xl','--ob-fig-lg','--ob-fig-md','--ob-fig-sm'];
+const probe = document.createElement('span');
+probe.style.cssText = 'position:absolute;visibility:hidden';
+document.body.appendChild(probe);
+const SCALE = new Set(TOKENS.map(t => {
+  probe.style.fontSize = `var(${t})`;
+  return +parseFloat(getComputedStyle(probe).fontSize).toFixed(2);
+}));
+probe.remove();
+
+const LEAD = new Set([0.98, 1, 1.08, 1.25, 1.4, 1.5, 1.6]);
+const EXEMPT = /footer-mark|vf-num-unit|vf-num-per/;  // your commented exceptions
+const offScale = [], offLead = [];
+document.querySelectorAll('body *').forEach(el => {
+  if (![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) return;
+  const cs = getComputedStyle(el);
+  const fs = +parseFloat(cs.fontSize).toFixed(2);
+  const ratio = Math.round((parseFloat(cs.lineHeight) / fs) * 100) / 100;
+  const cls = typeof el.className === 'string' ? el.className : el.tagName;
+  if (EXEMPT.test(cls)) return;
+  if (!SCALE.has(fs)) offScale.push(`${fs}px ${cls}`);
+  if (!LEAD.has(ratio)) offLead.push(`${fs}px/${ratio} ${cls}`);
+});
+return { offScale: [...new Set(offScale)], offLead: [...new Set(offLead)] };
+```
+
+Scroll to the bottom and wait before sampling, or every not-yet-revealed
+section reports whatever it inherits rather than what it will paint. Run it at
+both 1440px and 1280px — the clamps resolve differently and a rule that only
+misbehaves at one width is exactly what a single-width check misses.
+
+What that audit found on a product whose landing page *looked* consistent: 15
+distinct sizes on the marketing page, **38 distinct size+leading pairs on one
+app page** — roughly twice the typographic variety at the same level of
+content — sourced from 67 hardcoded pixel values across three stylesheets and
+six `text-[15px]` Tailwind escapes in components. None of it was expressive.
+Each value was a local decision that nobody could see from anywhere else, and
+the drift lived almost entirely in the *app*, not the landing page: marketing
+pages get designed, product pages get extended.
+
+Two lessons worth carrying into a new project:
+
+- **The overflow concentrates just below `--ob-body`.** 15px, 17px and 19px
+  are where "slightly smaller/larger than body" decisions land when there is
+  no named step. Naming `--ob-sub` and `--ob-xs` up front removes most of it.
+- **Tailwind arbitrary values are the leak.** `text-[15px]` reads as harmless
+  and bypasses the whole system. Ship `.ob-sub` / `.ob-sm` / `.ob-xs` recipe
+  classes so a component always has a token-backed way to say a size, and keep
+  Tailwind to layout.
+
+Deliberate exceptions are allowed but must be *unrepeatable and commented* —
+in the reference product exactly three exist: a 220px stroked footer watermark
+whose leading and tracking are tuned to make its baseline clip land, and two
+`em`-relative fragments of a single numeral. Each is a proportion or a piece of
+art, not a step. If an exception could plausibly get a second consumer, it is a
+missing token, not an exception.
 
 ### The metadata layer
 
