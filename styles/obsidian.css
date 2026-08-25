@@ -2525,11 +2525,19 @@ body::before {
   padding-block: 96px;
 }
 
-/* Four-up, which the system otherwise reserves for numerals — and these are
-   numerals, each with a label and one line of prose under a hairline. */
+/* **Three-up, not four, and the fourth card is now a figure of its own.**
+
+   Four equal boxes said four equal things, and they are not equal: `31`, `47`
+   and `9` are counts of work on the way to an answer, and `38` is the answer.
+   The old row expressed that difference with a single accent hairline on the
+   last box, which is one unit of emphasis for the one number the section is
+   named after. Split instead — the three steps in a row at lift 1, the result
+   below them at lift 3 with the arithmetic drawn out. Nothing was added to the
+   content model to do it; the split is `card.accent`, which was already there
+   to carry exactly this distinction. */
 .ob-vstrip-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 
@@ -2547,20 +2555,124 @@ body::before {
   border: 1px solid var(--ob-hairline);
   border-radius: var(--ob-r-card);
   background: var(--ob-surface);
+  box-shadow: var(--ob-lift-1);
   padding: 22px;
 }
 
-/* **The one accent card, and the accent is doing job two: verification.** On
-   this band it lands as burnt orange rather than blue, because the strip is
-   inside `.ob-warm` — same job, different hue, no rule here to say so. `38` is the
-   count that survived the check — the only figure on the strip that is a
-   verified state rather than a step on the way to one. `31`, `47` and `9` are
-   counts of work done, which is not one of blue's three jobs. */
-.ob-vstrip-card[data-accent="true"] {
-  border-color: var(--ob-hairline-accent);
+/* --- The result — one figure card, drawn ---------------------------------
+
+   **The accent is doing job two, verification**, exactly as it did when this
+   was the fourth box: on this band it lands as burnt orange because the strip
+   is inside `.ob-warm`, same job, different hue. `38` is what survived the
+   check. `31`, `47` and `9` are counts of work done, which is not one of the
+   three jobs, and none of them is allowed near the accent.
+
+   What is new is that the card *shows the check* instead of asserting its
+   result. The skill's proof/mechanic pattern asks for a live DOM animation of
+   the thing being claimed rather than a statement of it, and the claim here is
+   arithmetic the reader has just been given the terms of two cards to the
+   left: 47 extracted, 9 failed, 38 kept. The bar is those three numbers at
+   true proportion — 80.9% accent, 19.1% struck — so it is a *rendering* of the
+   content, not an illustration next to it. Change a value in `VERIFIED_STRIP`
+   and the bar is still correct.
+
+   Lift 3 makes it the band's one focal object, the same rank the composer
+   holds on the start band (§12C). */
+.ob-vstrip-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  align-items: center;
+  gap: 56px;
+  padding: 32px 36px;
+  border: 1px solid var(--ob-hairline-accent);
+  border-radius: var(--ob-r-lg);
+  background: var(--ob-raised);
+  box-shadow: var(--ob-lift-3);
 }
 
+.ob-vstrip-figure .ob-vstrip-value {
+  font-size: var(--ob-fig-xl);
+  color: var(--ob-accent);
+}
+
+/* The bar. 16px is the smallest height at which a 19% segment still reads as a
+   quantity rather than as a rule, and the two segments butt with a 3px gap so
+   the boundary is a cut rather than a colour change. */
+.ob-vstrip-bar {
+  display: flex;
+  gap: 3px;
+  height: 16px;
+}
+
+/* Both segments grow from the left on reveal. `transform` rather than `width`:
+   a width transition on a flex child relayouts its sibling every frame, and
+   the two segments would visibly fight for the track. `--ob-seg` is set inline
+   from the content, because the proportion is data.
+
+   320ms, the structural duration — this is a reveal, not an ambient effect,
+   and §16's blanket rule resolves it instantly under reduced motion because
+   `data-shown` is already `true` at first paint there. */
+.ob-vstrip-seg {
+  flex: 0 0 var(--ob-seg);
+  border-radius: var(--ob-r-tag);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--ob-base) var(--ob-ease);
+}
+
+[data-shown="true"] .ob-vstrip-seg {
+  transform: scaleX(1);
+}
+
+.ob-vstrip-seg[data-kind="kept"] {
+  background: var(--ob-accent);
+}
+
+/* The dropped segment is `--ob-discard` at a hatch, never red: a failed excerpt
+   is a non-event, not an error (see the token file). The hatch is what keeps it
+   from reading as a second, quieter category of kept. */
+.ob-vstrip-seg[data-kind="dropped"] {
+  background: repeating-linear-gradient(-45deg, var(--ob-discard) 0 2px, transparent 2px 5px);
+  border: 1px solid var(--ob-hairline-strong);
+  transition-delay: 90ms;
+}
+
+.ob-vstrip-legend {
+  display: flex;
+  gap: 28px;
+  margin-top: 14px;
+}
+
+.ob-vstrip-legend > * {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 8px square, not a dot: a circle at this size reads as the live dot, which is
+   a state and not a legend key. */
+.ob-vstrip-key {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.ob-vstrip-key[data-kind="kept"] {
+  background: var(--ob-accent);
+}
+
+.ob-vstrip-key[data-kind="dropped"] {
+  background: var(--ob-discard);
+}
+
+/* `display: block` on both the numeral and the label, and it is load-bearing
+   rather than defensive. In `.ob-vstrip-card` they are flex items and get
+   blockified for free; in `.ob-vstrip-figure` the left column is a plain block,
+   so as inline spans the numeral and its label set on the same line and `38`
+   collided with `IN YOUR REPORT`. Declaring it here rather than in the figure
+   means one rule covers both containers and the next one too. */
 .ob-vstrip-value {
+  display: block;
   font-family: var(--ob-font-mono);
   font-size: var(--ob-fig-lg);
   font-weight: var(--ob-weight);
@@ -2574,6 +2686,7 @@ body::before {
 }
 
 .ob-vstrip-label {
+  display: block;
   margin: 12px 0 20px;
 }
 
@@ -2590,25 +2703,33 @@ body::before {
   color: var(--ob-muted);
 }
 
-/* The closing ask, on the same band as the four cards.
+/* The closing ask, on the same band as the cards.
 
-   A hairline above it and nothing else — no card, no second surface step. The
-   row is the last thing on the page and the four cards directly above it are
-   already boxed; putting this in a fifth box would read as a fifth statistic.
-   The rule does the separating, which is the same job it does everywhere else
-   in this system.
+   **It used to be a hairline and nothing else**, on the argument that the four
+   boxes above it were already boxed and a fifth box would read as a fifth
+   statistic. That argument was right about the old row and is wrong now: with
+   the result promoted into a figure card, the row above this is not four peers
+   any more, and a bare rule at the very bottom of the page left the last thing
+   the reader sees as the flattest thing on it.
 
-   `align-items: end` rather than `center`: the button and its note form a
-   two-line stack on the right, and the baseline that has to line up is the
-   button's with the headline's — centring a two-line block against a
-   three-line one lands the button in the middle of the body copy. */
+   It is a panel now, and specifically the *inverse* of one — `--ob-void`, the
+   deeper paper, rather than a step up. That is what keeps it from reading as a
+   fifth statistic: every other object on the band lifts off the sheet, and
+   this one is pressed into it. No shadow for the same reason; a recessed
+   surface that also casts one is neither.
+
+   `align-items: center` — the two-line stack on the right no longer has to
+   hang off a shared hairline, so the old `end` alignment (which existed to
+   line the button's baseline up with the rule) has nothing left to do. */
 .ob-vstrip-cta {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
+  align-items: center;
   gap: 48px;
-  padding-top: 40px;
-  border-top: 1px solid var(--ob-hairline);
+  padding: 40px;
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-lg);
+  background: var(--ob-void);
 }
 
 /* ============================================================
@@ -2744,37 +2865,145 @@ body::before {
   border-bottom-width: 0;
 }
 
-/* --- Preview runs — three finished briefs under the composer ------------- */
+/* ============================================================
+   12C. Paper — what a warm band is allowed that slate is not.
 
-/* Shape from `design_inspiration/cardReference`: a soft card whose content
-   stacks a 40px mark, a gap, a title and a clamped description. What changed in
-   translation is written up in `PreviewRuns` — the short version is that
-   Obsidian has no shadows, so the reference's `variant="soft"` fill becomes
-   `--ob-surface` on the band's `--ob-canvas` (the same one-step lift
-   `.ob-vstrip-card` takes) with a hairline drawing the edge, and the title's
-   `font-semibold` becomes weight 400 at a larger step.
+   §12A got the colour of the inversion right and stopped there, and the two
+   warm bands shipped looking *correct and unfinished*: a cream ground, a
+   near-invisible one-step surface (#fdfaf5 on #f4ede2 is barely a unit of
+   lightness), warm hairlines, and nothing else. On slate that vocabulary is
+   complete, because a 1px #232326 rule on #0A0A0B is a strong line and a
+   surface step reads immediately. Neither is true on paper. The same two
+   devices at the same strengths, inverted, produce a band with no depth, no
+   focal point and no hierarchy beyond type size.
 
-   No shadow on hover either — the border goes to `--ob-hairline-strong`, the
-   surface takes one more step, and the arrow travels, which is the
-   `.ob-btn-bare` idiom already in §4. */
-.ob-preview-card {
+   **This section is the answer, and it is deliberately not a second system.**
+   Three additions, each of which is a thing paper does and slate cannot:
+
+   1. **Cast shadows** (`--ob-lift-1/2/3`). Rule 3 bans shadows because there
+      is no light on near-black to remove. There is light here. The tokens
+      resolve to `none` at `:root`, so the ban is still enforced by the token
+      file rather than by everyone remembering it — and no recipe below needs
+      a `.ob-warm` variant to get its elevation.
+   2. **Tooth** (`.ob-paper`). A 26px dot lattice at 3.5% ink. Under a card it
+      cannot be seen; in a 200px gutter it is the difference between paper and
+      a flat fill.
+   3. **A focal object per band.** Slate carves equal-weight boxes and lets the
+      hairlines rank them. Paper ranks by elevation, so each band now has one
+      object at lift 3 — the composer, and the verified figure — and everything
+      else sits at lift 1.
+
+   What does NOT change, and would be the failure mode if it did: the type
+   scale, the radii, the accent's three jobs, and the hairlines. Every card
+   below still carries its 1px stone border. The shadow is added *underneath*
+   the line work, not instead of it — a card that dropped its border for a
+   shadow would be a different system, which is what §WARM in tokens.css is
+   written to prevent.
+   ============================================================ */
+
+/* The tooth. A single 1px dot per 26px cell, drawn with a two-stop radial so
+   the dot has no antialiased halo, plus a very wide top-centred wash that
+   lifts the middle of the band a fraction — a sheet of paper is never
+   perfectly evenly lit, and that unevenness is most of what separates "paper"
+   from "beige rectangle".
+
+   `background-attachment: fixed` is deliberately NOT used: the lattice has to
+   travel with the band, or it shears against the two hairlines on scroll. */
+.ob-paper {
+  background-image: radial-gradient(circle at 1px 1px, var(--ob-paper-tooth) 1px, transparent 0),
+    radial-gradient(120% 60% at 50% 0%, var(--ob-hover-wash), transparent 70%);
+  background-size: 26px 26px, 100% 100%;
+}
+
+/* --- The start band's two columns ---------------------------------------
+
+   **The composer used to be a 760px column centred in a 1200px container**,
+   with the four run cards in a 2×2 under it at the same width. That left two
+   ~220px gutters of empty paper down the whole band, and the section read as a
+   narrow control sitting on a wide sheet rather than as a designed page.
+
+   Two-up asymmetric instead, which the skill calls the house layout: the thing
+   you *do* on the left at full remaining width, the thing you can *look at* on
+   the right at a fixed 420px. It fills the container, it puts the headline and
+   the composer in one column so they read as one statement, and it turns the
+   four runs from a grid you scan into a list you read down.
+
+   `align-items: start` — the two columns are different heights by design and
+   stretching the shorter one only produces a card with dead space in it. */
+.ob-start-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  align-items: start;
+  gap: 72px;
+}
+
+/* The left column's own rhythm, so the headline/composer pair is one object.
+   32px: closer and the composer crowds the descenders of a 66px headline;
+   further and the pair stops reading as cause and effect. */
+.ob-start-lede {
+  margin-top: 32px;
+}
+
+/* --- Preview runs — four finished briefs beside the composer ------------- */
+
+/* The column header. A mono label with a rule running to the right edge, which
+   is the `.ob-eyebrow` idiom already in §3 — repeated here rather than reused
+   because this one has to align to the top of a card stack rather than to a
+   section. */
+.ob-preview-stack {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 18px;
+  gap: 10px;
+}
+
+/* Shape still descends from `design_inspiration/cardReference` — a soft card
+   stacking a label, a title and a clamped description — but it is a row now
+   rather than a tile in a 2×2, and it has weight.
+
+   **The `variant="soft"` fill that §12A translated into a bare one-step
+   surface is a *card* in the reference, and on paper that means a shadow.** The
+   step from `--ob-canvas` to `--ob-surface` is 9 units of lightness on slate
+   and 9 units on paper, but the eye reads a lightness step against a dark
+   ground far more easily than against a bright one — which is why four
+   `#fdfaf5` tiles on `#f4ede2` read as outlines rather than as objects. Lift 1
+   supplies what the step alone cannot. The hairline stays: the shadow is
+   underneath the line work, not instead of it (§12C).
+
+   The `[data-*]` on the whole tile is unchanged — the anchor *is* the card, one
+   tab stop, one focus ring.
+
+   Hover does three things at once, all cheap and all composited: the surface
+   goes to `--ob-raised` (true white here), the shadow steps to 2, and the card
+   rises 2px. `translateY` rather than `scale`: a scaled card resamples its own
+   text for the duration of the transition. */
+.ob-preview-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 16px 16px 18px;
   border: 1px solid var(--ob-hairline);
   border-radius: var(--ob-r-card);
   background: var(--ob-surface);
-  transition: border-color var(--ob-base) var(--ob-ease), background var(--ob-base) var(--ob-ease);
+  box-shadow: var(--ob-lift-1);
+  transition: border-color var(--ob-base) var(--ob-ease), background var(--ob-base) var(--ob-ease),
+    box-shadow var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
 }
 
 .ob-preview-card:hover {
   border-color: var(--ob-hairline-strong);
   background: var(--ob-raised);
+  box-shadow: var(--ob-lift-2);
+  transform: translateY(-2px);
 }
 
+/* The ring snaps and the card does not move — a focus ring that arrives on a
+   moving target is the reason the skill bans transitions on `:focus-visible`. */
 .ob-preview-card:focus-visible {
+  outline: none;
   border-color: var(--ob-accent);
+  box-shadow: var(--ob-lift-focus);
+  transition: none;
 }
 
 /* `.ob-preview-mark` — the reference's `*:size-10` glyph tile, a 40px bordered
@@ -2783,14 +3012,17 @@ body::before {
    The card now opens on the sector line, so that line no longer needs a gap
    above it separating it from anything. */
 
-/* `--ob-h3`, the scale's named "card title" step and what `.ob-h3` already sets
-   for every other card on the page. This held `--ob-sub` (18px) for one
-   revision — the step the token file describes as "a card title too small for
-   `--ob-h3`", which at 370px wide these are not. Same `--ob-leading-snug` it had
-   before; only the size moved. */
+/* **Back to `--ob-sub`, and this time it is the right step rather than the
+   timid one.** It held `--ob-sub`, was moved up to `--ob-h3` on the argument
+   that a 370px-wide tile is not "a card title too small for `--ob-h3`", and the
+   card has since stopped being a tile. As a row in a 420px column with a
+   `--ob-fig`-free two-line finding under it, 23px puts every one of the four
+   titles onto two lines and the stack turns into four paragraphs. 18px keeps
+   three of the four on one line, which is what makes the column scannable —
+   the thing the 2×2 was worst at. Same `--ob-leading-snug` throughout. */
 .ob-preview-title {
   margin-top: 4px;
-  font-size: var(--ob-h3);
+  font-size: var(--ob-sub);
   line-height: var(--ob-leading-snug);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
@@ -2806,31 +3038,47 @@ body::before {
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: var(--ob-sm);
   line-height: var(--ob-leading-lead);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-muted);
 }
 
-/* `margin-top: auto` bottoms the four arrows out on one line regardless of how
-   each title wraps — the same trick `.ob-vstrip-claim` uses, and for the same
-   reason: four cards whose rules sit at four heights read as four unrelated
-   boxes. */
-.ob-preview-foot {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: auto;
-  padding-top: 12px;
+/* **The arrow is a 30px disc now, not a bare glyph bottom-right.** As a tile
+   the arrow had to bottom-anchor so four of them landed on one line; as a row
+   it centres in the grid's second column and the alignment is free. The disc
+   is what gives the row a target to point at — four rows of text with a
+   floating chevron read as a list, four rows with a control read as four
+   things you can open.
+
+   It fills with `--ob-accent-wash` on hover, and that is the accent doing job
+   one: the card is an action. It is a wash and a glyph, not a fill and a pill,
+   because the band already has its one primary button 300px to the left. */
+.ob-preview-go {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--ob-r-pill);
+  border: 1px solid var(--ob-hairline);
   color: var(--ob-dim);
+  transition: border-color var(--ob-fast) var(--ob-ease), color var(--ob-fast) var(--ob-ease),
+    background var(--ob-fast) var(--ob-ease);
 }
 
-.ob-preview-foot .ob-arrow {
+.ob-preview-go .ob-arrow {
   transition: transform var(--ob-base) var(--ob-ease);
 }
 
+.ob-preview-card:hover .ob-preview-go {
+  border-color: var(--ob-hairline-accent);
+  background: var(--ob-accent-wash);
+  color: var(--ob-accent);
+}
+
 .ob-preview-card:hover .ob-arrow {
-  transform: translate(3px, -3px);
+  transform: translate(2px, -2px);
 }
 
 /* --- Under construction — the placeholder body on /preview/[slug] -------- */
@@ -2844,16 +3092,58 @@ body::before {
    13. Composer — the live entry point in the chat section.
    ============================================================ */
 
+/* **The one object on the band at lift 3** (§12C). Everything else on the
+   start band — the four run rows — sits at lift 1, so the composer is
+   unambiguously the thing to use, and the ranking is carried by elevation
+   rather than by making it bigger than it needs to be.
+
+   `--ob-raised` rather than `--ob-surface`: on paper `--ob-raised` is true
+   white, and a white input on a cream sheet is the one place in the system
+   where the surface *should* run to the top of the scale — it is where the
+   reader's own words will go.
+
+   `box-shadow` here composes the lift; `border` is still what draws the edge.
+   Both, always — see §12C. */
 .ob-composer {
   border: 1px solid var(--ob-hairline);
   border-radius: var(--ob-r-lg);
-  background: var(--ob-surface);
+  background: var(--ob-raised);
+  box-shadow: var(--ob-lift-3);
   transition: border-color var(--ob-base) var(--ob-ease), box-shadow var(--ob-base) var(--ob-ease);
 }
 
+/* The accent ring and the panel's own lift have to arrive in one property, so
+   the warm token pre-composes them; on slate `--ob-lift-focus` is the ring
+   alone and the rule is unchanged from what it always was. */
 .ob-composer:focus-within {
   border-color: var(--ob-hairline-accent);
-  box-shadow: 0 0 0 4px var(--ob-accent-wash);
+  box-shadow: var(--ob-lift-focus);
+}
+
+/* The keycap hint in the composer's foot.
+
+   **It is present at rest now instead of appearing at 16 characters.** The slot
+   was empty until you were most of a sentence in, which meant the shortcut was
+   revealed to exactly the readers who had already committed to typing. As a
+   drawn keycap it reads as affordance rather than as instruction, so it can sit
+   there from the start; it goes from `--ob-dim` to `--ob-muted` once there is
+   something to submit, which is the same information the old appearance carried
+   without the layout event. */
+.ob-composer-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-tag);
+  background: var(--ob-surface);
+  color: var(--ob-dim);
+  transition: color var(--ob-fast) var(--ob-ease), border-color var(--ob-fast) var(--ob-ease);
+}
+
+.ob-composer-hint[data-armed="true"] {
+  border-color: var(--ob-hairline-strong);
+  color: var(--ob-muted);
 }
 
 .ob-composer textarea {

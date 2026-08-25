@@ -157,6 +157,38 @@
   --ob-r-lg: 16px;
   --ob-r-pill: 999px;
 
+  /* Elevation — `none` on slate, and that is the whole design.
+
+     Rule 3 says no shadows, ever, and on near-black it holds for a physical
+     reason: a shadow is an absence of light and there is no light on this
+     canvas to take away, so a drop shadow on #0A0A0B reads as a smudge. Paper
+     is the opposite case. A cream band lit from above without a single cast
+     shadow does not read as restrained, it reads as unfinished — which is
+     exactly what the warm bands looked like before this token existed.
+
+     So elevation is a *named abstraction that resolves to nothing here* and to
+     a real warm-ink shadow inside `.ob-warm`. A recipe writes
+     `box-shadow: var(--ob-lift-1)` once and is correct on both grounds; nobody
+     has to write a `.ob-warm .some-card` override, which is the pattern §12A
+     forbids. Three steps and no fourth:
+
+       1  a card at rest        2  a card under the cursor, or a panel
+       3  the one focal object on a band
+
+     `--ob-lift-focus` is not a step: it is the composer's focus ring, which
+     has to compose a spread ring with the panel's own lift in one property. */
+  --ob-lift-1: none;
+  --ob-lift-2: none;
+  --ob-lift-3: none;
+  --ob-lift-focus: 0 0 0 4px var(--ob-accent-wash);
+
+  /* Paper tooth — `transparent` here rather than undefined. `.ob-paper` is a
+     warm-band recipe, but an undefined custom property voids its entire
+     declaration silently, and a tiling `background-image` that vanishes with no
+     error is the exact class of bug `references/pitfalls.md` is about. Declared
+     invisible, it fails loudly the day someone puts `.ob-paper` on slate. */
+  --ob-paper-tooth: transparent;
+
   /* Motion */
   --ob-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ob-fast: 180ms;
@@ -421,4 +453,35 @@
   --ob-scrim: rgba(244, 237, 226, 0.72);
   --ob-grid: rgba(25, 20, 16, 0.1);
   --ob-hatch: rgba(25, 20, 16, 0.15);
+
+  /* Elevation — the three steps declared as `none` at `:root`, given values.
+
+     **Every shadow here is warm ink at low alpha, never neutral black.** A
+     `rgba(0,0,0,…)` shadow on #f4ede2 greys the paper under the card and is the
+     same failure the hairlines avoid by being stone rather than grey: it makes
+     the band read as a white card dropped onto beige. These are `#191410` —
+     `--ob-text`'s own ink — so the shadow is the card's own colour, thinned.
+
+     Two layers per step, and the reason is that one layer cannot do both jobs:
+     a tight 1–2px layer at higher alpha draws the *contact* edge that tells you
+     the card is sitting on something, and a wide soft layer at very low alpha
+     is the ambient occlusion that gives it height. One layer alone reads as
+     either a fuzzy halo or a hard offset border.
+
+     Lift 3 adds a third, near-invisible 1px inset-ish top highlight via the
+     spread on the first layer — paper catching light on its top edge. */
+  --ob-lift-1: 0 1px 2px rgba(25, 20, 16, 0.05), 0 4px 12px rgba(25, 20, 16, 0.04);
+  --ob-lift-2: 0 2px 4px rgba(25, 20, 16, 0.06), 0 12px 28px rgba(25, 20, 16, 0.07);
+  --ob-lift-3: 0 2px 6px rgba(25, 20, 16, 0.05), 0 24px 60px rgba(25, 20, 16, 0.09);
+
+  /* The composer's focus state: the accent ring and the panel's own lift in a
+     single `box-shadow`, because the two cannot be set independently. */
+  --ob-lift-focus: 0 0 0 4px var(--ob-accent-wash), 0 2px 6px rgba(25, 20, 16, 0.05), 0 24px 60px
+    rgba(25, 20, 16, 0.09);
+
+  /* The paper's own tooth. One ink dot per 26px cell at 3.5% — under a card it
+     is invisible, in the gutters it is the difference between paper and a flat
+     fill. Not `--ob-grid` (10%), which is a figure axis and four times too
+     loud to tile a whole band with. */
+  --ob-paper-tooth: rgba(25, 20, 16, 0.035);
 }
