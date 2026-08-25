@@ -2483,7 +2483,7 @@ body::before {
   transition: transform var(--ob-enter) var(--ob-ease);
 }
 
-/* --- the strip ----------------------------------------------------------- */
+/* --- the closing band ---------------------------------------------------- */
 
 /* **A background band, and therefore a deliberate deviation from the rule this
    whole system rests on** — sections are separated by a 1px hairline and
@@ -2511,225 +2511,152 @@ body::before {
    its two rules are one object. What is dead is the claim of uniqueness — the
    test a new band has to pass is in §12A, not the flat "there is only one".
 
-   96px, the documented floor for section rhythm rather than the 160px standard:
-   the point of the strip is that it is short.
-
    **The surface and the two hairlines moved out of this rule and into `.ob-band`
-   (§12A), which the section now also carries alongside `.ob-warm`.** The strip
-   is the page's second warm band, so it takes the band's `--ob-canvas` ground
-   rather than owning a `--ob-surface` one — two backgrounds on one element with
-   the later rule silently winning is how a band and its hairlines drift apart,
-   which is the exact failure `border-block` exists to prevent. What is left here
-   is the one thing that is genuinely this strip's own: its shorter rhythm. */
-.ob-vstrip {
+   (§12A), which the section also carries alongside `.ob-warm`.** It is the
+   page's second warm band, so it takes the band's `--ob-canvas` ground rather
+   than owning a `--ob-surface` one — two backgrounds on one element with the
+   later rule silently winning is how a band and its hairlines drift apart,
+   which is the exact failure `border-block` exists to prevent. What is left
+   here is the one thing genuinely its own: its rhythm.
+
+   **`.ob-vstrip` → `.ob-closing`, and this rule is nearly all that survives of
+   §12.** The verification section it named is deleted — three rebuilds of the
+   trust argument (cycling excerpt card and counter row, four stat cards, then
+   a source ledger) and then the owner removed it, keeping only the ask at its
+   foot. Deleted with it: `.ob-vstrip-head`, the whole `.ob-ledger-*` family,
+   `.ob-web-*`, `.ob-vstrip-bar` / `-seg` and `.ob-chip-discarded`.
+
+   **96px, back down from the ledger's 120px.** 120 was the tight-pairing value,
+   bought because the section had grown an `--ob-h1` headline and a five-part
+   card and was crowding the pillars above it. There is one panel on the band
+   now, so 96 — the documented floor — is right again: any more air and a
+   single closing ask reads as a section that lost its content, which is
+   precisely what a reader must not notice. */
+.ob-closing {
   padding-block: 96px;
 }
 
-/* **Three-up, not four, and the fourth card is now a figure of its own.**
+/* The closing ask — now the only object on the band.
 
-   Four equal boxes said four equal things, and they are not equal: `31`, `47`
-   and `9` are counts of work on the way to an answer, and `38` is the answer.
-   The old row expressed that difference with a single accent hairline on the
-   last box, which is one unit of emphasis for the one number the section is
-   named after. Split instead — the three steps in a row at lift 1, the result
-   below them at lift 3 with the arithmetic drawn out. Nothing was added to the
-   content model to do it; the split is `card.accent`, which was already there
-   to carry exactly this distinction. */
-.ob-vstrip-grid {
+   **It has been three things, and the third is a consequence of the section
+   around it being deleted.** It started as a hairline and nothing else, on the
+   argument that four stat cards above it were already boxed and a fifth box
+   would read as a fifth statistic. It became a *recessed* panel — `--ob-void`,
+   no shadow — when the row above it stopped being four peers: every other
+   object on the band lifted off the sheet and this one was pressed into it,
+   which is what kept it from reading as one more statistic.
+
+   That reasoning is gone with the objects it was reasoning about. There is
+   nothing else on the band, so a recessed panel is not contrasting with
+   anything — it is just the last thing on the page, sunk into the paper. It
+   lifts now: `--ob-surface` at `--ob-lift-2`, the same rank the ledger card
+   held, which makes the page's closing ask the closing band's one object.
+
+   **Not lift 3.** §12C reserves that for the composer, and this is a link back
+   up to that composer — the destination outranks the sign pointing at it.
+
+   **It is centred now, and that is the fourth version.** The two-column form
+   (prose left, button right, `1fr auto`) was inherited from a time when the
+   panel was the *last* of five objects on a busy band and had to read as a
+   footer to them. It is the only object on the band, so it has nothing to align
+   with and no reason to be asymmetric — a lone left-heavy panel on a 1200px
+   sheet reads as the remains of a wider layout, which is exactly what it was.
+   Axial symmetry is what a closing ask wants: one column, one focal point, the
+   button sitting under the sentence that argues for it rather than beside it.
+
+   **The fifth version is not a panel at all, and the name is now the only
+   thing left of one.** The card — `--ob-surface` at `--ob-lift-2`, a hairline,
+   `--ob-r-lg`, 72×64 of padding, 780px wide — is deleted along with the
+   overline, the 44ch lead and the note it was built to hold. What the band
+   carries at the user's direction is a headline, the button, and the four
+   finished runs in a 2×2, so the container's whole job is to centre a stack
+   and cap its width.
+
+   **Why the box had to go rather than just get shorter.** The 2×2 is four
+   `.ob-preview-card`s, each `--ob-surface` at `--ob-lift-1` on paper. Nesting
+   them inside a `--ob-surface` panel at `--ob-lift-2` puts a *brighter,
+   higher* object around four dimmer, lower ones — the frame out-ranking its
+   contents, which inverts the elevation ladder §12C exists to keep straight.
+   Four cards on bare paper read as four things you can open; the same four
+   inside a card read as one thing with a texture. `.ob-band`'s two hairlines
+   are the frame, which is the §12A argument that hairlines do the separating.
+
+   **860px inside a 1200px container.** The panel measured 780 because it was
+   sized to a 44ch line of prose; there is no prose now, and the number that
+   matters is the card. Two columns and a 12px gap inside 860 give each tile
+   ~424px — within a few pixels of the 420px column `.ob-preview-card` was
+   tuned against in §12C, so the titles break where they were measured to
+   break. It also keeps ~170px of bare paper down each side, which is where
+   §12C's tooth is actually visible; under a full-bleed grid it cannot be
+   seen, and this is the last chance on the page to notice the band is paper
+   rather than a beige rectangle. */
+.ob-closing-panel {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  justify-items: center;
+  text-align: center;
+  max-width: 860px;
+  margin-inline: auto;
 }
 
-/* One step above the band, and a hairline drawing the edge — the same lift
-   `.ob-preview-card` takes on the other warm band, so the page's two card
-   shapes sit at the same height off their ground.
-
-   It was `--ob-raised` while the band itself was `--ob-surface`; with the band
-   now on `--ob-canvas` (see `.ob-vstrip` above) that would have been a two-step
-   jump, which on paper is a white card dropped on a beige page rather than a
-   surface stepping up out of it. */
-.ob-vstrip-card {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-card);
-  background: var(--ob-surface);
-  box-shadow: var(--ob-lift-1);
-  padding: 22px;
+/* The act. 28px under the headline, down from the 48px it took when it had to
+   clear a three-line lead: the button follows the headline directly now, and
+   the pair is one move rather than two. No `gap` — the note that used to sit
+   under the button is deleted, so there is a single child. */
+.ob-closing-act {
+  margin-top: 28px;
 }
 
-/* --- The result — one figure card, drawn ---------------------------------
+/* Wider than the 24px inline padding `.ob-btn` ships, and only here. The page's
+   other primaries sit inside something — the composer's Start is in a card
+   footer beside a hint, the nav's is in a pill bar — where the base padding is
+   what keeps them proportional to their container. This one is alone on 860px
+   of paper with a headline above it, and at base width it read as a small
+   control dropped into a large space. The block padding is untouched: this is a
+   longer button, not a bigger one, and changing the height would put it on a
+   different rung from every other button on the page. */
+.ob-closing-act .ob-btn {
+  padding-inline: 56px;
+}
 
-   **The accent is doing job two, verification**, exactly as it did when this
-   was the fourth box: on this band it lands as burnt orange because the strip
-   is inside `.ob-warm`, same job, different hue. `38` is what survived the
-   check. `31`, `47` and `9` are counts of work done, which is not one of the
-   three jobs, and none of them is allowed near the accent.
+/* The four finished runs, as a 2×2 rather than the column `CofounderChat`
+   stacks beside the composer.
 
-   What is new is that the card *shows the check* instead of asserting its
-   result. The skill's proof/mechanic pattern asks for a live DOM animation of
-   the thing being claimed rather than a statement of it, and the claim here is
-   arithmetic the reader has just been given the terms of two cards to the
-   left: 47 extracted, 9 failed, 38 kept. The bar is those three numbers at
-   true proportion — 80.9% accent, 19.1% struck — so it is a *rendering* of the
-   content, not an illustration next to it. Change a value in `VERIFIED_STRIP`
-   and the bar is still correct.
+   `align-self: stretch` is load-bearing: the parent's `justify-items: center`
+   would otherwise shrink this to its content and the two columns would stop
+   being equal. `text-align: left` puts the cards back on a left edge — the
+   headline and button are centred, the cards are read, and centred card copy
+   at three stacked lines has no stable left edge to return to.
 
-   Lift 3 makes it the band's one focal object, the same rank the composer
-   holds on the start band (§12C). */
-.ob-vstrip-figure {
+   12px between tiles, matching the 10px of the stack rather than a section
+   gutter: these are four faces of one offer, and air between them would turn
+   the grid into four separate propositions.
+
+   64px above, against 28px between headline and button. The gap is what says
+   the 2×2 is a second, optional move — "or open one of these" — rather than
+   part of the ask. */
+.ob-closing-grid {
   display: grid;
-  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
-  align-items: center;
-  gap: 56px;
-  padding: 32px 36px;
-  border: 1px solid var(--ob-hairline-accent);
-  border-radius: var(--ob-r-lg);
-  background: var(--ob-raised);
-  box-shadow: var(--ob-lift-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: stretch;
+  gap: 12px;
+  margin-top: 64px;
+  text-align: left;
 }
 
-.ob-vstrip-figure .ob-vstrip-value {
-  font-size: var(--ob-fig-xl);
-  color: var(--ob-accent);
-}
+/* Equal heights across a row, which the stack never had to ask for. Each card
+   is wrapped in a `ScrollReveal` div, so the grid stretches the *wrapper* and
+   the anchor inside it keeps its content height — measured, the first tile came
+   out 104px against its neighbour's 125 because its title fits on one line.
+   Two tiles side by side at different heights read as one of them having
+   failed to load.
 
-/* The bar. 16px is the smallest height at which a 19% segment still reads as a
-   quantity rather than as a rule, and the two segments butt with a 3px gap so
-   the boundary is a cut rather than a colour change. */
-.ob-vstrip-bar {
-  display: flex;
-  gap: 3px;
-  height: 16px;
-}
-
-/* Both segments grow from the left on reveal. `transform` rather than `width`:
-   a width transition on a flex child relayouts its sibling every frame, and
-   the two segments would visibly fight for the track. `--ob-seg` is set inline
-   from the content, because the proportion is data.
-
-   320ms, the structural duration — this is a reveal, not an ambient effect,
-   and §16's blanket rule resolves it instantly under reduced motion because
-   `data-shown` is already `true` at first paint there. */
-.ob-vstrip-seg {
-  flex: 0 0 var(--ob-seg);
-  border-radius: var(--ob-r-tag);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform var(--ob-base) var(--ob-ease);
-}
-
-[data-shown="true"] .ob-vstrip-seg {
-  transform: scaleX(1);
-}
-
-.ob-vstrip-seg[data-kind="kept"] {
-  background: var(--ob-accent);
-}
-
-/* The dropped segment is `--ob-discard` at a hatch, never red: a failed excerpt
-   is a non-event, not an error (see the token file). The hatch is what keeps it
-   from reading as a second, quieter category of kept. */
-.ob-vstrip-seg[data-kind="dropped"] {
-  background: repeating-linear-gradient(-45deg, var(--ob-discard) 0 2px, transparent 2px 5px);
-  border: 1px solid var(--ob-hairline-strong);
-  transition-delay: 90ms;
-}
-
-.ob-vstrip-legend {
-  display: flex;
-  gap: 28px;
-  margin-top: 14px;
-}
-
-.ob-vstrip-legend > * {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* 8px square, not a dot: a circle at this size reads as the live dot, which is
-   a state and not a legend key. */
-.ob-vstrip-key {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-}
-
-.ob-vstrip-key[data-kind="kept"] {
-  background: var(--ob-accent);
-}
-
-.ob-vstrip-key[data-kind="dropped"] {
-  background: var(--ob-discard);
-}
-
-/* `display: block` on both the numeral and the label, and it is load-bearing
-   rather than defensive. In `.ob-vstrip-card` they are flex items and get
-   blockified for free; in `.ob-vstrip-figure` the left column is a plain block,
-   so as inline spans the numeral and its label set on the same line and `38`
-   collided with `IN YOUR REPORT`. Declaring it here rather than in the figure
-   means one rule covers both containers and the next one too. */
-.ob-vstrip-value {
-  display: block;
-  font-family: var(--ob-font-mono);
-  font-size: var(--ob-fig-lg);
-  font-weight: var(--ob-weight);
-  letter-spacing: var(--ob-tracking-fig);
-  line-height: var(--ob-leading-flat);
-  color: var(--ob-text);
-}
-
-.ob-vstrip-card[data-accent="true"] .ob-vstrip-value {
-  color: var(--ob-accent);
-}
-
-.ob-vstrip-label {
-  display: block;
-  margin: 12px 0 20px;
-}
-
-/* `margin-top: auto` is what makes four cards with different label wraps bottom
-   out together — the hairline above each claim has to sit on one line across
-   the row or the strip reads as four unrelated boxes. It needs the `20px`
-   bottom margin on the label above to keep a gap when the auto resolves to 0. */
-.ob-vstrip-claim {
-  margin: auto 0 0;
-  padding-top: 18px;
-  border-top: 1px solid var(--ob-hairline);
-  font-size: var(--ob-sm);
-  line-height: var(--ob-leading-lead);
-  color: var(--ob-muted);
-}
-
-/* The closing ask, on the same band as the cards.
-
-   **It used to be a hairline and nothing else**, on the argument that the four
-   boxes above it were already boxed and a fifth box would read as a fifth
-   statistic. That argument was right about the old row and is wrong now: with
-   the result promoted into a figure card, the row above this is not four peers
-   any more, and a bare rule at the very bottom of the page left the last thing
-   the reader sees as the flattest thing on it.
-
-   It is a panel now, and specifically the *inverse* of one — `--ob-void`, the
-   deeper paper, rather than a step up. That is what keeps it from reading as a
-   fifth statistic: every other object on the band lifts off the sheet, and
-   this one is pressed into it. No shadow for the same reason; a recessed
-   surface that also casts one is neither.
-
-   `align-items: center` — the two-line stack on the right no longer has to
-   hang off a shared hairline, so the old `end` alignment (which existed to
-   line the button's baseline up with the rule) has nothing left to do. */
-.ob-vstrip-cta {
+   Making the wrapper a grid container is what fixes it: the card then stretches
+   as the wrapper's own grid item. `height: 100%` on the card was tried first
+   and measured as *not applying* — the wrapper's height comes from grid
+   stretch, not from a specified `height`, so the percentage had nothing to
+   resolve against. */
+.ob-closing-grid > * {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 48px;
-  padding: 40px;
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-lg);
-  background: var(--ob-void);
 }
 
 /* ============================================================
@@ -2771,7 +2698,7 @@ body::before {
 
    **96px, which is the documented floor for section rhythm and not a number to
    go under.** This ran at 160px while the section held a transcript, then 120px
-   once that came out. It sits at the floor now for the same reason `.ob-vstrip`
+   once that came out. It sits at the floor now for the same reason `.ob-closing`
    does — a band is short by definition, and the two hairlines are already doing
    the separating that padding would otherwise have to do. Below 96 two sections
    start reading as one crowded block, so if this needs to shrink again the
@@ -3208,14 +3135,23 @@ body::before {
    baseline. A token here would invite a second consumer, which is exactly
    what it must not have. Same for the two `em`-relative sizes on
    `.ob-vf-num-unit` / `.ob-vf-num-per`: those are proportions of their own
-   numeral, not steps. */
+   numeral, not steps.
+
+   **The stroke is `--ob-muted`, two steps up from the `--ob-hairline-strong`
+   it shipped at**, at the user's direction. The old value was a *border* token
+   used as ink: #34343C on `--ob-void` is the dimmest pairing in the system, and
+   the mark was closer to invisible than to a watermark. Body grey would be too
+   loud as a fill at this size — but this is a 1px outline around a 220px
+   letterform, so the ink covers a fraction of the area it encloses and the
+   block still averages out well below the footer's own prose. Brightness here
+   buys legibility of the *shape*, not presence. */
 .ob-footer-mark {
   font-size: clamp(80px, 15vw, 220px);
   line-height: 0.78;
   font-weight: var(--ob-weight);
   letter-spacing: -0.05em;
   color: transparent;
-  -webkit-text-stroke: 1px var(--ob-hairline-strong);
+  -webkit-text-stroke: 1px var(--ob-muted);
   user-select: none;
   white-space: nowrap;
 }

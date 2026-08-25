@@ -131,13 +131,18 @@ describe('validate session — what the card is allowed to claim', () => {
     }
   });
 
-  it('keeps the dental thread continuous with the verification section', () => {
-    /* Pillar 02 and the section below it are one narrative. The shared page
-       count is what stops them reading as two unrelated demos. */
-    /* Matched on the NUMBERS, not the phrasing — the caption has to fit on one
+  it('states the scale of a run in its footnote', () => {
+    /* **This used to assert a continuity, and there is nothing left to be
+       continuous with.** `31` and `9` tied pillar 02 to the verification
+       section below it — `EVIDENCE_DEMO`, then `VERIFICATION_COUNTERS`, then
+       `VERIFIED_STRIP` — and all three are deleted. The assertion stays and
+       the reason changed: this footnote is now the only place the landing page
+       says how much work a run does, so the two numbers are load-bearing on
+       their own rather than as one end of a pair.
+
+       Matched on the NUMBERS, not the phrasing — the caption has to fit on one
        line beside the status and the replay control, so the wording is free to
-       get shorter. `31` and `9` are what tie this scene to `EVIDENCE_DEMO` and
-       `VERIFICATION_COUNTERS` below it, and those are not free to change. */
+       get shorter. */
     expect(VALIDATE_SESSION.footnote).toMatch(/\b31 pages\b/);
     expect(VALIDATE_SESSION.footnote).toMatch(/\b9 discarded\b/);
   });

@@ -159,84 +159,54 @@ export const PILLARS: Pillar[] = [
   },
 ];
 
-/* ------------------------------------------------------ verified strip --- */
+/* --------------------------------------------------------- closing ask --- */
 
 /**
- * The trust mechanic, as a banded strip rather than a section.
+ * The page's last object: one panel, one button, back up to the composer.
  *
- * **This replaced a whole section, `02 The mechanic`** — a two-column headline,
- * a cycling excerpt card that drew a blue rule under a matched quote and
- * resolved verified/discarded, and a four-up counter row underneath it. The
- * argument survives; the ~900px of page it took to make it does not. What was
- * `VERIFICATION_SECTION`, `EVIDENCE_DEMO` and `VERIFICATION_COUNTERS` is now
- * this one object.
+ * **What was here is gone, and this is the part of it that stayed.** The
+ * verification section — `VERIFIED_STRIP` — took three shapes and all three are
+ * now deleted: `02 The mechanic` (a cycling excerpt card and a four-up counter
+ * row), then a banded strip of four stat cards (`31 / 47 / 9 / 38`), then a
+ * source ledger of four claims matched against the pages they came from. Owner's
+ * call to remove the section outright; the closing ask was explicitly kept.
  *
- * It also **moved below the entry point**. Proof normally precedes the ask, and
- * this deliberately does not: by the time a reader reaches the composer they
- * have already watched pillar 02 verify things on screen, so the strip's job
- * here is closing reassurance, not persuasion. Owner's call.
+ * With it went `meter`, `ledger` and `rail`, the `LedgerRow` type, and the
+ * `31 / 47 / 9 / 38` tie to `VALIDATE_SESSION.footnote`. **That tie is now
+ * one-directional and the test that pinned it says so** — `31 pages · 9
+ * discarded` is still asserted on the footnote, but it no longer has a second
+ * consumer to stay continuous with, so it is a claim about pillar 02 alone.
  *
- * **The four numbers are not free to change.** `31` and `9` are the same run as
- * `VALIDATE_SESSION.footnote` (`31 pages · 9 discarded`) — one continuous
- * narrative across the page, and `validate-session.test.ts` pins that tie by
- * name. `47 − 9 = 38` also has to keep holding, or the strip states arithmetic
- * a reader can check in their head and find wrong.
+ * **The page still makes the verification argument, just not in prose.** Pillar
+ * 02 runs `ValidateSession`, which resolves four claims to VERIFIED on screen
+ * and discards one, and its `proof` line is `No score, no verdict, no fake
+ * percentage`. That is why `FOOTER`'s four `#verification` links now point at
+ * `#how-it-works`: the anchor they used to reach does not exist, and the
+ * section that actually demonstrates the thing does.
+ *
+ * `label` stays a verb the reader can picture doing. `note` answers the
+ * objection a reader has at the moment of being asked, which is how much this
+ * is going to cost them to start.
  */
-
-export type VerifiedCard = {
-  value: number;
-  label: string;
-  claim: string;
-  /** The one accent card. Blue doing job two: verification. */
-  accent: boolean;
-};
-
-export const VERIFIED_STRIP = {
-  label: 'Verified',
-  lead: 'Every excerpt in a report is checked against the page it came from. No match, it’s discarded — quietly, never softened into something vaguer.',
-  kicker:
-    'Milliseconds, no model needed — and the entire difference between research and confident fiction.',
-  /* Each claim sits under a hairline at ~250px, so it has two lines of 14px to
-     work with. Anything past ~58 characters takes a third and the four cards
-     stop bottoming out together. */
-  cards: [
-    {
-      value: 31,
-      label: 'Pages fetched',
-      claim: 'Read in full — not skimmed from a search snippet.',
-      accent: false,
-    },
-    {
-      value: 47,
-      label: 'Excerpts extracted',
-      claim: 'Pulled as exact quotes, never paraphrased.',
-      accent: false,
-    },
-    {
-      value: 9,
-      label: 'Failed the match',
-      claim: 'Dropped silently. Nothing is softened to survive.',
-      accent: false,
-    },
-    {
-      value: 38,
-      label: 'In your report',
-      claim: 'What was still standing after the check.',
-      accent: true,
-    },
-  ] as VerifiedCard[],
-  /* The page's closing ask. It does not repeat the composer — one composer per
-     page, and it is 1200px up — so this is a link back to it. `label` stays a
-     verb the reader can picture doing; `note` answers the objection that a
-     reader who has just been told 9 of 47 excerpts were discarded will have
-     next, which is how long any of this takes. */
-  cta: {
-    headline: 'Point it at your idea.',
-    body: 'The same check runs on whatever you type in. You’ll see what survived it, and what didn’t.',
-    label: 'Try your idea',
-    href: '#start',
-    note: 'Takes a sentence to start',
-  },
+/**
+ * The closing ask — three fields, down from six.
+ *
+ * `eyebrow`, `body` and `note` are **deleted, not left dead**, at the user's
+ * direction: the section is now a headline, a button and the four finished
+ * runs, and nothing else. Every one of the three was arguing for a click the
+ * button is one word away from — an overline naming the reader's turn, a
+ * two-clause lead restating what the composer's own placeholder demonstrates,
+ * and a reassurance ("Takes a sentence to start") about effort the reader
+ * cannot see the size of until they are already typing. Their recipes
+ * (`.ob-closing-eyebrow` and its two flanking rules, `.ob-closing-body`,
+ * `.ob-closing-note`) went with them.
+ */
+export const CLOSING_CTA = {
+  headline: 'Point it at your idea.',
+  label: 'Try your idea',
+  /* Back up to the composer, never a second one. One composer per page — a
+     second input asking for the same sentence reads as two different products. */
+  href: '#start',
 } as const;
 
 /* ------------------------------------------------------------ cofounder --- */
@@ -562,11 +532,15 @@ export const sessionTotalMs =
  * - **`rows[3]` resolves open, never verified.** Four blue chips in a column
  *   would say the product manufactures certainty, which is the exact thing it
  *   exists not to do. The open row hands off to pillar 03 by name.
- * - **The narrative thread is continuous.** Same dental-practice idea, the same
- *   `31 pages fetched · 9 discarded` as `VERIFIED_STRIP` above. (It used to say
- *   `EVIDENCE_DEMO` and `VERIFICATION_COUNTERS`; those were the deleted
- *   section's copy and the strip inherited both numbers unchanged.) Competitor
- *   names are invented and belong to no real company.
+ * - **`footnote` still reads `31 pages · 9 discarded`, and it is now the only
+ *   place on the page that does.** Those two numbers used to tie this scene to
+ *   the verification section below it — `EVIDENCE_DEMO`, then
+ *   `VERIFICATION_COUNTERS`, then `VERIFIED_STRIP`, all deleted — so the tie
+ *   has no second end any more and `validate-session.test.ts` pins the numbers
+ *   for their own sake rather than for a continuity that no longer has
+ *   anything to be continuous with. Keep them: this scene is the only place the
+ *   landing page states the scale of a run at all. Competitor names are
+ *   invented and belong to no real company.
  */
 
 /** Stage durations. The card plays this once on scroll-in, then rests.
@@ -783,15 +757,24 @@ export const FOOTER = {
         /* Page order — the composer now leads the body, the pillars follow. */
         { label: 'Start a run', href: '#start' },
         { label: 'How it works', href: '#how-it-works' },
-        { label: 'Verification', href: '#verification' },
+        /* Was `#verification`. That section is deleted, and a footer link to a
+           missing anchor is a link that silently does nothing. `#how-it-works`
+           is where the argument actually lives now: pillar 02 runs
+           `ValidateSession`, which resolves claims to VERIFIED on screen and
+           discards one that nothing supports. */
+        { label: 'Verification', href: '#how-it-works' },
       ],
     },
     {
       heading: 'What it is not',
       links: [
-        { label: 'Not a score', href: '#verification' },
-        { label: 'Not a verdict', href: '#verification' },
-        { label: 'Not a gate', href: '#verification' },
+        /* Same retarget, and these three land even better than the one above:
+           `PILLARS[1].proof` reads `No score, no verdict, no fake percentage`,
+           which is this column stated in one line by the section it now points
+           at. */
+        { label: 'Not a score', href: '#how-it-works' },
+        { label: 'Not a verdict', href: '#how-it-works' },
+        { label: 'Not a gate', href: '#how-it-works' },
       ],
     },
   ],

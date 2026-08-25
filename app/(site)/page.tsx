@@ -1,8 +1,8 @@
+import { ClosingCta } from '@/components/landing/closing-cta';
 import { CofounderChat } from '@/components/landing/cofounder-chat';
 import { DimensionMarquee } from '@/components/landing/dimension-marquee';
 import { Hero } from '@/components/landing/hero';
 import { Pillars } from '@/components/landing/pillars';
-import { VerifiedStrip } from '@/components/landing/verified-strip';
 
 /**
  * The landing page.
@@ -12,7 +12,7 @@ import { VerifiedStrip } from '@/components/landing/verified-strip';
  *   Marquee         the scope of a research run, stated once
  *   Cofounder chat  01  the demo and the live entry point, on a warm light band
  *   Pillars   02    the three things you actually do here
- *   Verified strip      four cards on a warm band, then the closing ask
+ *   Closing CTA         one panel on a warm band, back up to the composer
  *
  * **The entry point used to sit second, after the pillars.** It now leads: a
  * reader who already knows what they want reaches the composer without
@@ -20,13 +20,18 @@ import { VerifiedStrip } from '@/components/landing/verified-strip';
  * the same explanation immediately below. The two sections swapped numerals
  * with their positions — a page that counts 02 then 01 reads as a bug.
  *
- * **The proof used to sit between the pillars and the entry point, as its own
- * section.** `The mechanic` was a two-column headline, a cycling excerpt card
- * and a four-up counter row — roughly 900px of page arguing for something a
- * pillar has already shown the reader happening on screen. It is now
- * `VerifiedStrip`: the same argument, four cards, and it stays at the foot of
- * the page rather than travelling with the composer, so the page still closes
- * on the trust argument.
+ * **The verification section is gone, and that is the end of a long thread.**
+ * It began as `02 The mechanic` between the pillars and the entry point — a
+ * two-column headline, a cycling excerpt card and a four-up counter row, some
+ * 900px of page arguing for something pillar 02 already shows happening on
+ * screen. It was compressed into `VerifiedStrip` (four stat cards on a warm
+ * band), then rebuilt as a source ledger, then removed outright at the owner's
+ * direction with only its closing ask kept. `ClosingCta` is that ask.
+ *
+ * So the page no longer *states* the trust argument; pillar 02 *performs* it,
+ * resolving claims to VERIFIED on screen and discarding one nothing supports.
+ * `FOOTER`'s four ex-`#verification` links point at `#how-it-works` for that
+ * reason. The page still closes on paper and on something to do.
  *
  * **The shell moved up one level in A20.** `SkipLink`, the backdrop, `.ob-layer`,
  * `SiteNav`, `<main id="main">` and `SiteFooter` now live in
@@ -75,7 +80,7 @@ export default function Home() {
           of `<main>` its bottom rule drops to `0` — `.ob-footer` carries a
           `border-top` of its own, and two adjacent hairlines are a 2px line. */}
       <div className="ob-band-mount">
-        <VerifiedStrip />
+        <ClosingCta />
       </div>
     </>
   );
