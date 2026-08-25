@@ -33,11 +33,26 @@ import { ScrollReveal } from './scroll-reveal';
  * last child of `<main>` its bottom rule drops — `.ob-footer` already carries
  * one.
  */
+/* **The split is `card.accent`, which already meant this.** The flag existed to
+   put an accent hairline on one of four boxes; it is now what decides which
+   card is a step and which is the result, so nothing was added to the content
+   model to promote the figure. `31`, `47` and `9` are counts of work done on
+   the way to an answer; `38` is the answer, and it is the only one the accent
+   is allowed near (verification, job two).
+
+   `?? at(-1)` is a type narrowing, not a fallback with an opinion: `find`
+   returns `T | undefined` and the content file has exactly one accent card. If
+   that ever stops being true the last card is the one that reads as the
+   result, which is the same ordering the strip already depends on. */
+const STEPS = VERIFIED_STRIP.cards.filter((card) => !card.accent);
+const RESULT = VERIFIED_STRIP.cards.find((card) => card.accent) ?? VERIFIED_STRIP.cards[0];
+const DROPPED = STEPS[STEPS.length - 1] ?? RESULT;
+
 export function VerifiedStrip() {
   return (
     <section
       id="verification"
-      className="ob-vstrip ob-warm ob-band"
+      className="ob-vstrip ob-warm ob-band ob-paper"
       aria-labelledby="verified-label"
     >
       <div className="ob-container">
@@ -58,12 +73,12 @@ export function VerifiedStrip() {
 
         {/* `h-full` on both the reveal and the card below: `ScrollReveal`
             renders the grid item, so without it the card stops at its own
-            content height and the four claim lines no longer bottom out
+            content height and the three claim lines no longer bottom out
             together. */}
         <div className="ob-vstrip-grid mt-14">
-          {VERIFIED_STRIP.cards.map((card, i) => (
+          {STEPS.map((card, i) => (
             <ScrollReveal key={card.label} delay={i * 90} className="h-full">
-              <article className="ob-vstrip-card h-full" data-accent={card.accent}>
+              <article className="ob-vstrip-card h-full">
                 <CountUp value={card.value} className="ob-vstrip-value" />
                 <span className="ob-meta ob-vstrip-label">{card.label}</span>
                 <p className="ob-vstrip-claim">{card.claim}</p>
@@ -72,7 +87,11 @@ export function VerifiedStrip() {
           ))}
         </div>
 
-        {/* The continuation, on the same band: the four cards state what the
+        <ScrollReveal delay={180}>
+          <VerifiedFigure />
+        </ScrollReveal>
+
+        {/* The continuation, on the same band: the cards state what the
             check did to someone else's run, and this turns that into something
             the reader can do about their own. It links up to the composer at
             `#start` rather than carrying a second one — one composer per page,
@@ -100,5 +119,72 @@ export function VerifiedStrip() {
         </ScrollReveal>
       </div>
     </section>
+  );
+}
+
+/**
+ * The result, as a figure rather than as a fourth box.
+ *
+ * **It draws the arithmetic the two cards to its left just supplied.** 47
+ * excerpts were extracted, 9 failed the match, 38 are in the report — so the
+ * bar is 38 of 47 accent and 9 of 47 struck, at true proportion, computed from
+ * the same content the cards render. It is a rendering of the claim, not an
+ * illustration beside it: change a value in `VERIFIED_STRIP` and the bar moves
+ * with it. That is the skill's proof/mechanic pattern — show the mechanism
+ * happening, never a picture of it having happened.
+ *
+ * The total is `kept + dropped` rather than the `47` card, deliberately. Both
+ * are 47 today, but the two numbers mean different things — one is what was
+ * pulled, the other is what the bar is a partition of — and reading the total
+ * off the partition is what guarantees the segments always sum to the track.
+ *
+ * Still a Server Component. The segments animate from a CSS transition keyed to
+ * the `data-shown` that `ScrollReveal` already sets on its wrapper, so the
+ * reveal costs no client JS of its own; `CountUp` is the one client leaf, as it
+ * is on the three step cards.
+ */
+function VerifiedFigure() {
+  const kept = RESULT.value;
+  const dropped = DROPPED.value;
+  const total = kept + dropped;
+
+  return (
+    <div className="ob-vstrip-figure mt-5">
+      <div>
+        <CountUp value={kept} className="ob-vstrip-value" />
+        <span className="ob-meta ob-vstrip-label">{RESULT.label}</span>
+        <p className="ob-vstrip-claim">{RESULT.claim}</p>
+      </div>
+
+      {/* `aria-hidden`: the bar is a second rendering of numbers a screen
+          reader has already been given twice — once on the `47`/`9` cards and
+          once on the numeral to the left. Announcing the partition again would
+          be three readings of one fact. */}
+      <div aria-hidden="true">
+        <div className="ob-vstrip-bar">
+          <span
+            className="ob-vstrip-seg"
+            data-kind="kept"
+            style={{ '--ob-seg': `${(kept / total) * 100}%` } as React.CSSProperties}
+          />
+          <span
+            className="ob-vstrip-seg"
+            data-kind="dropped"
+            style={{ '--ob-seg': `${(dropped / total) * 100}%` } as React.CSSProperties}
+          />
+        </div>
+
+        <div className="ob-vstrip-legend">
+          <span className="ob-meta">
+            <span className="ob-vstrip-key" data-kind="kept" />
+            {RESULT.label} {kept}
+          </span>
+          <span className="ob-meta">
+            <span className="ob-vstrip-key" data-kind="dropped" />
+            {DROPPED.label} {dropped}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

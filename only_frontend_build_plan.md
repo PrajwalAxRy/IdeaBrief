@@ -673,6 +673,81 @@ session needs.
 - Decision: …
 -->
 
+### Paper — the warm bands get their own depth — 2026-08-25
+
+Not a numbered phase. A user-requested redesign of the two light sections on
+`/` — `CofounderChat` (`#start`) and `VerifiedStrip` (`#verification`) — on the
+brief "make them more appealing." Scope agreed up front with the user: soften
+the Obsidian rules *inside the warm bands only*, recompose freely, invent no
+copy. No schema, seam, route or fixture changed; `lib/content/landing.ts` is
+byte-identical; the dark sections and every app page are untouched.
+
+**The diagnosis.** The entry two below got the colour of the inversion right
+and stopped there, and both bands shipped *correct and unfinished*. On slate a
+1px `#2e2e34` rule is a strong line and a one-step surface lift reads
+instantly; inverted, neither does. `#fdfaf5` on `#f4ede2` is barely a unit of
+lightness, so eight cards across two bands read as outlines rather than as
+objects, with no focal point and no hierarchy beyond type size.
+
+- Decision: **elevation is a token that resolves to `none` on slate.**
+  `--ob-lift-1/2/3` (plus `--ob-lift-focus`) are `none` at `:root` and real
+  warm-ink shadows inside `.ob-warm`. Rule 3's ban on shadows is therefore
+  still enforced *by the token file* rather than by everyone remembering it,
+  and no recipe needs a `.ob-warm .x` override — the pattern §12A forbids.
+  Every shadow is `#191410` at low alpha, never neutral black: a black shadow
+  greys the paper under the card, which is the same failure warm hairlines
+  exist to avoid.
+- Decision: **each band gets exactly one object at lift 3** — the composer, and
+  the verified figure. Paper ranks by elevation the way slate ranks by
+  hairline; everything else sits at lift 1. Cards keep their 1px border in both
+  modes. The shadow goes *under* the line work, never instead of it.
+- Decision: **`#start` becomes two-up asymmetric.** A 760px column centred in a
+  1200px container left ~220px of dead paper down both sides. Headline +
+  composer on the left, the four finished runs as a 420px stack on the right.
+  The 2×2 is gone: at 370px those tiles held two short lines and a hole.
+- Decision: **the four preview tiles become rows**, and `.ob-preview-title`
+  goes back to `--ob-sub` — the step it left one revision ago on the argument
+  that a 370px tile is not "too small for `--ob-h3`". As a row in a 420px
+  column, 23px puts all four titles on two lines and the stack stops being
+  scannable, which was the whole point of the change.
+- Decision: **the composer hint is present at rest**, as a drawn keycap. It
+  used to appear at 16 characters, i.e. for exactly the readers who no longer
+  needed it. The threshold survives as `data-armed`, which changes the chip's
+  colour rather than adding an element to the layout.
+- Decision: **`#verification` splits 4 cards into 3 + a figure.** `31`, `47`
+  and `9` are counts of work; `38` is the answer, and the old row expressed
+  that with one accent hairline. The result is now a wide card that *draws* the
+  arithmetic — a 16px bar partitioned 38/9 at true proportion, computed from
+  `VERIFIED_STRIP` rather than hardcoded, with the dropped segment hatched in
+  `--ob-discard` (never red — a failed excerpt is a non-event). The split key
+  is `card.accent`, which already existed to carry exactly this distinction, so
+  the content model did not grow. This is the skill's proof/mechanic pattern:
+  show the mechanism, not a picture of it.
+- Decision: **the closing CTA is a recessed panel**, on `--ob-void` — the
+  *deeper* paper — with no shadow. The old bare hairline row left the last
+  thing on the page as the flattest thing on it; a lifted panel would have read
+  as a fifth statistic, which is the objection the hairline version was written
+  to answer. Pressing it into the sheet satisfies both.
+- Deviation, named: **shadows, on a system whose third rule bans them.** The
+  ban is physical — there is no light on #0A0A0B to remove — and it does not
+  transfer to paper. Contained by the token indirection above, so slate cannot
+  acquire one by accident.
+- Deviation, small: `.ob-paper` tiles a 26px dot lattice at 3.5% ink plus a
+  wide top wash. Invisible under a card, and the difference between paper and a
+  flat fill in a 200px gutter.
+- Verified: `npm run build` clean, `npx tsc --noEmit` clean, 230/230 unit tests
+  pass. Playwright at 1440px and 1280px; the type audit reports
+  `offScale: []` / `offLead: []` across both bands at both widths. Hover, focus
+  ring and the armed/disarmed hint states all checked in the browser.
+- Left alone, deliberately: the accent still has exactly three jobs. It appears
+  in these bands as the Start button (action), the preview row's hover disc
+  (action), the composer's focus ring (action), and the `38` figure with its
+  bar and border (verification). Nothing else on either band is orange.
+- Housekeeping the next session should know: `npx biome check --write .`
+  rewrites **184 unrelated files from LF to CRLF**. The content diffs are
+  empty (`git diff --ignore-cr-at-eol` shows only the four files this entry
+  touched). Prefer `npx biome check <paths>` on the files you changed.
+
 ### Warm band — section 01 inverts — 2026-08-25
 
 Not a numbered phase. A user-requested change to `/`: the page alternates

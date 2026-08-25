@@ -50,7 +50,7 @@ export function CofounderChat() {
        then `ob-section-tight` (120px); `.ob-band` now sets its own 96px, the
        documented floor, and stacking a rhythm class on top would only fight it.
        See §12A for why 96 is where this stops. */
-    <section id="start" className="ob-warm ob-band" aria-labelledby="chat-headline">
+    <section id="start" className="ob-warm ob-band ob-paper" aria-labelledby="chat-headline">
       <div className="ob-container">
         {/* No `SectionHead`, so no `01 START HERE` overline and no numeral. The
             page no longer counts its sections — `Pillars` dropped `02` in the
@@ -66,19 +66,27 @@ export function CofounderChat() {
             Left-aligned, also for consistency: nothing else on the page centres
             a headline. The 760px column stays centred in the container, so the
             headline, the composer and the card grid share one left edge. */}
-        <ScrollReveal className="mx-auto max-w-[760px]">
-          <h2 id="chat-headline" className="ob-h1 max-w-[20ch]">
-            {CHAT_SECTION.headline}
-          </h2>
-        </ScrollReveal>
+        {/* **Two-up asymmetric, replacing a 760px column centred in a 1200px
+            container.** The old shape left ~220px of empty paper down both
+            sides of the whole band and read as a narrow control dropped onto a
+            wide sheet. The thing you do goes left at whatever width is left
+            over; the thing you can look at instead goes right at a fixed 420px.
+            See obsidian.css §12C. */}
+        <div className="ob-start-grid">
+          <div>
+            <ScrollReveal>
+              <h2 id="chat-headline" className="ob-h1 max-w-[15ch]">
+                {CHAT_SECTION.headline}
+              </h2>
+            </ScrollReveal>
 
-        {/* Narrower than the container: a composer at full 1200px stops reading
-            as something you type one sentence into. */}
-        <ScrollReveal delay={120} className="mx-auto mt-8 max-w-[760px]">
-          <Composer />
-        </ScrollReveal>
+            <ScrollReveal delay={120} className="ob-start-lede">
+              <Composer />
+            </ScrollReveal>
+          </div>
 
-        <PreviewRuns />
+          <PreviewRuns />
+        </div>
       </div>
     </section>
   );
@@ -108,15 +116,13 @@ export function CofounderChat() {
  */
 function PreviewRuns() {
   return (
-    /* **The block is capped at the composer's 760px, not the container's 1200px,
-       and that cap is what makes 2×2 work.** Left at full width the two columns
-       are ~590px each — cards that wide holding two short lines read as empty,
-       and the reference's proportions disappear. At 760px each card is ~370px,
-       which is within 30px of the reference's own ~341px columns. It also lines
-       the row up with the composer directly above it, so the section reads as
-       one centred column rather than as a narrow control sitting on a wide
-       grid. */
-    <div className="mx-auto mt-12 max-w-[760px]">
+    /* **A stack in the right column, replacing a 2×2 under the composer.**
+       At 760px the 2×2 gave each card ~370px and two short lines of copy, which
+       is a tile with a hole in it; as rows at 420px the same copy fills the
+       card and the four sectors line up in one scannable column. The grid also
+       stops competing with the composer for the reader's first fixation —
+       side by side, the elevation ranking (§12C) settles it. */
+    <div>
       {/* The label alone. Its explanatory line under it is gone — the four
           cards say what they are, and a sentence telling the reader that four
           cards are four cards was restating the row rather than adding to it. */}
@@ -126,19 +132,20 @@ function PreviewRuns() {
         </div>
       </ScrollReveal>
 
-      {/* 2×2. Four-up in one row is what the system warns against for cards, and
-          this is the shape that avoids it without stretching anything. */}
-      <div className="mt-6 grid grid-cols-2 gap-5">
+      <div className="ob-preview-stack mt-5">
         {PREVIEW_RUNS.map((run, i) => (
-          <ScrollReveal key={run.slug} delay={i * 90} className="h-full">
-            <Link href={`/preview/${run.slug}`} className="ob-preview-card h-full">
-              <span className="ob-meta ob-preview-sector">{run.sector}</span>
-              <span className="ob-preview-title">{run.title}</span>
-              <span className="ob-preview-finding">{run.finding}</span>
+          <ScrollReveal key={run.slug} delay={i * 90}>
+            <Link href={`/preview/${run.slug}`} className="ob-preview-card">
+              {/* The text column. `min-w-0` is load-bearing: without it a grid
+                  item refuses to shrink below its content's intrinsic width and
+                  the line clamp never engages. */}
+              <span className="min-w-0">
+                <span className="ob-meta ob-preview-sector block">{run.sector}</span>
+                <span className="ob-preview-title block">{run.title}</span>
+                <span className="ob-preview-finding">{run.finding}</span>
+              </span>
 
-              {/* Bottom-anchored, so the arrow sits on one line across all four
-                  cards however their titles wrap. */}
-              <span className="ob-preview-foot">
+              <span className="ob-preview-go">
                 <ArrowUpRight size={14} className="ob-arrow" aria-hidden="true" />
               </span>
             </Link>
@@ -172,14 +179,14 @@ function Composer() {
   }
 
   return (
-    <div className="ob-composer p-5">
+    <div className="ob-composer p-6">
       <label className="sr-only" htmlFor="idea">
         Describe your idea
       </label>
       <textarea
         id="idea"
         ref={textareaRef}
-        rows={3}
+        rows={4}
         value={value}
         disabled={submitting}
         placeholder={CHAT_SECTION.composerPlaceholder}
@@ -187,19 +194,22 @@ function Composer() {
         onKeyDown={onKeyDown}
       />
       <div className="mt-4 flex items-center justify-between gap-4">
-        {/* **Empty until you type.** This slot used to carry `Not a demo — this
-            box starts your run` at rest, handing over to the shortcut once you
-            were a few words in; the standing copy is gone at the user's
-            direction and the hint now arrives into an empty slot.
+        {/* **Present at rest, as a drawn keycap.** This slot has been through
+            two states: standing copy (`Not a demo — this box starts your run`),
+            then nothing at all until `SHORTCUT_HINT_AT` characters had been
+            typed. The second is why the shortcut is here now — it appeared for
+            exactly the readers who had already committed to typing a sentence,
+            which is the point at which they no longer need it.
 
-            That does not reflow, and the `<span>` is not what prevents it —
-            measured, it collapses to 0 height when empty. The row is a
-            `justify-between` flex whose height is set by the 50px button and
-            whose right edge the button holds regardless, so the hint appearing
-            on the left moves nothing. Keep the button in this row and it stays
-            true; move it and re-measure. */}
-        <span className="ob-meta">
-          {value.trim().length >= SHORTCUT_HINT_AT ? CHAT_SECTION.hint : ''}
+            The threshold survives as `data-armed`: same information, expressed
+            as the chip going from `--ob-dim` to `--ob-muted` rather than as an
+            element entering the layout. Nothing reflows either way, and this
+            version cannot — the chip's box is there from first paint. */}
+        <span
+          className="ob-meta ob-composer-hint"
+          data-armed={value.trim().length >= SHORTCUT_HINT_AT}
+        >
+          {CHAT_SECTION.hint}
         </span>
         <button
           type="button"
