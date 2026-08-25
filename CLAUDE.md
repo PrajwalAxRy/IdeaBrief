@@ -64,8 +64,20 @@ Rules:
 ## Styling rules (enforced by review, not tooling)
 
 - **`styles/tokens.css` is the only file permitted to contain a colour value.** Not in a component, not in a Tailwind class, not in `style={{}}`. If a needed colour isn't a token, the answer is a token or a different design.
-- **Tailwind is for layout only** — flex, grid, spacing, sizing. `tailwind.config.ts` deliberately has no `colors` key (it only adds `maxWidth` names). All colour, shadow, glow, border, and typography come from `styles/components.css` recipes or `style={{}}` reading CSS variables.
+- **The same rule now applies to type size and leading (A19).** `styles/tokens.css` holds sixteen size steps in four tiers (display / text / meta / figure numeral) and exactly seven leading values; a `font-size` or `line-height` literal anywhere else is a bug. The audit that produced this found **67 hardcoded pixel values across three stylesheets and six `text-[15px]` Tailwind escapes**, which had the app rendering roughly twice the typographic variety of the landing at the same level of content — 38 distinct size+leading pairs on `/r/[slug]/validate` alone. `15px`, `17px` and `19px` no longer exist; use `--ob-sm` or `--ob-sub`. There are exactly **three** commented exceptions, all in `obsidian.css`: `.ob-footer-mark`'s 220px stroked watermark and the two `em`-relative fragments of `.ob-vf-num`. Verify with the measurement snippet in the skill's Typography §"Closing the scale" — it prints anything off-scale per route.
+- **Tailwind is for layout only** — flex, grid, spacing, sizing. `tailwind.config.ts` deliberately has no `colors` key (it only adds `maxWidth` names). All colour, shadow, glow, border, and typography come from the recipe stylesheets or `style={{}}` reading CSS variables. **A `text-[15px]`-style arbitrary value is the leak that put 15px into the system in the first place** — reach for the `.ob-sub` / `.ob-body` / `.ob-sm` / `.ob-xs` recipe classes instead, which exist for exactly this reason.
 - **Everything in `styles/` must be layered.** Global CSS lives inside `@layer base` in `styles/globals.css`; recipe stylesheets are imported with `layer(components)`. Unlayered rules beat every layered rule regardless of specificity — this has silently zeroed out every Tailwind spacing utility in the app twice now, once globally and once for the whole landing page. It produces no error and the page still looks plausible, so it is only ever caught by measuring a computed style.
+- **`/` alternates; the app does not.** The landing page runs near-black, then a
+  warm light band (`01 START HERE`), then near-black again. The light theme is a
+  **token remap, not a second system**: `.ob-warm` in `styles/tokens.css`
+  overwrites the `--ob-*` colour tokens in place, so every recipe inverts with no
+  per-recipe light variant, and the accent changes hue (burnt orange) while
+  keeping its three jobs. Never add a `--ob-warm-*` parallel namespace, and never
+  write a `.ob-warm .some-recipe` colour override — a recipe that needs one has a
+  colour baked into it, which is the actual bug. The one sanctioned override
+  (`obsidian.css` §12A) is about `opacity`, not colour: **state expressed as
+  `opacity` does not survive an inversion.** A band earns its inversion by being
+  somewhere the reader *does* something, not reads about something.
 - **Desktop only.** Do not add mobile breakpoints. Read at 1440px and 1280px.
 - Every interactive element needs hover, `:focus-visible`, and active states at build time — not in a later polish pass. Exactly one `.btn-primary` visible per viewport.
 - Reserve space for streamed content; no layout shift when it arrives.

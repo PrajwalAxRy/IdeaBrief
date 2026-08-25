@@ -145,7 +145,7 @@ export const PILLARS: Pillar[] = [
     index: '02',
     kicker: 'Validate',
     title: 'Find out what the world already knows.',
-    body: 'One research run, the same for every idea. It searches five dimensions, reads about thirty pages, and reports what’s actually there: competitors, pricing, real complaints, and anything that would change the build.',
+    body: 'One run gives you a report on your idea — what’s working in the market, what the competition looks like, where yours is thin, and anything that would change whether you build it.',
     proof: 'Findings appear as they’re verified. No score, no verdict, no fake percentage.',
     fragment: 'evidence',
   },
@@ -159,78 +159,169 @@ export const PILLARS: Pillar[] = [
   },
 ];
 
-/* -------------------------------------------------------- verification --- */
+/* ------------------------------------------------------ verified strip --- */
 
-export const VERIFICATION_SECTION = {
-  eyebrow: 'The mechanic',
-  headline: 'The one thing a chat prompt can’t do.',
-  body: 'Ask a model to research your idea and you get confident, unfalsifiable prose. This does something dumber and more useful: every excerpt is checked against the page it came from. No match, it’s discarded — quietly, never softened into something vaguer.',
-  kicker: 'Milliseconds, no model needed — and the entire difference between research and confident fiction.',
-} as const;
+/**
+ * The trust mechanic, as a banded strip rather than a section.
+ *
+ * **This replaced a whole section, `02 The mechanic`** — a two-column headline,
+ * a cycling excerpt card that drew a blue rule under a matched quote and
+ * resolved verified/discarded, and a four-up counter row underneath it. The
+ * argument survives; the ~900px of page it took to make it does not. What was
+ * `VERIFICATION_SECTION`, `EVIDENCE_DEMO` and `VERIFICATION_COUNTERS` is now
+ * this one object.
+ *
+ * It also **moved below the entry point**. Proof normally precedes the ask, and
+ * this deliberately does not: by the time a reader reaches the composer they
+ * have already watched pillar 02 verify things on screen, so the strip's job
+ * here is closing reassurance, not persuasion. Owner's call.
+ *
+ * **The four numbers are not free to change.** `31` and `9` are the same run as
+ * `VALIDATE_SESSION.footnote` (`31 pages · 9 discarded`) — one continuous
+ * narrative across the page, and `validate-session.test.ts` pins that tie by
+ * name. `47 − 9 = 38` also has to keep holding, or the strip states arithmetic
+ * a reader can check in their head and find wrong.
+ */
 
-export type EvidenceDemo = {
-  id: string;
-  dimension: string;
-  domain: string;
-  excerpt: string;
-  outcome: 'verified' | 'discarded';
-  note: string;
+export type VerifiedCard = {
+  value: number;
+  label: string;
+  claim: string;
+  /** The one accent card. Blue doing job two: verification. */
+  accent: boolean;
 };
 
-/** Cycled one at a time by the verification demo. Two pass, one fails — the
-    failure is the point of the section, so it is not hidden at the end. */
-export const EVIDENCE_DEMO: EvidenceDemo[] = [
-  {
-    id: 'EV_12',
-    dimension: 'Money',
-    domain: 'weave.com/pricing',
-    excerpt: 'Plans start at $299 per month per location, billed annually.',
-    outcome: 'verified',
-    note: 'Matched in fetched page text',
+export const VERIFIED_STRIP = {
+  label: 'Verified',
+  lead: 'Every excerpt in a report is checked against the page it came from. No match, it’s discarded — quietly, never softened into something vaguer.',
+  kicker:
+    'Milliseconds, no model needed — and the entire difference between research and confident fiction.',
+  /* Each claim sits under a hairline at ~250px, so it has two lines of 14px to
+     work with. Anything past ~58 characters takes a third and the four cards
+     stop bottoming out together. */
+  cards: [
+    {
+      value: 31,
+      label: 'Pages fetched',
+      claim: 'Read in full — not skimmed from a search snippet.',
+      accent: false,
+    },
+    {
+      value: 47,
+      label: 'Excerpts extracted',
+      claim: 'Pulled as exact quotes, never paraphrased.',
+      accent: false,
+    },
+    {
+      value: 9,
+      label: 'Failed the match',
+      claim: 'Dropped silently. Nothing is softened to survive.',
+      accent: false,
+    },
+    {
+      value: 38,
+      label: 'In your report',
+      claim: 'What was still standing after the check.',
+      accent: true,
+    },
+  ] as VerifiedCard[],
+  /* The page's closing ask. It does not repeat the composer — one composer per
+     page, and it is 1200px up — so this is a link back to it. `label` stays a
+     verb the reader can picture doing; `note` answers the objection that a
+     reader who has just been told 9 of 47 excerpts were discarded will have
+     next, which is how long any of this takes. */
+  cta: {
+    headline: 'Point it at your idea.',
+    body: 'The same check runs on whatever you type in. You’ll see what survived it, and what didn’t.',
+    label: 'Try your idea',
+    href: '#start',
+    note: 'Takes a sentence to start',
   },
-  {
-    id: 'EV_13',
-    dimension: 'The problem',
-    domain: 'dentalgrowth.blog/recall-benchmarks',
-    excerpt: 'Most practices lose roughly 30% of their recall patients every year.',
-    outcome: 'discarded',
-    note: 'Not found on page — discarded',
-  },
-  {
-    id: 'EV_14',
-    dimension: 'Demand signals',
-    domain: 'reddit.com/r/Dentistry',
-    excerpt:
-      'we have something like 800 patients overdue and nobody at the front desk has time to call them',
-    outcome: 'verified',
-    note: 'Matched in fetched page text',
-  },
-];
-
-export const VERIFICATION_COUNTERS = [
-  { label: 'Pages fetched', value: 31, accent: false },
-  { label: 'Excerpts extracted', value: 47, accent: false },
-  { label: 'Failed the match', value: 9, accent: false },
-  { label: 'In your report', value: 38, accent: true },
-] as const;
+} as const;
 
 /* ------------------------------------------------------------ cofounder --- */
 
 export type ChatTurn = { role: 'user' | 'ai'; text: string };
 
 export const CHAT_SECTION = {
-  eyebrow: 'Start here',
-  headline: 'Talk to it.',
-  lead: 'This is the actual first screen. A sentence, a paragraph, or a direction you can’t quite name yet — any of those works.',
+  /* One line, not the hand-broken `headlineLines` a `SectionHead` takes: the
+     section no longer has a head, and at `ob-h2` over a 760px composer the
+     browser's own break lands where the design wants it. `eyebrow` went with
+     the head — there is no `01 START HERE` overline any more. */
+  headline: 'It asks what a cofounder would.',
+  /* `lead`, `transcriptLabel`, `seedsLabel`, `seeds` and `replayLabel` were
+     deleted here rather than left as dead fields: the transcript card, its
+     header bar and the seed-chip row are all gone from the section. The seeds
+     in particular are not coming back — `PREVIEW_RUNS` replaces them, and the
+     reason is written up there. */
   composerPlaceholder: 'I want to do something in fitness, I don’t know what yet…',
-  seedsLabel: 'Try',
-  seeds: ['dental recall SMS', 'a tool for freelance editors', 'something in fitness'],
   submitLabel: 'Start',
   submittingLabel: 'Starting',
+  /* The only thing left in the composer's left slot — `composerNote` ("Not a
+     demo — this box starts your run") used to hold it at rest and is deleted.
+     Kept a fragment, not a sentence: the slot is uppercase mono. */
   hint: '⌘ ↵ to start',
-  footnote: 'No signup. Your run lives at its own URL — bookmark it, share it, come back anytime.',
-  replayLabel: 'Replay',
 } as const;
+
+/* ------------------------------------------------------ finished runs --- */
+
+export type PreviewRun = {
+  /** The URL segment under `/preview`. Kebab-case, and the only id there is. */
+  slug: string;
+  /** The market the idea sits in — the mono label the card opens on. */
+  sector: string;
+  /** The idea itself, stated the way its founder would say it out loud. */
+  title: string;
+  /** The one thing the finished run actually settled. Never a verdict. */
+  finding: string;
+};
+
+/**
+ * The three finished runs offered under the composer.
+ *
+ * **These are deliberately specific, and that is the whole point of the row.**
+ * The seed chips this replaces read `something in fitness` — a placeholder that
+ * asked the reader to imagine a run rather than showing them one, and which
+ * taught them that the product accepts vagueness as a finished thought. Each
+ * card here names a real customer, a real trigger and a real unit of work,
+ * because the row's job is to demonstrate the resolution the brief gets pushed
+ * to, before the reader types a word.
+ *
+ * Each `finding` states **what the research settled**, never whether the idea
+ * is good — `executive_summary.md` is binding here: no verdict, no score. "Two
+ * of the four incumbents already ship this" is a fact a reader can act on; "a
+ * crowded market" would be a judgement the product does not make.
+ */
+export const PREVIEW_SECTION = {
+  label: 'Preview finished runs',
+} as const;
+
+export const PREVIEW_RUNS: PreviewRun[] = [
+  {
+    slug: 'dental-recall',
+    sector: 'Local services',
+    title: 'Recall texts for dental practices',
+    finding: 'Two of the four incumbents already bundle recall SMS.',
+  },
+  {
+    slug: 'freelance-invoicing',
+    sector: 'Freelance tooling',
+    title: 'Invoice chasing for freelance editors',
+    finding: 'The blocker is the awkward follow-up email, not the tracking.',
+  },
+  {
+    slug: 'clinic-scheduling',
+    sector: 'Healthcare ops',
+    title: 'Filling cancellations at physio clinics',
+    finding: 'Front-desk staff already do this by hand from a paper waitlist.',
+  },
+  {
+    slug: 'trade-quoting',
+    sector: 'Field service',
+    title: 'Site photos into quotes for electricians',
+    finding: 'Quotes get written after hours, on a phone, from memory.',
+  },
+];
 
 /** The scripted exchange that types itself when the section scrolls into view.
     Chosen to demonstrate the three rules the conversation lives by: push for
@@ -472,9 +563,10 @@ export const sessionTotalMs =
  *   would say the product manufactures certainty, which is the exact thing it
  *   exists not to do. The open row hands off to pillar 03 by name.
  * - **The narrative thread is continuous.** Same dental-practice idea, the same
- *   `$299/mo`, the same `31 pages fetched · 9 discarded` as `EVIDENCE_DEMO` and
- *   `VERIFICATION_COUNTERS` below. Competitor names are invented and belong to
- *   no real company.
+ *   `31 pages fetched · 9 discarded` as `VERIFIED_STRIP` above. (It used to say
+ *   `EVIDENCE_DEMO` and `VERIFICATION_COUNTERS`; those were the deleted
+ *   section's copy and the strip inherited both numbers unchanged.) Competitor
+ *   names are invented and belong to no real company.
  */
 
 /** Stage durations. The card plays this once on scroll-in, then rests.
@@ -688,9 +780,10 @@ export const FOOTER = {
     {
       heading: 'Product',
       links: [
+        /* Page order — the composer now leads the body, the pillars follow. */
+        { label: 'Start a run', href: '#start' },
         { label: 'How it works', href: '#how-it-works' },
         { label: 'Verification', href: '#verification' },
-        { label: 'Start a run', href: '#start' },
       ],
     },
     {

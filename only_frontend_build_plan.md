@@ -673,6 +673,105 @@ session needs.
 - Decision: …
 -->
 
+### Warm band — section 01 inverts — 2026-08-25
+
+Not a numbered phase. A user-requested change to `/`: the page alternates
+between the near-black canvas and a warm light band, and `01 START HERE`
+(`CofounderChat`) is the first band. No schema, seam, route, fixture or
+component logic changed — the diff is two stylesheets, one `className` and two
+deleted `<hr>`s. The app pages under `/r/[slug]/*` are untouched and stay dark.
+
+- Decision: **it is a token remap, not a second system.** `.ob-warm` in
+  `styles/tokens.css` overwrites the existing `--ob-*` colour tokens in place —
+  surfaces, hairlines, text, accent, washes. Every recipe in `obsidian.css`
+  already reads those tokens, so the fragment card, the bubbles, the composer,
+  the seed chips, the type scale and the primary button invert with **zero**
+  per-recipe light variants. The rejected alternative was a `--ob-warm-*`
+  namespace, which is how you end up maintaining two systems that drift.
+- Decision: **the accent changes hue, not meaning.** Blue on warm paper reads
+  as a link and fights the ground, so the band's accent is burnt orange
+  `#b03c0a`. It still has exactly the three jobs — action, verification, live
+  state — and nothing else in the band is permitted to be orange. The live dot,
+  the typing caret, the composer focus ring and the Start button all inherit it
+  through `--ob-accent` without naming a colour.
+- Decision: **the band owns its dividers.** `.ob-band` carries `border-block`,
+  the same way `.ob-vstrip` does, and `page.tsx` dropped the two
+  `<hr className="ob-rule">` that used to bracket the section. Band and
+  hairlines are one object rather than three siblings that can drift apart.
+- Deviation: **this is the second banded section, and `obsidian.css` §12 said
+  in as many words that a second one "would turn a deliberate exception into a
+  pattern".** It is a pattern now, at the user's direction. §12's comment was
+  amended rather than left to read as false; the surviving half of its
+  reasoning — hairlines still separate, the band carries them itself — is what
+  §12A follows. The test a *third* band has to pass now lives in §12A: a band
+  earns its inversion by being a place the reader **does** something rather than
+  reads about something, which is why the composer section is the one that
+  flipped.
+- Deviation: **one `.ob-warm` override exists and it is not a colour.**
+  `.ob-btn:disabled` expresses state as `opacity: 0.38`, which is a dark-ground
+  idiom: over `#0a0a0b` it leaves white label text at ~5:1, over cream it leaves
+  it at ~1.5:1 and the disabled Start button loses its label. The warm rule says
+  the state with tokens instead — flat `--ob-hairline` fill, `--ob-dim` text.
+  **Worth knowing generally: `opacity` for state does not survive an
+  inversion.** If any other surface is ever inverted, that is the first thing to
+  re-measure.
+- Decision: **the fixed nav does not recolour over the band.** It stays the
+  dark scrim pill across the whole page. A nav that re-themed per section would
+  flicker on every scroll boundary, and it is page chrome rather than part of
+  any one section.
+- Verified: measured at 1440px and 1280px through the Playwright MCP — band
+  surface, both hairlines, every remapped token, the disabled and enabled
+  button, the composer focus ring. The type-scale audit reports `offScale: []`
+  and `offLead: []` inside `#start` at both widths; only colour moved.
+- Known, pre-existing, **not** caused by this: `/` overflows horizontally at
+  1280px (`scrollWidth` 1319 vs `clientWidth` 1265). The offenders are
+  `.ob-collage-card` in the hero and `.ob-marquee-track`. Nothing inside
+  `#start` contributes.
+
+### Verified strip — 2026-08-24
+
+Not a numbered phase. A user-requested compression of `/`'s `02 The mechanic`
+from a full section into a banded four-card strip, moved below the entry point.
+No schema, seam, route or fixture changed; the app pages are untouched.
+
+**This reverses a decision recorded in the entry below**, which reads
+"verification was inserted before the chat so the trust argument lands before
+the ask". The order is now `Hero` → `DimensionMarquee` → `Pillars` (01) →
+`CofounderChat` (02) → `VerifiedStrip` → `SiteFooter`.
+
+- Decision: **the section is deleted, not shrunk.** `components/landing/
+  verification.tsx` is gone, and with it the cycling excerpt demo — the card
+  that typed a quote, drew a blue rule under it and resolved verified or
+  discarded. The user chose deletion over keeping one card live: pillar 02's
+  `ValidateSession` already shows verification happening on screen, and the page
+  did not need a fourth animated surface to assert it a second time.
+- Decision: **the four counters survive as the cards**, each paired with one
+  line of the deleted section's argument. `31` and `9` still tie to
+  `VALIDATE_SESSION.footnote`, and `47 − 9 = 38` still holds.
+- Decision: **`03 Start here` renumbered to `02`.** A jump from 01 to 03 with
+  nothing between reads as a bug. The strip carries no numeral at all — it is a
+  strip, not a section, and the marquee is the precedent.
+- Deviation: **the strip is a background band**, which the system's second rule
+  forbids ("sections are separated by a 1px rule and nothing else"). Asked for
+  explicitly. Held to the smallest available step, `--ob-canvas` → `--ob-surface`,
+  with a hairline still at each edge via `border-block`, so deleting the tint
+  would leave the page structurally identical. Cards sit a third step up on
+  `--ob-raised`, because a `--ob-surface` card on a `--ob-surface` band is
+  invisible — the trap that comes free with tinting a section. Reasoning is
+  written into `styles/obsidian.css` §12 at the rule itself.
+- Note: `.ob-excerpt` and `.ob-verify-rule` stayed in §12 when the rest of it
+  was deleted. They are **app** recipes despite living in the landing
+  stylesheet — the drawer, finding card and accordion all render them, and
+  obsidian-app.css §6 points at §12 by name. Verified in-browser after the edit:
+  47 live `.ob-verify-rule`s on `/r/[slug]/validate`, and a mounted probe
+  confirms both still resolve to their original computed values.
+- Deferred: **`/` overflows horizontally by ~56px at 1280px, and it is not
+  this change's doing.** Bisected in-browser: hiding `.ob-vstrip` moves
+  `scrollWidth` not at all, hiding the `Pillars` section drops it to
+  `clientWidth` exactly. Constant at every scroll position, so it is a static
+  layout fact rather than an animation frame. Left alone — it is inside §11b's
+  glass scene, which is not this task's surface.
+
 ### Obsidian landing-page rebuild — 2026-08-20
 
 Not a numbered phase. A user-requested rebuild of `/` from scratch, taking its

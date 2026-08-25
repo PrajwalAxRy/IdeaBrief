@@ -13,7 +13,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-20">
           <div className="max-w-[38ch]">
             <p className="ob-h3">{BRAND.name}</p>
-            <p className="ob-body mt-4 text-[15px]">{FOOTER.note}</p>
+            <p className="ob-sm ob-body-bright mt-4">{FOOTER.note}</p>
           </div>
 
           {FOOTER.columns.map((column) => (

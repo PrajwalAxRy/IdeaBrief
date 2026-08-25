@@ -39,7 +39,7 @@ function BriefFragment() {
             {'unknown' in row && row.unknown ? (
               <span className="ob-chip">{row.value}</span>
             ) : (
-              <span className="ob-body ob-body-bright text-[15px] leading-snug">{row.value}</span>
+              <span className="ob-sm ob-body-bright">{row.value}</span>
             )}
           </div>
         ))}
@@ -56,14 +56,14 @@ function RoadmapFragment() {
       <FragHead title={FRAGMENT_ROADMAP.title} status={FRAGMENT_ROADMAP.status} />
       <div className="ob-frag-body">
         <p className="ob-h3">{FRAGMENT_ROADMAP.question}</p>
-        <p className="ob-body mt-4 text-[15px]">{FRAGMENT_ROADMAP.matters}</p>
+        <p className="ob-sm ob-body-bright mt-4">{FRAGMENT_ROADMAP.matters}</p>
 
         <p className="ob-meta mt-7">The script</p>
         <ol className="mt-3 flex flex-col gap-2">
           {FRAGMENT_ROADMAP.script.map((line, i) => (
             <li className="flex gap-3" key={line}>
               <span className="ob-meta pt-1">{String(i + 1).padStart(2, '0')}</span>
-              <span className="ob-body ob-body-bright text-[15px] leading-snug">{line}</span>
+              <span className="ob-sm ob-body-bright">{line}</span>
             </li>
           ))}
         </ol>

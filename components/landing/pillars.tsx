@@ -63,10 +63,13 @@ export function Pillars() {
         {/* Pinned column */}
         <div className="relative">
           <div className="sticky top-[22vh] flex flex-col gap-14">
+            {/* No `index` and no `eyebrow`: the `02 WHAT YOU DO HERE` overline
+                is gone. `CofounderChat` dropped its `01` in the same change, so
+                a `02` here would be the only numeral on the page — a count that
+                starts at two. The per-pillar `01/02/03` labels inside the
+                panels are untouched; those number the pillars, not the page. */}
             <SectionHead
-              index="01"
               id="pillars-headline"
-              eyebrow={PILLARS_SECTION.eyebrow}
               headlineLines={['Three things,', 'and nothing else.']}
               lead={PILLARS_SECTION.lead}
             />

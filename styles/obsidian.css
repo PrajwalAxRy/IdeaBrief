@@ -244,7 +244,7 @@ body::before {
 .ob-h3 {
   font-size: var(--ob-h3);
   font-weight: var(--ob-weight);
-  line-height: 1.25;
+  line-height: var(--ob-leading-snug);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
   margin: 0;
@@ -253,9 +253,23 @@ body::before {
 .ob-lead {
   font-size: var(--ob-lead);
   font-weight: var(--ob-weight);
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-muted);
+  margin: 0;
+}
+
+/* The three text-tier steps below `.ob-lead`. They exist as classes so a
+   component can name a size without reaching for a Tailwind `text-[15px]`
+   escape — six of those were the reason 15px got into the system at all, and
+   Tailwind is layout-only here. Colour is deliberately absent from `.ob-sub`
+   and down: these compose onto `.ob-body`'s colour or a recipe's own. */
+.ob-sub {
+  font-size: var(--ob-sub);
+  font-weight: var(--ob-weight);
+  line-height: var(--ob-leading-lead);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
   margin: 0;
 }
 
@@ -263,6 +277,20 @@ body::before {
   font-size: var(--ob-body);
   line-height: var(--ob-leading-body);
   color: var(--ob-text);
+  margin: 0;
+}
+
+.ob-sm {
+  font-size: var(--ob-sm);
+  line-height: var(--ob-leading-body);
+  letter-spacing: var(--ob-tracking-snug);
+  margin: 0;
+}
+
+.ob-xs {
+  font-size: var(--ob-xs);
+  line-height: var(--ob-leading-body);
+  letter-spacing: var(--ob-tracking-snug);
   margin: 0;
 }
 
@@ -276,7 +304,7 @@ body::before {
   font-size: var(--ob-meta);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
-  line-height: 1.4;
+  line-height: var(--ob-leading-meta);
   text-transform: uppercase;
   color: var(--ob-dim);
 }
@@ -495,12 +523,15 @@ body::before {
   pointer-events: auto;
 }
 
-/* Wordmark */
+/* Wordmark. The tracking is a literal and stays one: this is a brand mark
+   being tightened, not a text step. `--ob-tracking-fig` happens to hold the
+   same −0.02em, but it means "figure numeral" and reading it here would say
+   something untrue about what this element is. */
 .ob-wordmark {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 18px;
+  font-size: var(--ob-sub);
   letter-spacing: -0.02em;
   color: var(--ob-text);
 }
@@ -834,7 +865,7 @@ body::before {
    at once, which would make the rail's active-blue mean nothing. */
 .ob-pillar-index {
   font-family: var(--ob-font-mono);
-  font-size: 13px;
+  font-size: var(--ob-xs);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-text);
@@ -896,7 +927,7 @@ body::before {
   border: 1px solid var(--ob-hairline);
   border-radius: var(--ob-r-tag);
   font-family: var(--ob-font-mono);
-  font-size: 10px;
+  font-size: var(--ob-meta-xs);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
@@ -917,7 +948,7 @@ body::before {
   border-radius: var(--ob-r-card);
   padding: 13px 16px;
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   max-width: 48ch;
   width: fit-content;
 }
@@ -990,7 +1021,7 @@ body::before {
      beside it, so the bar grows even once the padding is cancelled. Pinned to 1,
      the bar is driven by `DEFINE` / `DRAFT` exactly as it is on pillars 02 and
      03, and the padding survives only as hit area (~36px). */
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
   /* 7px, not more. `.ob-btn:focus-visible` draws its ring as a 4px box-shadow
      spread, and `.ob-frag` clips to the card — at 10px the button's box was
      36px tall inside a 39px bar and the ring's top and bottom arcs were cut
@@ -1063,7 +1094,7 @@ body::before {
   align-items: baseline;
   gap: 10px;
   padding-block: 7px;
-  line-height: 1.5;
+  line-height: var(--ob-leading-lead);
   animation: ob-session-in var(--ob-base) var(--ob-ease) both;
 }
 
@@ -1075,7 +1106,7 @@ body::before {
   flex: none;
   width: 1ch;
   font-family: var(--ob-font-mono);
-  font-size: 11px;
+  font-size: var(--ob-meta-sm);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   color: var(--ob-dim);
@@ -1129,7 +1160,7 @@ body::before {
 .ob-session-lens-text {
   margin-top: 6px;
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
 }
@@ -1143,7 +1174,7 @@ body::before {
 }
 
 .ob-session-finish-head {
-  font-size: 17px;
+  font-size: var(--ob-sub);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
 }
@@ -1152,7 +1183,7 @@ body::before {
   margin-top: 5px;
   max-width: 52ch;
   font-size: var(--ob-sm);
-  line-height: 1.55;
+  line-height: var(--ob-leading-body);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-muted);
 }
@@ -1174,7 +1205,7 @@ body::before {
   border: 1px solid var(--ob-accent);
   border-radius: var(--ob-r-pill);
   background: var(--ob-accent);
-  font-size: 13px;
+  font-size: var(--ob-xs);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-on-accent);
   white-space: nowrap;
@@ -1890,8 +1921,8 @@ body::before {
 }
 
 .ob-vf-num {
-  font-size: 33px;
-  line-height: 1.05;
+  font-size: var(--ob-fig-md);
+  line-height: var(--ob-leading-flat);
   letter-spacing: var(--ob-tracking-h2);
   color: var(--ob-text);
   font-variant-numeric: tabular-nums;
@@ -1936,7 +1967,7 @@ body::before {
 }
 
 .ob-vf-stat-num {
-  font-size: 13px;
+  font-size: var(--ob-xs);
   color: var(--ob-text);
   font-variant-numeric: tabular-nums;
 }
@@ -1984,7 +2015,7 @@ body::before {
 }
 
 .ob-vf-scan-pct {
-  font-size: 13px;
+  font-size: var(--ob-xs);
   color: var(--ob-accent-bright);
   font-variant-numeric: tabular-nums;
 }
@@ -2093,7 +2124,7 @@ body::before {
 }
 
 .ob-vf-pane-price {
-  font-size: 13px;
+  font-size: var(--ob-xs);
   color: var(--ob-muted);
   margin-top: 3px;
 }
@@ -2153,7 +2184,7 @@ body::before {
 
 .ob-vf-metric-value {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--ob-meta);
   color: var(--ob-text);
   white-space: nowrap;
 }
@@ -2167,7 +2198,7 @@ body::before {
 /* The line that survives the dissolve — this is the claim that becomes the
    conclusion, so it is not a footnote under the price. */
 .ob-vf-pane-gap {
-  font-size: 12px;
+  font-size: var(--ob-meta);
   color: var(--ob-text);
   margin-top: auto;
   padding-top: 8px;
@@ -2303,7 +2334,7 @@ body::before {
   flex: none;
   margin-left: auto;
   font-family: var(--ob-font-mono);
-  font-size: 10px;
+  font-size: var(--ob-meta-xs);
   font-weight: var(--ob-weight-meta);
   letter-spacing: var(--ob-tracking-meta);
   text-transform: uppercase;
@@ -2405,7 +2436,7 @@ body::before {
    makes a 12px label a 19px line and pushes the caption row out of alignment
    with the status dot beside it. */
 .ob-vf-replay {
-  line-height: 1;
+  line-height: var(--ob-leading-flat);
   padding-block: 9px;
   margin-block: -9px;
   color: var(--ob-dim);
@@ -2416,42 +2447,34 @@ body::before {
 }
 
 /* ============================================================
-   12. Verification — the trust mechanic, animated.
+   12. Verified strip — the trust mechanic, compressed.
    ============================================================ */
 
-.ob-evidence {
-  border: 1px solid var(--ob-hairline);
-  border-radius: var(--ob-r-card);
-  background: var(--ob-surface);
-  padding: 20px 22px;
-  transition: border-color var(--ob-base) var(--ob-ease), opacity var(--ob-base) var(--ob-ease),
-    transform var(--ob-base) var(--ob-ease);
-}
+/* **This section used to be twice this long and belonged to a whole page
+   section.** `/`'s `02 The mechanic` — a cycling excerpt card, a rule that drew
+   itself under a matched quote, a verdict line and a four-up counter row — was
+   replaced by a banded strip of four static cards below the entry point. Gone
+   with it: `.ob-evidence*`, `.ob-verdict*`, `.ob-cycle-dot*` and `.ob-counter*`,
+   which had exactly one call site each and no app-side use.
 
-.ob-evidence[data-state="verified"] {
-  border-color: var(--ob-hairline-accent);
-}
-
-.ob-evidence[data-state="discarded"] {
-  opacity: 0.42;
-  transform: translateY(6px);
-}
+   **`.ob-excerpt` and `.ob-verify-rule` below are NOT landing recipes and did
+   not go with them.** Both are load-bearing on `/r/[slug]/*` — the drawer, the
+   finding card and the accordion all render them, and obsidian-app.css §6
+   explicitly says "do not redefine `.ob-verify-rule`, it lives in obsidian.css
+   §12". They stay here, where that comment points. The `.ob-evidence[data-state]`
+   descendant rules that used to drive them are what went; the app drives the
+   same two classes through `.ob-finding[data-state]` and `[data-drawn]` instead. */
 
 .ob-excerpt {
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: var(--ob-sub);
+  line-height: var(--ob-leading-lead);
   letter-spacing: var(--ob-tracking-snug);
   color: var(--ob-text);
 }
 
-.ob-evidence[data-state="discarded"] .ob-excerpt {
-  color: var(--ob-discard);
-  text-decoration: line-through;
-  text-decoration-thickness: 1px;
-}
-
 /* The rule that draws itself under a matched excerpt — the literal moment of
-   verification. Scales from the left over --ob-enter. */
+   verification. Scales from the left over --ob-enter. Drawn by the app, never
+   by this stylesheet: see the note above. */
 .ob-verify-rule {
   height: 1px;
   background: var(--ob-accent);
@@ -2460,75 +2483,361 @@ body::before {
   transition: transform var(--ob-enter) var(--ob-ease);
 }
 
-.ob-evidence[data-state="verified"] .ob-verify-rule,
-.ob-evidence[data-state="discarded"] .ob-verify-rule {
-  transform: scaleX(1);
+/* --- the strip ----------------------------------------------------------- */
+
+/* **A background band, and therefore a deliberate deviation from the rule this
+   whole system rests on** — sections are separated by a 1px hairline and
+   nothing else, no alternating surfaces. Asked for by the owner: a strip that
+   reads as a surface laid *on* the page rather than as another section *of* it.
+
+   Three things keep the deviation from becoming the generic-dark-SaaS failure
+   mode the rule exists to prevent:
+
+   - **It is the smallest step available.** `--ob-canvas` (#0a0a0b) to
+     `--ob-surface` (#101012) is two units of lightness. Felt, not seen.
+   - **The hairlines are still the separators.** `border-block` puts one at each
+     edge, so deleting the `background` line would leave the page structurally
+     identical — the tint is decoration on a boundary the rule already drew, not
+     a replacement for one.
+   - **It bands a strip, not a section.** Nothing above or below alternates;
+     this is the only banded element on `/`, and a second one would turn a
+     deliberate exception into a pattern.
+
+   **That third point is now out of date and the pattern is the rule.** §12A
+   bands section 01 in warm paper, at the user's direction, and `/` alternates
+   between slate and paper from there. What survives of the reasoning above is
+   the first two points, which §12A follows exactly: the hairlines still do the
+   separating, and the band carries them on `border-block` so the surface and
+   its two rules are one object. What is dead is the claim of uniqueness — the
+   test a new band has to pass is in §12A, not the flat "there is only one".
+
+   96px, the documented floor for section rhythm rather than the 160px standard:
+   the point of the strip is that it is short.
+
+   **The surface and the two hairlines moved out of this rule and into `.ob-band`
+   (§12A), which the section now also carries alongside `.ob-warm`.** The strip
+   is the page's second warm band, so it takes the band's `--ob-canvas` ground
+   rather than owning a `--ob-surface` one — two backgrounds on one element with
+   the later rule silently winning is how a band and its hairlines drift apart,
+   which is the exact failure `border-block` exists to prevent. What is left here
+   is the one thing that is genuinely this strip's own: its shorter rhythm. */
+.ob-vstrip {
+  padding-block: 96px;
 }
 
-.ob-evidence[data-state="discarded"] .ob-verify-rule {
-  background: var(--ob-discard);
+/* Four-up, which the system otherwise reserves for numerals — and these are
+   numerals, each with a label and one line of prose under a hairline. */
+.ob-vstrip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
 }
 
-.ob-verdict {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
+/* One step above the band, and a hairline drawing the edge — the same lift
+   `.ob-preview-card` takes on the other warm band, so the page's two card
+   shapes sit at the same height off their ground.
+
+   It was `--ob-raised` while the band itself was `--ob-surface`; with the band
+   now on `--ob-canvas` (see `.ob-vstrip` above) that would have been a two-step
+   jump, which on paper is a white card dropped on a beige page rather than a
+   surface stepping up out of it. */
+.ob-vstrip-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-card);
+  background: var(--ob-surface);
+  padding: 22px;
 }
 
-.ob-evidence[data-state="verified"] .ob-verdict,
-.ob-evidence[data-state="discarded"] .ob-verdict {
-  opacity: 1;
-  transform: none;
+/* **The one accent card, and the accent is doing job two: verification.** On
+   this band it lands as burnt orange rather than blue, because the strip is
+   inside `.ob-warm` — same job, different hue, no rule here to say so. `38` is the
+   count that survived the check — the only figure on the strip that is a
+   verified state rather than a step on the way to one. `31`, `47` and `9` are
+   counts of work done, which is not one of blue's three jobs. */
+.ob-vstrip-card[data-accent="true"] {
+  border-color: var(--ob-hairline-accent);
 }
 
-.ob-verdict-pass {
-  color: var(--ob-accent);
-}
-
-.ob-verdict-fail {
-  color: var(--ob-discard);
-}
-
-/* Which of the cycled excerpts is playing. */
-.ob-cycle-dot {
-  width: 26px;
-  height: 2px;
-  border: 0;
-  padding: 0;
-  background: var(--ob-hairline-strong);
-  cursor: pointer;
-  transition: background var(--ob-base) var(--ob-ease);
-}
-
-.ob-cycle-dot:hover {
-  background: var(--ob-muted);
-}
-
-.ob-cycle-dot[data-active="true"] {
-  background: var(--ob-accent);
-}
-
-.ob-cycle-dot:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--ob-canvas), 0 0 0 4px var(--ob-accent);
-}
-
-/* Counter readout. */
-.ob-counter {
+.ob-vstrip-value {
   font-family: var(--ob-font-mono);
-  font-size: 40px;
+  font-size: var(--ob-fig-lg);
   font-weight: var(--ob-weight);
-  letter-spacing: -0.02em;
-  line-height: 1;
+  letter-spacing: var(--ob-tracking-fig);
+  line-height: var(--ob-leading-flat);
   color: var(--ob-text);
-  font-variant-numeric: tabular-nums;
 }
 
-.ob-counter-accent {
+.ob-vstrip-card[data-accent="true"] .ob-vstrip-value {
   color: var(--ob-accent);
+}
+
+.ob-vstrip-label {
+  margin: 12px 0 20px;
+}
+
+/* `margin-top: auto` is what makes four cards with different label wraps bottom
+   out together — the hairline above each claim has to sit on one line across
+   the row or the strip reads as four unrelated boxes. It needs the `20px`
+   bottom margin on the label above to keep a gap when the auto resolves to 0. */
+.ob-vstrip-claim {
+  margin: auto 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--ob-hairline);
+  font-size: var(--ob-sm);
+  line-height: var(--ob-leading-lead);
+  color: var(--ob-muted);
+}
+
+/* The closing ask, on the same band as the four cards.
+
+   A hairline above it and nothing else — no card, no second surface step. The
+   row is the last thing on the page and the four cards directly above it are
+   already boxed; putting this in a fifth box would read as a fifth statistic.
+   The rule does the separating, which is the same job it does everywhere else
+   in this system.
+
+   `align-items: end` rather than `center`: the button and its note form a
+   two-line stack on the right, and the baseline that has to line up is the
+   button's with the headline's — centring a two-line block against a
+   three-line one lands the button in the middle of the body copy. */
+.ob-vstrip-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 48px;
+  padding-top: 40px;
+  border-top: 1px solid var(--ob-hairline);
+}
+
+/* ============================================================
+   12A. Warm band — the light inversion of a full section.
+
+   Numbered `12A` rather than taking `13`: it belongs beside §12, which is the
+   only other banded object on the page, and renumbering nine sections to say so
+   would cost more than the letter does.
+   ============================================================ */
+
+/* **§12 said a second band would turn a deliberate exception into a pattern.
+   This is that second band, added at the user's direction, and it is a pattern
+   now.** The rule it replaces: `/` alternates between the near-black canvas and
+   warm paper, and a band earns its inversion by being a place the reader *does*
+   something rather than reads about something. Section 01 is the composer — the
+   one surface on the page that takes input — so it is the one that inverts.
+
+   The structure is unchanged from §12, and deliberately so:
+
+   - **`border-block` puts the two hairlines on the band itself**, so the band
+     and the rules that bound it are one object rather than three siblings that
+     drift apart. `app/(site)/page.tsx` dropped the two `<hr className="ob-rule">`
+     that used to sit either side of this section for exactly that reason.
+   - **The hairlines still do the separating.** Delete the `background` line and
+     the page is structurally identical — the paper is a treatment on a boundary
+     the rule already drew, not a replacement for one.
+
+   All of the colour arrives through `.ob-warm` in `styles/tokens.css`, which
+   remaps the `--ob-*` tokens in place. There is not one colour value in this
+   rule: every recipe in this stylesheet already reads those tokens, so the
+   fragment card, the bubbles, the composer, the seed chips and the primary
+   button invert for free.
+
+   **Exactly one override sits below, and it is not a colour.** Anything that
+   needs a hand-written light *colour* would mean a recipe had a value baked
+   into it — that is a bug in the recipe, not a missing rule here. What does not
+   survive the flip is the one place the system expresses state as `opacity`
+   rather than as a token.
+
+   **96px, which is the documented floor for section rhythm and not a number to
+   go under.** This ran at 160px while the section held a transcript, then 120px
+   once that came out. It sits at the floor now for the same reason `.ob-vstrip`
+   does — a band is short by definition, and the two hairlines are already doing
+   the separating that padding would otherwise have to do. Below 96 two sections
+   start reading as one crowded block, so if this needs to shrink again the
+   space has to come from inside the section, not from here. */
+.ob-band {
+  background: var(--ob-canvas);
+  border-block: 1px solid var(--ob-hairline);
+  padding-block: 96px;
+}
+
+/* `color-scheme` is a keyword, not a colour, so it belongs in the recipe rather
+   than the token file. Without it the `<html>`-level `color-scheme: dark` in
+   globals.css §base leaves the composer's textarea with a dark caret and a dark
+   scrollbar on white paper — the one part of the inversion the token remap
+   cannot reach, because the UA draws it. */
+.ob-warm {
+  color-scheme: light;
+}
+
+/* **`opacity` is a dark-ground idiom and it does not invert.** `.ob-btn:disabled`
+   fades the whole button to 0.38, which on `--ob-canvas` #0a0a0b leaves white
+   label text at roughly 5:1 — dimmed, still readable. Composited over paper the
+   same 0.38 puts white on cream at about 1.5:1, so the disabled Start button
+   loses its label entirely and reads as a smear rather than as a control that
+   is waiting for input. The state has to be said with tokens instead: a flat
+   hairline fill and `--ob-dim` text, which reads as *off* rather than as
+   *faded*, and stays legible.
+
+   Deliberately below AA (3.6:1) and allowed to be — WCAG 1.4.3 exempts an
+   inactive control, and this one is a beat away from becoming active as soon as
+   the reader types a character into the composer above it. */
+.ob-warm .ob-btn-primary:disabled {
+  opacity: 1;
+  background: var(--ob-hairline);
+  border-color: var(--ob-hairline);
+  color: var(--ob-dim);
+}
+
+/* ============================================================
+   12B. Band mount — the slate side of a dark→light boundary.
+
+   **§12A's claim that "the hairlines still do the separating" was false at the
+   band's outer edge, and this rule is what makes it true.** `.ob-band` draws
+   its `border-block` with `var(--ob-hairline)`, but `.ob-warm` sits on the same
+   element, so that resolves to the *warm* stone `#ddd0bc`. Against paper it is
+   near-invisible; against slate it reads as the band being 1px taller. Delete
+   `.ob-band`'s `background` and the boundary does not survive — there was no
+   rule there, only a value cliff from near-black to cream, and the top one
+   landed directly under the marquee with nothing between them.
+
+   The mount is a wrapper *outside* `.ob-warm`, and that placement is the whole
+   trick: every token it reads resolves to the dark system, so the boundary gets
+   a slate hairline without a single new token. **Do not solve this by adding
+   `--ob-slate-*` names that `.ob-warm` declines to remap** — a pseudo-element
+   inherits from its originating element, so a `::before` on the band would
+   still resolve warm, and reaching for a parallel namespace to escape that is
+   the exact drift `tokens.css` §WARM forbids. Move the element instead.
+
+   What it draws, reading downward into the paper: canvas, a slate hairline,
+   24px of slate, the paper edge. The paper reads as mounted on the board rather
+   than as the page being interrupted, and both grounds keep a rule of their own
+   — the band's warm `border-block` stays, redundant and invisible from outside,
+   because it is the *paper's* edge and §12A's one-object structure depends on
+   it.
+
+   **The gradient is the one place this brushes rule 2 (`no gradient
+   transitions`), and it is pointed the other way.** Near-black butted against
+   cream halates: the slate reads washed for roughly 40px approaching the seam,
+   which is why a geometrically razor cut still looked soft. The ramp deepens
+   `--ob-canvas` to `--ob-void` as it *approaches* the paper, so the cut lands
+   harder, not softer. It never touches the paper and never blends the two
+   grounds — a gradient that crossed the boundary would be the thing the rule
+   is actually about.
+
+   24px, not the 8px a tight double-rule would take: at 8px the hairline reads
+   as a second edge of the same object, and the point is that it belongs to the
+   slate. It costs 48px per band on a page whose sections run 96–160px.
+
+   `:last-child` drops the bottom rule because `.ob-footer` already carries
+   `border-top: 1px solid var(--ob-hairline)` — two adjacent hairlines are a
+   2px line, which is the one weight this system has no use for. */
+.ob-band-mount {
+  padding-block: 24px;
+  border-block: 1px solid var(--ob-hairline);
+  background: linear-gradient(180deg, var(--ob-canvas), var(--ob-void)) top / 100% 24px no-repeat,
+    linear-gradient(0deg, var(--ob-canvas), var(--ob-void)) bottom / 100% 24px no-repeat,
+    var(--ob-canvas);
+}
+
+.ob-band-mount:last-child {
+  border-bottom-width: 0;
+}
+
+/* --- Preview runs — three finished briefs under the composer ------------- */
+
+/* Shape from `design_inspiration/cardReference`: a soft card whose content
+   stacks a 40px mark, a gap, a title and a clamped description. What changed in
+   translation is written up in `PreviewRuns` — the short version is that
+   Obsidian has no shadows, so the reference's `variant="soft"` fill becomes
+   `--ob-surface` on the band's `--ob-canvas` (the same one-step lift
+   `.ob-vstrip-card` takes) with a hairline drawing the edge, and the title's
+   `font-semibold` becomes weight 400 at a larger step.
+
+   No shadow on hover either — the border goes to `--ob-hairline-strong`, the
+   surface takes one more step, and the arrow travels, which is the
+   `.ob-btn-bare` idiom already in §4. */
+.ob-preview-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 18px;
+  border: 1px solid var(--ob-hairline);
+  border-radius: var(--ob-r-card);
+  background: var(--ob-surface);
+  transition: border-color var(--ob-base) var(--ob-ease), background var(--ob-base) var(--ob-ease);
+}
+
+.ob-preview-card:hover {
+  border-color: var(--ob-hairline-strong);
+  background: var(--ob-raised);
+}
+
+.ob-preview-card:focus-visible {
+  border-color: var(--ob-accent);
+}
+
+/* `.ob-preview-mark` — the reference's `*:size-10` glyph tile, a 40px bordered
+   box holding a lucide icon — lived here and is deleted at the user's direction,
+   along with the `mark` field on `PreviewRun` and the icon map that resolved it.
+   The card now opens on the sector line, so that line no longer needs a gap
+   above it separating it from anything. */
+
+/* `--ob-h3`, the scale's named "card title" step and what `.ob-h3` already sets
+   for every other card on the page. This held `--ob-sub` (18px) for one
+   revision — the step the token file describes as "a card title too small for
+   `--ob-h3`", which at 370px wide these are not. Same `--ob-leading-snug` it had
+   before; only the size moved. */
+.ob-preview-title {
+  margin-top: 4px;
+  font-size: var(--ob-h3);
+  line-height: var(--ob-leading-snug);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-text);
+}
+
+/* `line-clamp: 2` is the reference's own `line-clamp-2`, and it is doing real
+   work rather than being copied: it caps the description at two lines so four
+   cards of unequal copy still present the same silhouette. The findings are
+   written to fit — the clamp is the guarantee, not the plan. */
+.ob-preview-finding {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin-top: 8px;
+  font-size: var(--ob-sm);
+  line-height: var(--ob-leading-lead);
+  letter-spacing: var(--ob-tracking-snug);
+  color: var(--ob-muted);
+}
+
+/* `margin-top: auto` bottoms the four arrows out on one line regardless of how
+   each title wraps — the same trick `.ob-vstrip-claim` uses, and for the same
+   reason: four cards whose rules sit at four heights read as four unrelated
+   boxes. */
+.ob-preview-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 12px;
+  color: var(--ob-dim);
+}
+
+.ob-preview-foot .ob-arrow {
+  transition: transform var(--ob-base) var(--ob-ease);
+}
+
+.ob-preview-card:hover .ob-arrow {
+  transform: translate(3px, -3px);
+}
+
+/* --- Under construction — the placeholder body on /preview/[slug] -------- */
+
+.ob-underconstruction {
+  max-width: 62ch;
+  padding-block: 200px 240px;
 }
 
 /* ============================================================
@@ -2555,8 +2864,8 @@ body::before {
   outline: none;
   color: var(--ob-text);
   font-family: var(--ob-font);
-  font-size: 18px;
-  line-height: 1.55;
+  font-size: var(--ob-sub);
+  line-height: var(--ob-leading-body);
   letter-spacing: var(--ob-tracking-snug);
 }
 
@@ -2571,7 +2880,7 @@ body::before {
   border-radius: var(--ob-r-pill);
   background: transparent;
   color: var(--ob-muted);
-  font-size: 13px;
+  font-size: var(--ob-xs);
   letter-spacing: var(--ob-tracking-snug);
   cursor: pointer;
   transition: border-color var(--ob-fast) var(--ob-ease), color var(--ob-fast) var(--ob-ease),
@@ -2600,7 +2909,16 @@ body::before {
 }
 
 /* Oversized ghost wordmark closing the page. Clipped at the baseline so it
-   reads as a watermark rather than a heading. */
+   reads as a watermark rather than a heading.
+
+   **The one deliberate exception to the type scale**, and it stays literal
+   rather than becoming a token. It is not a text step — nothing else will
+   ever be set at this size, it is stroked rather than filled, and its
+   leading and tracking are both chosen to make the clip land on the
+   baseline. A token here would invite a second consumer, which is exactly
+   what it must not have. Same for the two `em`-relative sizes on
+   `.ob-vf-num-unit` / `.ob-vf-num-per`: those are proportions of their own
+   numeral, not steps. */
 .ob-footer-mark {
   font-size: clamp(80px, 15vw, 220px);
   line-height: 0.78;
@@ -2717,10 +3035,14 @@ body::before {
      absent rule in this block is otherwise indistinguishable from a forgotten
      one, which is exactly what the completeness diff exists to catch. */
 
-  .ob-verdict {
-    opacity: 1;
-    transform: none;
-  }
+  /* `.ob-verdict` had a rule here and no longer needs one: the class went with
+     the `02 The mechanic` section. **The strip that replaced it needs nothing
+     in this block either**, and that is worth stating rather than leaving as an
+     absence — an omitted end state is otherwise indistinguishable from a
+     forgotten one, which is the one thing the completeness diff has to catch.
+     Its only two moving parts are already covered: `ScrollReveal` resolves
+     through `.ob-reveal` above, and `CountUp` short-circuits to its final value
+     in JS rather than through a transition this blanket could reach. */
 
   /* The Validate Field renders its LAST stage under reduced motion, so most of
      §11b resolves through the `[data-lit]`/`[data-in]`/`[data-state]`
