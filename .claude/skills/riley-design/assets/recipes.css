@@ -1,0 +1,900 @@
+/* ============================================================================
+   RILEY — component recipes
+   ----------------------------------------------------------------------------
+   IMPORT THIS INTO @layer components. Not unlayered.
+
+       @import "./riley.css" layer(components);
+
+   Unlayered, a `.rl-card { margin: 0 }` silently beats every Tailwind spacing
+   utility on the same element regardless of specificity. It produces no error
+   and the page still looks plausible, so it is only ever caught by measuring a
+   computed style. See references/pitfalls.md §1.
+
+   Tailwind is for LAYOUT ONLY — flex, grid, spacing, sizing. Every colour,
+   border, shadow and type value in this file reads a token. No literals.
+   ========================================================================= */
+
+/* ============================================================================
+   1. TYPE
+   These exist so a component always has a token-backed way to say a size.
+   `text-[15px]` is the leak that puts an unnamed step into the system.
+   ========================================================================= */
+
+.rl-display {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-display);
+  font-weight: var(--rl-w-semibold);
+  letter-spacing: var(--rl-tracking-display);
+  line-height: var(--rl-leading-display);
+  color: var(--rl-ink);
+  text-wrap: balance;
+}
+
+.rl-h1 {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-h1);
+  font-weight: var(--rl-w-semibold);
+  letter-spacing: var(--rl-tracking-tight);
+  line-height: var(--rl-leading-tight);
+  color: var(--rl-ink);
+  text-wrap: balance;
+}
+
+.rl-h2 {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-h2);
+  font-weight: var(--rl-w-semibold);
+  letter-spacing: var(--rl-tracking-tight);
+  line-height: var(--rl-leading-tight);
+  color: var(--rl-ink);
+}
+
+.rl-h3 {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-h3);
+  font-weight: var(--rl-w-semibold);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-snug);
+  color: var(--rl-ink);
+}
+
+.rl-lead {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-lead);
+  font-weight: var(--rl-w-regular);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-lead);
+  color: var(--rl-body);
+  text-wrap: pretty;
+}
+
+.rl-sub {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sub);
+  font-weight: var(--rl-w-regular);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-snug);
+  color: var(--rl-body);
+}
+
+.rl-body {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-body-size);
+  font-weight: var(--rl-w-regular);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-body);
+  color: var(--rl-body);
+  text-wrap: pretty;
+}
+
+.rl-sm {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  font-weight: var(--rl-w-regular);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-snug);
+  color: var(--rl-body);
+}
+
+.rl-xs {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-xs);
+  font-weight: var(--rl-w-regular);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-snug);
+  color: var(--rl-body);
+}
+
+/* The metadata layer. Never carries a sentence — uppercase mono at sentence
+   length is unreadable. If your mono string has a verb in it, use sans. */
+.rl-meta,
+.rl-meta-sm,
+.rl-meta-xs {
+  font-family: var(--rl-font-mono);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-meta);
+  line-height: var(--rl-leading-meta);
+  text-transform: uppercase;
+  color: var(--rl-muted);
+}
+.rl-meta    { font-size: var(--rl-meta); }
+.rl-meta-sm { font-size: var(--rl-meta-sm); }
+.rl-meta-xs { font-size: var(--rl-meta-xs); }
+
+/* Figure numerals. Mono so digits are tabular; a number is not a heading, so
+   it never takes the display tier's tracking. */
+.rl-fig-xl,
+.rl-fig-lg,
+.rl-fig-md,
+.rl-fig-sm {
+  font-family: var(--rl-font-mono);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-fig);
+  line-height: var(--rl-leading-flat);
+  font-variant-numeric: tabular-nums;
+  color: var(--rl-ink);
+}
+.rl-fig-xl { font-size: var(--rl-fig-xl); }
+.rl-fig-lg { font-size: var(--rl-fig-lg); }
+.rl-fig-md { font-size: var(--rl-fig-md); }
+.rl-fig-sm { font-size: var(--rl-fig-sm); }
+
+/* Long-form prose. The ONE place the text budget is uncapped — give it a
+   measure so the line length stays readable. */
+.rl-prose {
+  max-width: var(--rl-measure);
+}
+.rl-prose > * + * {
+  margin-top: 1em;
+}
+
+/* ============================================================================
+   2. LAYOUT AND BANDS
+   Rule 5: sections separate by ground change, not by a rule.
+   ========================================================================= */
+
+.rl-container {
+  width: 100%;
+  max-width: var(--rl-container);
+  margin-inline: auto;
+  padding-inline: var(--rl-gutter);
+}
+
+.rl-container-wide {
+  width: 100%;
+  max-width: var(--rl-container-wide);
+  margin-inline: auto;
+  padding-inline: var(--rl-gutter);
+}
+
+.rl-section {
+  padding-block: var(--rl-section);
+}
+.rl-section-tight {
+  padding-block: var(--rl-section-tight);
+}
+
+/* The bands. Alternate these — never two of the same in a row, which produces
+   an accidental 256px void where a section boundary should be. */
+.rl-band-paper  { background: var(--rl-paper); }
+.rl-band-canvas { background: var(--rl-canvas); }
+.rl-band-linen  { background: var(--rl-linen); }
+
+/* A dark band. Sets its own ground because .rl-invert only remaps tokens. */
+.rl-invert {
+  background: var(--rl-canvas);
+  color: var(--rl-body);
+}
+
+/* ============================================================================
+   3. SURFACES
+   Rule 3, the one-step rule: an element sits at least one tier from its ground.
+   A bordered card on --rl-inset has a 1.05:1 border and is invisible.
+   ========================================================================= */
+
+/* The base unit. White card — belongs on a canvas or linen band. */
+.rl-card {
+  background: var(--rl-paper);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-lg);
+}
+
+/* A tinted panel — belongs INSIDE a white card, or on a paper band. */
+.rl-panel {
+  background: var(--rl-linen);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-md);
+}
+
+/* The deepest recess: code blocks, empty states. Note it has NO border —
+   at 1.05:1 the border would not render, so the tier step does the work. */
+.rl-well {
+  background: var(--rl-inset);
+  border-radius: var(--rl-r-md);
+}
+
+/* Large panel — hero product surface, a full-width feature container. */
+.rl-panel-xl {
+  background: var(--rl-paper);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-xl);
+}
+
+/* The house unit. Sonarly's pattern, and the best answer to "how do I explain
+   this without a paragraph": drawn UI fragment on tint, one sentence below. */
+.rl-bento {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--rl-paper);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-lg);
+}
+.rl-bento__visual {
+  min-height: 200px;
+  padding: 24px;
+  background: var(--rl-linen);
+  border-bottom: 1px solid var(--rl-line);
+}
+.rl-bento__body {
+  padding: 24px;
+}
+.rl-bento__body > * + * {
+  margin-top: 8px;
+}
+
+/* Icon card — the bento's sibling, for an ABSTRACT concept with no UI to draw
+   (deliverability, compliance, uptime). A single 64px line icon at 3px stroke
+   in --rl-accent, centred in a tall empty area, no tinted panel behind it.
+
+   The accent is legitimate here: it is a MARK, not text, and at 3.39:1 it
+   clears the 3.0 threshold for graphical objects. It would fail as a label.
+
+   Reach for .rl-bento first. If the concept has a real interface, draw the
+   interface — an icon is what you use when there is genuinely nothing to show. */
+.rl-card-icon {
+  position: relative;
+  overflow: hidden;
+  background: var(--rl-paper);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-lg);
+}
+.rl-card-icon__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 256px;
+}
+.rl-card-icon__visual svg {
+  width: 64px;
+  height: 64px;
+  color: var(--rl-accent);
+  stroke-width: 3;
+}
+.rl-card-icon__body {
+  padding: 0 24px 24px;
+}
+.rl-card-icon__body > * + * {
+  margin-top: 8px;
+}
+/* Corner affordance marker. Decorative, so it takes --rl-faint, which is
+   explicitly not-text-safe and therefore correct for exactly this. */
+.rl-card-icon__corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: var(--rl-faint);
+}
+
+/* The hero product panel's bloom. ONE per page, behind the panel, never free-
+   floating. Sits behind its parent's content, so the parent needs a stacking
+   context of its own or the bloom paints over the page (pitfalls.md §10). */
+.rl-bloom {
+  position: relative;
+  isolation: isolate;
+}
+.rl-bloom::before {
+  content: '';
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  background: var(--rl-bloom);
+  pointer-events: none;
+}
+
+/* The one border meant to be CHOSEN — highlighted plan, selected card.
+   Near-black, not accent: the accent marks focus, not selection. */
+.rl-card-chosen {
+  border-color: var(--rl-line-ink);
+  box-shadow: inset 0 0 0 1px var(--rl-line-ink);
+}
+
+/* Elevation. Rule 7: before adding one, answer what it floats ABOVE.
+   "Nothing, it's in the grid" means it gets a border and no shadow. */
+.rl-lift       { box-shadow: var(--rl-lift); }
+.rl-lift-panel { box-shadow: var(--rl-lift-panel); }
+
+/* ============================================================================
+   4. BUTTONS
+   Rule 4: near-black is the action, the accent is the pointer.
+   Exactly one .rl-btn--primary visible per viewport.
+   ========================================================================= */
+
+.rl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-flat);
+  border: 1px solid transparent;
+  border-radius: var(--rl-r-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--rl-dur-fast) var(--rl-ease-out),
+    border-color var(--rl-dur-fast) var(--rl-ease-out),
+    color var(--rl-dur-fast) var(--rl-ease-out);
+}
+
+/* Hover LIGHTENS. On a bright ground a black control going darker reads dead;
+   going lighter reads pressed-ready. */
+.rl-btn--primary {
+  background: var(--rl-action);
+  color: var(--rl-on-action);
+}
+.rl-btn--primary:hover {
+  background: var(--rl-action-hover);
+}
+
+.rl-btn--secondary {
+  background: transparent;
+  border-color: var(--rl-line-strong);
+  color: var(--rl-ink);
+}
+.rl-btn--secondary:hover {
+  background: var(--rl-linen);
+  border-color: var(--rl-ink);
+}
+
+.rl-btn:active {
+  transform: translateY(1px);
+}
+
+.rl-btn:disabled,
+.rl-btn[aria-disabled='true'] {
+  color: var(--rl-faint);
+  background: var(--rl-linen);
+  border-color: var(--rl-line);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* The accent's main job. Appears beside the primary constantly — this pairing
+   IS the CTA block: black button, accent link, nothing else. */
+.rl-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-snug);
+  color: var(--rl-accent-text);   /* never --rl-accent: that is 3.39:1 */
+  cursor: pointer;
+}
+.rl-link__arrow {
+  transition: transform var(--rl-dur-fast) var(--rl-ease-out);
+}
+.rl-link:hover .rl-link__arrow {
+  transform: translateX(3px);
+}
+
+/* Inline prose link — underlined, because colour alone is not an affordance. */
+.rl-link-inline {
+  color: var(--rl-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--rl-accent-line);
+}
+.rl-link-inline:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ============================================================================
+   5. EYEBROWS
+   Pick ONE variant per page, not per section.
+   ========================================================================= */
+
+.rl-eyebrow {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  font-weight: var(--rl-w-regular);
+  letter-spacing: var(--rl-tracking-snug);
+  color: var(--rl-muted);
+}
+
+/* NEVER rotate this pill's hue per section. The third reference does exactly
+   that and it is the one thing from it not to copy — it turns the accent into
+   decoration and rule 4 stops meaning anything. */
+.rl-eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-xs);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-snug);
+  line-height: var(--rl-leading-flat);
+  color: var(--rl-accent-text);
+  background: var(--rl-accent-wash);
+  border-radius: var(--rl-r-pill);
+}
+
+/* Credibility badge — an eyebrow carrying a logo ("Backed by <investor>",
+   "SOC 2 compliant"). Deliberately NEUTRAL, not accent: the claim is the
+   borrowed authority, and tinting it orange spends the accent on something
+   that is already doing its own work. */
+.rl-badge-credibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  font-weight: var(--rl-w-regular);
+  line-height: var(--rl-leading-flat);
+  color: var(--rl-body);
+  background: var(--rl-linen);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-pill);
+}
+.rl-badge-credibility__mark {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* The friction-remover under a CTA pair — "No card required", "One command to
+   install". This is text that EARNS its place: it answers the objection the
+   button just raised. Not the same thing as filler. */
+.rl-hint {
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-xs);
+  font-weight: var(--rl-w-regular);
+  letter-spacing: var(--rl-tracking-snug);
+  color: var(--rl-muted);
+}
+
+/* ============================================================================
+   6. CHIPS AND STATUS
+   ========================================================================= */
+
+.rl-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  font-family: var(--rl-font-mono);
+  font-size: var(--rl-meta-xs);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-meta);
+  line-height: var(--rl-leading-flat);
+  text-transform: uppercase;
+  color: var(--rl-muted);
+  background: var(--rl-linen);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-sm);
+  white-space: nowrap;
+}
+
+.rl-chip--accent {
+  color: var(--rl-accent-text);
+  background: var(--rl-accent-wash);
+  border-color: var(--rl-accent-line);
+}
+
+/* Never place a --critical chip inside an accent-marked card: the two hues are
+   close enough to collide and the status stops reading as a status. */
+.rl-chip--positive { color: var(--rl-positive); background: var(--rl-positive-wash); border-color: transparent; }
+.rl-chip--caution  { color: var(--rl-caution);  background: var(--rl-caution-wash);  border-color: transparent; }
+.rl-chip--critical { color: var(--rl-critical); background: var(--rl-critical-wash); border-color: transparent; }
+.rl-chip--info     { color: var(--rl-info);     background: var(--rl-info-wash);     border-color: transparent; }
+
+/* A discarded item goes faint and stops mattering. It does NOT go red — red is
+   a failed state, not a rejected one. */
+.rl-discarded {
+  color: var(--rl-faint);
+  text-decoration: line-through;
+  text-decoration-color: var(--rl-line-strong);
+}
+
+/* The only pulsing thing in the system. */
+.rl-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rl-r-pill);
+  background: var(--rl-accent);
+  flex-shrink: 0;
+}
+.rl-dot--live {
+  animation: rl-pulse 2s var(--rl-ease-inout) infinite;
+}
+@keyframes rl-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--rl-accent-ring); }
+  50%      { box-shadow: 0 0 0 5px transparent; }
+}
+
+/* ============================================================================
+   7. SEGMENTED CONTROL
+   The thumb is the one place a shadow does affordance work, not decoration.
+   ========================================================================= */
+
+.rl-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--rl-linen);
+  border-radius: var(--rl-r-pill);
+}
+.rl-segmented__item {
+  padding: 7px 18px;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  font-weight: var(--rl-w-medium);
+  line-height: var(--rl-leading-flat);
+  color: var(--rl-body);
+  background: transparent;
+  border: 0;
+  border-radius: var(--rl-r-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--rl-dur-fast) var(--rl-ease-out),
+    color var(--rl-dur-fast) var(--rl-ease-out);
+}
+.rl-segmented__item:hover {
+  color: var(--rl-ink);
+}
+.rl-segmented__item[aria-selected='true'] {
+  color: var(--rl-ink);
+  background: var(--rl-paper);
+  box-shadow: var(--rl-lift);
+}
+
+/* ============================================================================
+   8. TABS
+   The active rule is one of the accent's three jobs.
+   ========================================================================= */
+
+.rl-tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--rl-line);
+}
+.rl-tabs__item {
+  position: relative;
+  padding: 14px 0;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  font-weight: var(--rl-w-medium);
+  color: var(--rl-muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color var(--rl-dur-fast) var(--rl-ease-out);
+}
+.rl-tabs__item:hover {
+  color: var(--rl-ink);
+}
+.rl-tabs__item[aria-selected='true'] {
+  color: var(--rl-ink);
+}
+.rl-tabs__item[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--rl-accent);
+}
+
+/* ============================================================================
+   9. ACCORDION
+   Bottom border only, no card. Cards around accordion rows double the border
+   count for nothing.
+   ========================================================================= */
+
+.rl-accordion__row {
+  border-bottom: 1px solid var(--rl-line);
+}
+.rl-accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 20px 0;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sub);
+  font-weight: var(--rl-w-medium);
+  color: var(--rl-ink);
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.rl-accordion__icon {
+  flex-shrink: 0;
+  color: var(--rl-muted);
+  transition: transform var(--rl-dur-base) var(--rl-ease-out);
+}
+.rl-accordion__trigger[aria-expanded='true'] .rl-accordion__icon {
+  transform: rotate(45deg);
+}
+.rl-accordion__content {
+  padding-bottom: 20px;
+  max-width: var(--rl-measure);
+}
+
+/* ============================================================================
+   10. INPUTS
+   ========================================================================= */
+
+.rl-input {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-body-size);
+  letter-spacing: var(--rl-tracking-snug);
+  color: var(--rl-ink);
+  background: var(--rl-paper);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-md);
+  transition:
+    border-color var(--rl-dur-fast) var(--rl-ease-out),
+    box-shadow var(--rl-dur-fast) var(--rl-ease-out);
+}
+.rl-input::placeholder {
+  color: var(--rl-faint);
+}
+.rl-input:hover {
+  border-color: var(--rl-line-strong);
+}
+.rl-input:focus {
+  outline: none;
+  border-color: var(--rl-accent-line);
+  box-shadow: 0 0 0 3px var(--rl-accent-ring);
+}
+.rl-input[aria-invalid='true'] {
+  border-color: var(--rl-critical);
+}
+
+/* ============================================================================
+   11. ROWS AND LISTS
+   The third tier of the card system — a bordered row inside a tinted panel.
+   ========================================================================= */
+
+.rl-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--rl-paper);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-md);
+}
+.rl-row__icon {
+  flex-shrink: 0;
+  color: var(--rl-muted);
+}
+.rl-row--marked {
+  border-color: var(--rl-accent-line);
+}
+
+/* A table that reads as rules, not as a grid of boxes. */
+.rl-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.rl-table th {
+  padding: 10px 12px;
+  font-family: var(--rl-font-mono);
+  font-size: var(--rl-meta);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-meta);
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--rl-muted);
+  border-bottom: 1px solid var(--rl-line);
+}
+.rl-table td {
+  padding: 12px;
+  font-size: var(--rl-sm);
+  color: var(--rl-body);
+  border-bottom: 1px solid var(--rl-line);
+}
+.rl-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ============================================================================
+   12. STEP / JOURNEY
+   Connector-linked step cards. The connector is a hairline; the active step is
+   accent-marked. This replaces "here's how the flow works" as a paragraph.
+   ========================================================================= */
+
+.rl-steps {
+  position: relative;
+  display: grid;
+  gap: 16px;
+}
+/* The connector sits BEHIND the cards. Note it is on the container, not on a
+   pseudo-element of each card — a per-card connector overhangs the last one. */
+.rl-steps::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  inset-inline: 12%;
+  height: 1px;
+  background: var(--rl-line);
+  z-index: 0;
+}
+.rl-step {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  background: var(--rl-paper);
+  border: 1px solid var(--rl-line);
+  border-radius: var(--rl-r-md);
+}
+.rl-step__index {
+  font-family: var(--rl-font-mono);
+  font-size: var(--rl-meta);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-meta);
+  color: var(--rl-faint);
+}
+.rl-step--active {
+  border-color: var(--rl-accent-line);
+}
+.rl-step--active .rl-step__index {
+  color: var(--rl-accent-text);
+}
+
+/* ============================================================================
+   13. STAT ROW
+   Oversized figure numerals. Replaces "it's fast / cheap / accurate".
+   ========================================================================= */
+
+.rl-stat__value {
+  font-family: var(--rl-font-mono);
+  font-size: var(--rl-fig-xl);
+  font-weight: var(--rl-w-medium);
+  letter-spacing: var(--rl-tracking-fig);
+  line-height: var(--rl-leading-flat);
+  font-variant-numeric: tabular-nums;
+  color: var(--rl-ink);
+}
+.rl-stat__label {
+  margin-top: 8px;
+  font-family: var(--rl-font-sans);
+  font-size: var(--rl-sm);
+  color: var(--rl-body);
+}
+/* A figure without a source is a claim without a receipt. */
+.rl-stat__source {
+  margin-top: 4px;
+  font-family: var(--rl-font-mono);
+  font-size: var(--rl-meta-xs);
+  letter-spacing: var(--rl-tracking-meta);
+  text-transform: uppercase;
+  color: var(--rl-faint);
+}
+
+/* ============================================================================
+   14. MARQUEE
+   Must carry real information — real logos, real sources. Never filler words.
+   ========================================================================= */
+
+.rl-marquee {
+  position: relative;
+  overflow: hidden;
+  /* The edge fade. mask-image beats two gradient overlays: an overlay has to
+     know the band colour, so it breaks the moment the section moves.
+
+     THE ONE COMMENTED EXCEPTION TO RULE 1 in this file. The #000 here is not a
+     colour — in a mask it is an alpha value meaning "fully opaque", and it
+     renders nothing. It cannot be tokenised without making the token lie about
+     what it is. A rule-1 grep will flag this line; this comment is the answer.
+     If a second consumer appears, that is a missing token, not an exception. */
+  mask-image: linear-gradient(to right, transparent, #000 96px, #000 calc(100% - 96px), transparent);
+}
+.rl-marquee__track {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  width: max-content;
+  animation: rl-marquee 42s linear infinite;
+}
+.rl-marquee:hover .rl-marquee__track {
+  animation-play-state: paused;
+}
+@keyframes rl-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }   /* requires the track duplicated once */
+}
+
+/* ============================================================================
+   15. MOTION
+   One reveal recipe, used everywhere. See references/motion.md.
+   ========================================================================= */
+
+.rl-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--rl-dur-reveal) var(--rl-ease-out),
+    transform var(--rl-dur-reveal) var(--rl-ease-out);
+}
+.rl-reveal[data-revealed='true'] {
+  opacity: 1;
+  transform: none;
+}
+/* Stagger by index: style={{ '--rl-i': i }}. Cap the index at 6 — beyond that
+   the last item waits over half a second and the group stops reading as a group.
+   The `, 0` fallback is not decorative: an undefined custom property voids the
+   WHOLE declaration, so without it a missing --rl-i kills transition-delay
+   silently. See pitfalls.md §2. */
+.rl-reveal[style*='--rl-i'] {
+  transition-delay: calc(var(--rl-i, 0) * var(--rl-stagger));
+}
+
+/* ============================================================================
+   16. FOCUS
+   Rings must not inherit a hover transition — a ring that fades in over 320ms
+   reads as lag. Every interactive element gets this at BUILD time.
+   ========================================================================= */
+
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--rl-accent);
+  outline-offset: 2px;
+  border-radius: var(--rl-r-sm);
+  transition: none;
+}
+
+::selection {
+  background: var(--rl-accent-wash);
+  color: var(--rl-ink);
+}
+
+/* ============================================================================
+   17. REDUCED MOTION
+   Ambient motion stops. Auto-advancing content must resolve to a static FULL
+   state, not a frozen partial one — a reveal stuck at opacity 0 is a blank page.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-marquee__track,
+  .rl-dot--live {
+    animation: none;
+  }
+  .rl-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
