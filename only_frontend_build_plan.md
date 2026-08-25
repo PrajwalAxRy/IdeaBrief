@@ -673,6 +673,163 @@ session needs.
 - Decision: …
 -->
 
+### `#verification` deleted — the page closes on the ask — 2026-08-25
+
+Not a numbered phase, and it lands the same day as the entry below it. The
+owner's instruction was to remove the verification section outright and keep the
+"try it on your idea" panel at its foot. **The entry below is now history: the
+source ledger it describes shipped and was removed within the hour.** Read it
+for why the four stat cards were wrong, not for what is on the page.
+
+`ClosingCta` (`components/landing/closing-cta.tsx`) is what is left — one panel,
+one button, back up to the composer at `#start`. `/` still alternates dark →
+warm → dark → warm and still closes on paper.
+
+- **Decision: the page no longer *states* the trust argument, and that is
+  survivable, because pillar 02 *performs* it.** `ValidateSession` resolves four
+  claims to VERIFIED on screen, discards one nothing supports, and its `proof`
+  line reads `No score, no verdict, no fake percentage`. What is genuinely lost
+  is the *breadth* claim — the crawl manifest was the only element on the page
+  showing sources spread across the web, and nothing replaces it. Flagged, not
+  fixed: re-adding it would be re-adding the section.
+- **`FOOTER`'s four `#verification` links now point at `#how-it-works`.** The
+  anchor they used to reach no longer exists, and a footer link to a missing
+  anchor is a link that silently does nothing. The retarget is not a fallback:
+  `PILLARS[1].proof` is the *Not a score / Not a verdict / Not a gate* column
+  stated in one line by the section it now points at.
+- **The panel flipped from recessed to lifted.** `--ob-void` with no shadow was
+  correct while it was the one pressed-in object among cards that lifted off the
+  paper; with nothing else on the band it was just the last thing on the page,
+  sunk into it. Now `--ob-surface` at `--ob-lift-2`. **Not lift 3** — §12C
+  reserves that for the composer, and this is a link back up to that composer;
+  the destination outranks the sign pointing at it.
+- **Band padding 120px → 96px**, back to the documented floor. 120 was bought
+  when the section grew an `--ob-h1` headline and a five-part card. One panel at
+  120 reads as a section that lost its content, which is exactly what a reader
+  must not notice.
+- **Deleted, not left dead:** `components/landing/verified-strip.tsx`;
+  `VERIFIED_STRIP` (its `label`, `headline`, `lead`, `kicker`, `meter`, `ledger`
+  and `rail`) and the `LedgerRow` type; the CSS recipes `.ob-vstrip-head`, the
+  whole `.ob-ledger-*` family, `.ob-web-*`, `.ob-vstrip-bar` / `-seg` and
+  `.ob-chip-discarded`. `.ob-vstrip` → `.ob-closing` and `.ob-vstrip-cta` →
+  `.ob-closing-panel` are the two survivors, renamed because the name they
+  carried referred to a section that no longer exists.
+- **The section carries no `id`.** `id="verification"` existed for the four
+  footer links; none survive, and an anchor named after a deleted argument is
+  worse than no anchor. `aria-labelledby` points at the panel's own heading.
+- **Decision: `31 pages · 9 discarded` stays in `VALIDATE_SESSION.footnote`, and
+  the test that pins it changed its reason.** Those numbers tied pillar 02 to
+  the verification section — `EVIDENCE_DEMO`, then `VERIFICATION_COUNTERS`, then
+  `VERIFIED_STRIP`, all three now deleted — so the tie has no second end. The
+  assertion stays because that footnote is now the only place the landing page
+  states the scale of a run at all. Test renamed from *keeps the dental thread
+  continuous with the verification section* to *states the scale of a run in its
+  footnote*, with the history in its comment.
+- **No client component left in the section.** The two `CountUp` numerals went
+  with the ledger's footer; `ScrollReveal` is the only client component below the
+  pillars now.
+- **Verified.** Read at 1440 and 1280. Typography audit `offScale: []`,
+  `offLead: []` across `.ob-closing` at both widths. No dead in-page anchor left
+  on `/` (every footer `href^="#"` resolves), and `#verification` is gone from
+  the DOM. Zero console errors. `npm test` 230 passing, `npm run build` clean.
+
+### Source ledger — `#verification` rebuilt as the mechanism — 2026-08-25 (superseded same day)
+
+Not a numbered phase. A user-requested ground-up redesign of the second warm
+band on `/` — `VerifiedStrip` — on the brief "capture the essence that all the
+output is verified and validated across the web," with copy and structure
+explicitly in scope. No schema, seam, route, fixture or app page touched. The
+three seams are untouched; `lib/content/landing.ts` is still static site copy
+imported directly, as it has always been.
+
+**The diagnosis.** The section was four counters — `31 pages fetched · 47
+excerpts extracted · 9 failed the match · 38 in your report` — and two of them
+were wrong in the same way. First, every one of those is a *count of the
+mechanism*, and none of them is the mechanism: the section whose entire subject
+is not taking claims on trust was asking the reader to take four numbers on
+trust. Second, it never said **web** anywhere. Four counters describe a process
+that could equally have run against one PDF on someone's desktop, and "across
+the web" is half the claim the product actually makes. It also had no headline
+— it opened on a 12px mono word while every other section on the page opens on
+display type — so it read as a footnote to the pillars rather than as the page's
+closing argument.
+
+**What it is now.** Three movements on the same band.
+
+1. **A head with a voice.** Mono eyebrow, an `--ob-h1` headline (*"Every line
+   traces to a page on the open web."*), and the lead moved into a right-hand
+   column so the claim and its qualification sit on one line of the page.
+2. **The source ledger** — the centrepiece, and a fragment card (`.ob-frag-bar`
+   reused verbatim; this *is* a code-drawn product surface). Four report
+   sentences on the left, the page each was matched against on the right, and
+   the matched span underlined **inside the quote** by a rule that draws itself
+   as the row arrives. One of the four matched nothing: struck out, no citation
+   number, `DISCARDED`, and routed to `→ open question 02` on screen. The
+   discard policy is demonstrated rather than promised, which is the skill's
+   proof/mechanic pattern.
+3. **The crawl manifest** — sixteen hostnames and `+15 more`, mono, `--ob-dim`,
+   no borders. This is the *only* element on the page that shows the sources are
+   spread across the web. Bordered chips were rejected deliberately: they turn a
+   list of what was read into a partner wall, which is a claim the product is
+   not making.
+
+The four counts survive as the ledger's header (`31 pages read · 47 excerpts
+pulled`) and its footer (two figures and the partition bar). That is the rank
+they always deserved — a summary of the mechanism, not the mechanism.
+
+- **Decision: the ledger is pillar 02's run, not a new one.** Its four claims
+  are `VALIDATE_SESSION.rows` verbatim, its citation numbers are those rows'
+  `EV_` suffixes (`EV_04` → `[4]`, the same derivation `lib/citations.ts`
+  performs), its discarded row is that section's `open` row carrying the same
+  `→ open question 02` note, and three of its domains belong to the three
+  invented competitors in `VALIDATE_SESSION.competitors`. Pillar 02 shows rows
+  resolving to VERIFIED; this shows what each resolved *against*. Written into
+  the doc comment on `VERIFIED_STRIP` so the next editor knows the two files
+  have to move together.
+- **Decision: `31 / 47 / 9 / 38` are still frozen.** Same tie to
+  `VALIDATE_SESSION.footnote`, same `47 − 9 = 38`. `rail.domains.length +
+  rail.hidden` is now a third constraint that has to equal `meter.read`.
+- **Deviation: the band went 96px → 120px.** 96 was the documented floor and it
+  was right for a strip that was "short". It is a section now — an `--ob-h1`
+  headline and a five-part card — and at the floor it crowded the pillars above
+  it. 120 is the tight-pairing value, not the 160 standard: this and the
+  composer band are still one argument delivered twice.
+- **The verification underline is a `background-image`, not a positioned
+  child.** An absolutely positioned rule inside an inline element breaks the
+  moment the match wraps to a second line, which at this measure it does;
+  `box-decoration-break: clone` restarts the gradient on the second line.
+  `box-shadow` was not an option — the system bans it. **Two hours were nearly
+  lost to the `<mark>` reset:** the UA yellow is a `background-color`, and a
+  `background-image` does *not* override one, it paints on top of it. The
+  highlight rendered fully yellow with a correct 2px accent hairline underneath
+  and looked like a styling choice rather than a missing reset.
+- **The discarded row says its state in tokens, never in `opacity`.** §12A's
+  rule: this band is `.ob-warm`, and 0.4 white on cream is a smear, not a dimmed
+  row. `--ob-discard` plus a strike, and no red anywhere — a dropped excerpt is
+  a non-event, not the reader's error.
+- **The footer's summary line moved from mono to sans.** `38 of 47 excerpts
+  survived the check` has a verb in it, and the metadata layer never carries a
+  sentence. A mono string that reads as prose is always a sign it is in the
+  wrong tier.
+- **Deleted rather than left dead:** `.ob-vstrip-grid`, `.ob-vstrip-card`,
+  `.ob-vstrip-figure`, `.ob-vstrip-value`, `.ob-vstrip-label`,
+  `.ob-vstrip-claim`, `.ob-vstrip-legend`, `.ob-vstrip-key`, and the
+  `VerifiedCard` type. `.ob-vstrip`, `.ob-vstrip-bar`, `.ob-vstrip-seg` and
+  `.ob-vstrip-cta` survive and are reused by the new footer.
+- **Still a Server Component**, and still two client leaves — the same two
+  `CountUp` numerals. Everything else, the four staggered rows, the four
+  underlines drawing themselves and the two meter segments growing, is a CSS
+  transition keyed to the `data-shown` `ScrollReveal` already sets.
+- **Verified, not eyeballed.** Read at 1440 and 1280. The typography audit
+  reports `offScale: []` and `offLead: []` across the section at both widths;
+  no hardcoded colour and no undefined custom property in the new region (the
+  only unresolved `var()` is `--ob-seg`, which is set inline from the content
+  because the proportion is data). Under `prefers-reduced-motion` the section
+  resolves to its full static state, not a frozen partial one: all four rows
+  `data-shown="true"`, all three underlines at `100% 2px`, both segments at
+  `scaleX(1)`, both counters at their final values. `npm test` 230 passing,
+  `npm run build` clean.
+
 ### Paper — the warm bands get their own depth — 2026-08-25
 
 Not a numbered phase. A user-requested redesign of the two light sections on
