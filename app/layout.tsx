@@ -1,3 +1,4 @@
+import { AccountProvider } from '@/components/account/account-provider';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/globals.css';
@@ -72,10 +73,32 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * `AccountProvider` is the one thing this layout adds beyond `<html><body>`.
+ *
+ * It is `'use client'`, and mounting it here does **not** pull the tree into
+ * the client bundle: `{children}` arrives as an already-server-rendered prop,
+ * the identical mechanism `app/r/[slug]/layout.tsx` uses for
+ * `EvidenceProvider`. A client boundary marks where that file's own code runs,
+ * not where server rendering stops.
+ *
+ * It reads `localStorage`, so it is `unknown` on the server and on the first
+ * client render and widens in a `useLayoutEffect` — R24's prescribed shape. See
+ * its docstring; getting this wrong is what made the server render a Report
+ * while the client silently regenerated the Console.
+ *
+ * There is deliberately **no `<head>`** and no inline pre-hydration script. The
+ * zero-flash recipe in the Next docs would need one, plus
+ * `suppressHydrationWarning` on `<html>`, and it carries a Strict-Mode dev trap
+ * where React remounts and resets the element's attributes. The layout effect
+ * flushes before paint, which is enough.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AccountProvider>{children}</AccountProvider>
+      </body>
     </html>
   );
 }

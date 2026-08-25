@@ -13,8 +13,10 @@
    a layout utility at the call site can still override it, which is the whole
    contract between the two.
 
-   Import order is tokens → obsidian (landing) → obsidian-app (app). The last
-   two share one layer, so source order decides ties.
+   Import order is tokens → obsidian (landing) → obsidian-app (app) →
+   obsidian-account (the A20–A25 account surfaces). They share one layer, so
+   source order decides ties, and account comes last of the three permanent
+   sheets deliberately: it is the newest and the least entitled to win one.
 
    **`components.css` is gone.** A15 deleted it: 1843 lines of Deep Canopy, the
    forest-green system Obsidian replaced. Before deleting, every `var(--…)` that
@@ -24,6 +26,7 @@
    which A14 had already rewritten onto Obsidian. */
 @import "./obsidian.css" layer(components);
 @import "./obsidian-app.css" layer(components);
+@import "./obsidian-account.css" layer(components);
 
 /* Experiment-only, and last so it can lean on the two above. `/experiment`
    compares two candidate replacements for pillar 03's static fragment; when

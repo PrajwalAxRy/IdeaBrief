@@ -1,0 +1,122 @@
+/* ============================================================================
+   OBSIDIAN — ACCOUNT SURFACES. Recipes for `/sign-in`, `/runs`, `/account` and
+   `/pricing`: the surfaces added by A20–A25 (see `accounts_build_plan.md`).
+
+   **Why a fourth stylesheet and not a §17 in `obsidian-app.css`.** That file's
+   header states its sixteen sections "never shift and are never renumbered;
+   each is owned by exactly one phase", and §16 (REDUCED MOTION) is its
+   terminator — the completeness diff §16's own comment depends on reads the
+   motion block as the end of the file. A §17 after it breaks that diff. The
+   `roadmap-experiment.css` precedent is the shape a fourth sheet takes: its own
+   header, one documented prefix, prefixed keyframes.
+
+   **The prefix stays `ob-`.** `roadmap-experiment.css` could use `rx-` because
+   it is deletable and wanted to be one grep from gone; these recipes ship, so
+   they are Obsidian recipes and are named like them. The deletability signal
+   that file relies on is therefore unavailable here — this header is it.
+
+   **Keyframes here are prefixed `ob-acct-`.** `obsidian.css` uses bare `ob-*`
+   and `obsidian-app.css` uses `ob-app-*`. A duplicate `@keyframes` name is
+   silently *replaced* rather than merged, across every route, with no error —
+   and this file imports last of the three permanent sheets, so it would be the
+   one doing the replacing.
+
+   Imported into `@layer components` from `globals.css`, like every other recipe
+   stylesheet — `references/pitfalls.md` §1. Unlayered, a single
+   `.ob-auth { margin: 0 }` would silently beat every Tailwind spacing utility
+   on the same element, which has zeroed this app's spacing three times.
+
+   Colour values: none. Type sizes: none. Every one is a token from
+   `tokens.css` (standing rules 2 and the A19 scale rule).
+
+   SECTIONS — fixed, never renumbered, one owner each:
+     §1  SHELL              A20   page containers and the backdrop guard
+     §2  FORM               A21   labels, rows, hints, errors
+     §3  AUTH               A21   method buttons, the divider, the modal
+     §4  ACCOUNT & RUNS     A23/A24  the nav slot, rows, the runs destination
+     §5  REDUCED MOTION     with whatever first animates
+   ============================================================================ */
+
+/* ============================================================
+   §1 — SHELL                                              (A20)
+   ============================================================ */
+
+/* **`position: relative; z-index: 1` is load-bearing, not decoration**, and it
+   goes on every one of these in their first commit rather than in a later
+   sweep.
+
+   `AppBackdrop` renders as a *sibling* of the page container inside `main`, and
+   it is `position: fixed; z-index: 0`. A positioned element with `z-index: 0`
+   paints at step 6 of its stacking context; static in-flow text paints at step
+   5. Without this rule the backdrop paints **over every static word on the
+   page**, while absolutely-positioned children survive because they are
+   positioned too and come later in tree order.
+
+   `.ob-roadmap` (obsidian-app.css §12) carries the same rule and the same
+   comment, and was for a long time the only container that did — which is why
+   `.ob-report`, `.ob-define`, `.ob-sources` and `.ob-explorer` shipped with the
+   defect live. A20 fixes those four in place; these four are simply born
+   correct.
+
+   The failure is invisible until a backdrop asset exists, which is exactly how
+   it shipped. `z-index: -1` on the backdrop is not the alternative:
+   `globals.css` records that it must stay above the body background. */
+.ob-auth,
+.ob-pricing,
+.ob-runs,
+.ob-account {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   §2 — FORM                                               (A21)
+   ------------------------------------------------------------
+   Empty until A21. Labels are sentence-case `--ob-sm` in `--ob-muted`,
+   deliberately NOT `.ob-brief-label` / `.ob-field-label`, which are mono and
+   uppercase and read as data-field keys rather than as things you type into.
+
+   The error treatment is settled and is not a new token: reuse
+   `.ob-error-panel`'s surface + 2px `--ob-accent` left border. There is no red
+   in this system, and `--ob-discard` is documented as "never red; a non-event,
+   not an error" — at 4.7:1 it reads as *stopped mattering*, not *fix this*.
+   A14 already justified that blue as the live/active job.
+   ============================================================ */
+
+/* ============================================================
+   §3 — AUTH                                               (A21)
+   ------------------------------------------------------------
+   Empty until A21. Note for whoever fills it: the auth modal cannot use
+   `.ob-modal`'s z-index. Measured stack today —
+
+     70  .ob-skip
+     60  .ob-nav · .ob-evidence-overlay
+     52  .ob-popover · .ob-tooltip
+     51  .ob-drawer · .ob-modal
+     50  .ob-overlay · the run header
+
+   so a modal at 51 renders *under* an open evidence overlay and under the
+   landing nav. Do not raise `.ob-modal` globally — that silently changes its
+   relationship to `.ob-drawer`. A variant at 62 over a scrim at 61 clears both
+   60s and stays under the skip link, which is highest on purpose (R19).
+   ============================================================ */
+
+/* ============================================================
+   §4 — ACCOUNT & RUNS                                (A23 / A24)
+   ------------------------------------------------------------
+   Empty until A23. The nav slot must reserve its own width while the account
+   state is `unknown` (standing rule 12 — no layout shift), and `.ob-nav-inner`
+   condenses to `max-width: 940px` on scroll, so the crowded state to measure is
+   the *scrolled* one at 1280.
+   ============================================================ */
+
+/* ============================================================
+   §5 — REDUCED MOTION
+   ------------------------------------------------------------
+   Empty because nothing in §1–§4 animates yet. It lands in the same session as
+   the first thing that does (standing rule 16).
+
+   When it does: assert `animationName === 'none'`, never just the end state.
+   `obsidian.css` §16's universal `*` blanket crushes every duration to 0.001ms
+   whether or not a rule here applied, and has hidden three dead rules that way.
+   ============================================================ */
