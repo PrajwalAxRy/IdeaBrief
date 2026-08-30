@@ -1,5 +1,4 @@
 import {
-  VALIDATE_SCAN_MS,
   VALIDATE_SESSION,
   VALIDATE_STAGE_MS,
   VALIDATE_VERIFY_MS,
@@ -10,7 +9,7 @@ import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
 import { Check, ChevronRight, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const { bar, stages, chart, stats, competitors, rows, footnote, scan } = VALIDATE_SESSION;
+const { bar, stages, chart, stats, competitors, rows, footnote } = VALIDATE_SESSION;
 
 /* ------------------------------------------------------------ geometry --- */
 
@@ -81,18 +80,22 @@ const FIRST_STRIP_UNDER_FIELD = 1;
  * How long into the model beat the callout arrives.
  *
  * The beat builds in the order the figure would be drawn by hand: the line
- * (1500ms to draw), the head landing on it (1420ms), the cone wiping open from
- * that head (1620ms + 720ms, both in CSS), then this pane. 2460 sits after the
- * cone has finished drawing and still leaves the 3900ms beat enough room for the
- * figures to count up — the count is 1150ms and the entrance 760ms, so it lands
- * with ~270ms to spare. Slide the cone and this has to slide with it.
+ * (760ms to draw), the head landing on it (720ms), the cone wiping open from
+ * that head (820ms + 380ms, both in CSS), then this pane. 1240 sits after the
+ * cone has finished drawing and still leaves the 1850ms beat enough room for the
+ * figures to count up — the slowest stat is 540ms, so it lands with ~70ms to
+ * spare. Slide the cone and this has to slide with it.
+ *
+ * Every number here halved when the scene was compressed under 6s; the ORDER
+ * and the overlaps are unchanged, which is why the beat still reads as drawn
+ * rather than assembled.
  *
  * **It is a timer here rather than a `transition-delay` in CSS because it gates
  * the COUNT as well as the entrance.** The count-up runs off this flag; left on
  * `lit`, it would run while the pane was still invisible and the pane would
  * arrive already showing $84k.
  */
-const CALLOUT_ENTER_MS = 2460;
+const CALLOUT_ENTER_MS = 1240;
 
 const STAGE_HOLD: Record<Stage, number | null> = {
   wake: VALIDATE_STAGE_MS.wake,
@@ -150,7 +153,6 @@ export function ValidateSession() {
   const [resolved, setResolved] = useState(0);
   const [runId, setRunId] = useState(0);
   const [calloutIn, setCalloutIn] = useState(false);
-  const [scanDone, setScanDone] = useState(false);
 
   const playing = inView && !reduced;
   /* Drives the timer chain: where the run actually is. */
@@ -170,16 +172,10 @@ export function ValidateSession() {
   const settled = at >= 2;
   const stripsBehind = at >= 3;
   /* The competitors are the LAST plane and the final state — they arrive at
-     `field`, in front of everything, and never recede. They only arrive once
-     the scan card has finished filling; `fielded` alone would show them the
-     moment the strips recede, with nothing having "analysed" anything. */
+     `field`, in front of everything, and never recede. A scan card used to sit
+     between the strips receding and the panes landing, filling a bar for five
+     seconds; it is deleted, so the panes now open the beat themselves. */
   const fielded = at >= 3;
-  /* The scan card stays up for the whole field beat — it is what the field
-     lands ON, not a placeholder that gets swapped out. `scanning` only gates
-     the caption and the bar's read: true while the bar is still filling,
-     false once it has landed so the caption can hand off to `field`/`rest`. */
-  const scanning = fielded && !scanDone;
-  const cardsShown = fielded && scanDone;
   const done = at >= 4;
   const shown = reduced ? rows.length : resolved;
 
@@ -205,24 +201,6 @@ export function ValidateSession() {
     const timer = window.setTimeout(() => setCalloutIn(true), CALLOUT_ENTER_MS);
     return () => window.clearTimeout(timer);
   }, [playing, lit, reduced]);
-
-  /* The scan card fills its bar for `VALIDATE_SCAN_MS` at the start of `field`,
-     then the real cards take over. Mirrors `calloutIn` above: gated on `at`
-     rather than `stage` so it resets the instant the field beat is left behind
-     (a replay, or scrolling past), not just when it is first entered. */
-  useEffect(() => {
-    if (reduced) {
-      setScanDone(true);
-      return;
-    }
-    if (at < 3) {
-      setScanDone(false);
-      return;
-    }
-    if (!playing) return;
-    const timer = window.setTimeout(() => setScanDone(true), VALIDATE_SCAN_MS);
-    return () => window.clearTimeout(timer);
-  }, [playing, at, reduced]);
 
   useEffect(() => {
     if (!playing) return;
@@ -323,15 +301,8 @@ export function ValidateSession() {
           />
         ))}
 
-        {/* The scan card sits behind the row it hands off to — same footprint,
-            same glass — and stays put for the whole field beat rather than
-            dissolving out. The three cards arrive ON TOP of it once it has
-            filled, which is what "hands off" means here: they cover it, they
-            don't replace it. */}
-        <ScanCard shown={fielded} label={scan.label} />
-
         {competitors.map((c, i) => (
-          <Pane key={c.name} competitor={c} i={i} shown={cardsShown} />
+          <Pane key={c.name} competitor={c} i={i} shown={fielded} />
         ))}
       </div>
 
@@ -343,11 +314,8 @@ export function ValidateSession() {
           ) : (
             <span className="ob-dot" aria-hidden="true" />
           )}
-          <span
-            className="ob-meta ob-vf-stage"
-            key={scanning ? stages.scanning : stages[shownStage]}
-          >
-            {done ? bar.done : scanning ? stages.scanning : stages[shownStage]}
+          <span className="ob-meta ob-vf-stage" key={stages[shownStage]}>
+            {done ? bar.done : stages[shownStage]}
           </span>
         </span>
 
@@ -505,7 +473,7 @@ function Curve({ lit, receded }: { lit: boolean; receded: boolean }) {
  * occlusion lives on the strip in front of it.
  */
 function Callout({ shown, receded }: { shown: boolean; receded: boolean }) {
-  const v = useCountUp(peak, shown && !receded, 1150);
+  const v = useCountUp(peak, shown && !receded, 520);
   return (
     <div className="ob-vf-callout" data-in={shown}>
       {/* Drifts with the strips (`--d: 5`), not on its own phase — the first
@@ -545,45 +513,10 @@ function Stat({ stat, run }: { stat: (typeof stats)[number]; run: boolean }) {
   );
 }
 
-/**
- * Stands in for the whole card row while it "runs" — same footprint, same
- * glass — and then keeps standing there once the three real cards land. It is
- * the surface the field beat is built on, not a placeholder for it.
- *
- * The bar's fill and the percentage next to it are driven by the same
- * `useCountUp` value, so they can never drift against each other. It is blue
- * rather than the muted grey `.ob-vf-bar` uses on the cards themselves: those
- * bars report a static fact (coverage), this one reports a live state
- * (analysis in progress), and blue's job here is exactly that — live/active,
- * one of its three.
- *
- * `shown` is `fielded`, not `scanning` — this card enters once at the start of
- * the field beat and stays in until the beat itself ends (a replay, or
- * scrolling past). The three competitor panes render after it in the tree, so
- * once they land they simply paint over it — see the "tree order is z-order"
- * note on `ValidateSession`'s volume.
- */
-function ScanCard({ shown, label }: { shown: boolean; label: string }) {
-  const pct = useCountUp(100, shown, VALIDATE_SCAN_MS);
-  const done = pct >= 100;
-  return (
-    <div className="ob-vf-scan" data-in={shown}>
-      <div className="ob-vf-bob ob-vf-glass" style={{ '--d': 2 } as React.CSSProperties}>
-        {!done && (
-          <>
-            <span className="ob-vf-scan-head">
-              <span className="ob-meta">{label}</span>
-              <span className="ob-vf-scan-pct">{Math.round(pct)}%</span>
-            </span>
-            <span className="ob-vf-scan-track">
-              <span style={{ '--w': `${pct}%` } as React.CSSProperties} />
-            </span>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
+/* `ScanCard` was here — a full-width glass card that filled a bar 0→100% over
+   five seconds at the start of the field beat, with the three competitor panes
+   landing on top of it once it finished. Deleted: the panes are the beat. Its
+   `.ob-vf-scan*` recipes went with it. */
 
 /**
  * A competitor — the evidence behind the conclusion at the same index, arriving

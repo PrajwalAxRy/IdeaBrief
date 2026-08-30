@@ -218,7 +218,7 @@ export const CHAT_SECTION = {
      section no longer has a head, and at `ob-h2` over a 760px composer the
      browser's own break lands where the design wants it. `eyebrow` went with
      the head — there is no `01 START HERE` overline any more. */
-  headline: 'It asks what a cofounder would.',
+  headline: 'Think out loud with your Cofounder.',
   /* `lead`, `transcriptLabel`, `seedsLabel`, `seeds` and `replayLabel` were
      deleted here rather than left as dead fields: the transcript card, its
      header bar and the seed-chip row are all gone from the section. The seeds
@@ -547,37 +547,59 @@ export const sessionTotalMs =
     Played in the order `wake → model → verify → field → rest`; that order lives
     in `STAGES` in the component, not in this object's key order. */
 export const VALIDATE_STAGE_MS = {
-  /** The lights come up on an empty volume, before anything is in it. */
-  wake: 700,
-  /** Line draws, cone opens, the callout and three figures count up. */
-  model: 3900,
-  /** Chart recedes; the assumptions land and each one resolves in turn. */
-  verify: 3900,
-  /** The conclusions recede; a scan card fills 0→100%, then three competitors
-      swing in on an arc, landing on top of it, and close the scene — the scan
-      card stays mounted underneath rather than exiting.
-      9600, not 7600: `VALIDATE_SCAN_MS` is 5000 — the bar needs to read as
-      genuinely working the field, not just clearing three seconds — and the
-      original 4600 for the three competitor panes (each carries three
-      drill-down metrics) is preserved in full after it rather than being
-      carved out of it. This pushes the whole card well past pillar 01's
-      ~14s pass; that "shorter than pillar 01" rule was a pacing preference,
-      not a hard limit, and loses to giving the scan real dwell time. */
-  field: 9600,
+  /** The lights come up on an empty volume, before anything is in it.
+      250, down from 700. It must stay ABOVE zero and the reason is not the
+      empty frame alone: `useInView` fires at `threshold: 0.25` on a 496px
+      scene, so the chain starts when only ~124px of it has crossed the
+      viewport edge, and at 0 the curve begins drawing while the scene is still
+      a quarter visible and moving. This is also the beat that guarantees the
+      unlit frame paints before `data-lit` flips — every entrance in the model
+      beat is a CSS transition, and a transition with no painted `from` state
+      snaps. (Measured: at 0 the transitions do still run, because React paints
+      before a zero-delay timer fires. That is a scheduling detail, not a
+      guarantee.) */
+  wake: 250,
+  /** Line draws, cone opens, the callout and three figures count up.
+      1850, was 3900. The beat's own CSS ends at 1780 (callout at 1240 + the
+      slowest stat count at 540), so this is that number plus a breath — cut it
+      further and the chart recedes while the figures are still counting. */
+  model: 1850,
+  /** Chart recedes; the assumptions land and each one resolves in turn.
+      1750, was 3900. The four rows resolve at 520/800/1080/1360 nominally —
+      see `VALIDATE_VERIFY_MS` — but **the arithmetic understates it**. Each row
+      is a `setTimeout` that fires, sets state, re-renders and only then
+      schedules the next, so React's effect chain adds ~40ms per row: measured,
+      the fourth row lands at ~1520, not 1360. At an earlier 1550 the last row
+      resolved on the exact frame the competitors began landing on top of it.
+      The margin here is deliberate; `validate-session.test.ts` asserts the
+      nominal sequence fits, which is necessary but not sufficient. */
+  verify: 1750,
+  /** The conclusions recede and three competitors swing in on an arc, landing
+      on top of them and closing the scene.
+      2000, was 4600 (and 9600 before that, when a scan card filled a bar for
+      5000ms ahead of the panes). Each pane swings in over 560ms, 120ms after
+      the one before it, then staggers its own three drill-down metrics — the
+      last one lands at 1020, leaving ~800ms before the caption reads
+      `Analysis complete`. 200ms of what this gave up went to `verify`, which
+      needed the margin more; the rest is the buffer that keeps the MEASURED
+      pass under 6s. Nominal 5650 measures ~5760 — every stage boundary is a
+      `setTimeout` that fires, sets state and re-renders, so the chain runs
+      ~110ms long. Budget against the measurement, not the sum.
+      **That is not the reading time and does not have to be.** `rest` is
+      terminal and holds forever, so the reader has as long as they like with
+      the three cards; this number only decides when the scene stops narrating.
+      That is why the field beat compresses further than its content would
+      otherwise allow. */
+  field: 1800,
 } as const;
 
 /** Inside the verify stage: the settle after the stack lands, then one row
     resolving per beat. Was `collapse` when the competitive field ran first and
     its cards folded into these rows; nothing collapses into them now. */
-export const VALIDATE_VERIFY_MS = { settle: 1000, row: 640 } as const;
+export const VALIDATE_VERIFY_MS = { settle: 520, row: 280 } as const;
 
-/** Inside the field stage, before the cards: one shared scan card fills its
-    bar 0→100%, then the three competitor cards land on top of it — it stays
-    mounted underneath, covered rather than replaced. Kept alongside
-    `VALIDATE_VERIFY_MS` rather than as a component constant since it also has
-    to be reflected in `VALIDATE_STAGE_MS.field` above — a single source of
-    truth for a number that lives in two places. */
-export const VALIDATE_SCAN_MS = 5000;
+/* `VALIDATE_SCAN_MS` was here. The scan card it timed is deleted — the three
+   competitor panes now land the moment the field beat opens. */
 
 export type ValidateRow = {
   /** Evidence id, or an em-dash pair where there is nothing to cite. */
@@ -621,12 +643,7 @@ export const VALIDATE_SESSION = {
     /* Only ever shown if `done` is somehow false at rest; the caption swaps to
        `bar.done` there. Kept honest anyway. */
     rest: 'Competitive field',
-    /* Transient: shown only while the scan card's bar is filling, at the
-       start of `field`, then swapped for `field` above once cards land. */
-    scanning: 'Scanning competitors',
   },
-  /** The scan card's own label, shown above its bar while it fills. */
-  scan: { label: 'Analysing competition' },
   chart: {
     label: 'Projected revenue',
     /** $k/mo, months 1–12. */
@@ -641,11 +658,13 @@ export const VALIDATE_SESSION = {
     caption: 'Month 12 · P50',
     ticks: ['M1', 'M4', 'M8', 'M12'],
   },
-  /** Count up alongside the callout, each landing on its own beat. */
+  /** Count up alongside the callout, each landing on its own beat. The three
+      `ms` are staggered rather than equal so the column settles top-to-bottom;
+      the slowest sets how long the model beat has to stay open. */
   stats: [
-    { label: 'TAM', prefix: '$', value: 2.4, decimals: 1, suffix: 'B', ms: 900 },
-    { label: 'CAC', prefix: '$', value: 310, decimals: 0, suffix: '', ms: 1080 },
-    { label: 'Payback', prefix: '', value: 4.1, decimals: 1, suffix: ' mo', ms: 1260 },
+    { label: 'TAM', prefix: '$', value: 2.4, decimals: 1, suffix: 'B', ms: 420 },
+    { label: 'CAC', prefix: '$', value: 310, decimals: 0, suffix: '', ms: 480 },
+    { label: 'Payback', prefix: '', value: 4.1, decimals: 1, suffix: ' mo', ms: 540 },
   ],
   /** Invented. Index-aligned with `rows` — card `i` is the evidence behind
       row `i`, and lands in front of it. */

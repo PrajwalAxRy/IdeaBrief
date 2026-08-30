@@ -508,20 +508,9 @@ body::before {
   font-size: var(--ob-body);
 }
 
-/* The nav CTA is held back until the hero's primary button has scrolled away,
-   so only one filled button is ever on screen at once. */
-.ob-nav-cta {
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
-}
-
-.ob-nav[data-past-hero="true"] .ob-nav-cta {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-}
+/* The nav's account link is permanent. It used to be a `Start` CTA held back
+   until the hero's primary had scrolled away, so only one filled button was
+   ever on screen; as `Sign In` it is not a CTA and has nothing to yield to. */
 
 /* Wordmark. The tracking is a literal and stays one: this is a brand mark
    being tightened, not a text step. `--ob-tracking-fig` happens to hold the
@@ -1524,7 +1513,7 @@ body::before {
   inset: -14% -6%;
   z-index: 0;
   opacity: 0;
-  transition: opacity 1400ms var(--ob-ease);
+  transition: opacity 760ms var(--ob-ease);
   pointer-events: none;
 }
 
@@ -1591,7 +1580,7 @@ body::before {
   height: 34%;
   background: var(--ob-bloom-focus);
   opacity: 0;
-  transition: opacity 1100ms var(--ob-ease);
+  transition: opacity 700ms var(--ob-ease);
   transform: translate3d(calc(var(--mx, 0) * -16px), calc(var(--my, 0) * -10px), 0);
   animation: ob-vf-swim-d 37s ease-in-out infinite alternate;
 }
@@ -1775,7 +1764,11 @@ body::before {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   filter: drop-shadow(0 0 7px var(--ob-accent-glow));
-  transition: stroke-dashoffset 1500ms var(--ob-ease);
+  /* 760, was 1500. The whole scene was compressed to fit under 6s, and this
+     draw was the single longest transition in it — and one of four that sat
+     outside `motion.md`'s 150–900ms structural band. Shortening it moved it
+     into the band rather than away from it. */
+  transition: stroke-dashoffset 760ms var(--ob-ease);
 }
 
 .ob-vf-curve[data-lit="true"] .ob-vf-line {
@@ -1788,7 +1781,7 @@ body::before {
   stroke-width: 1;
   stroke-dasharray: 3 5;
   opacity: 0;
-  transition: opacity var(--ob-base) var(--ob-ease) 700ms;
+  transition: opacity var(--ob-base) var(--ob-ease) 360ms;
 }
 
 /* Dashes, not the near-dots this was (0.013/0.013). `pathLength="1"` on the
@@ -1825,7 +1818,10 @@ body::before {
   transform-box: fill-box;
   transform-origin: left center;
   transform: scaleX(0);
-  transition: transform 720ms var(--ob-ease) 1620ms;
+  /* 380 after 820, was 720 after 1620. The delay is keyed to the line's draw:
+     it must start as the stroke reaches the head, so it stays just past the
+     760ms draw. */
+  transition: transform 380ms var(--ob-ease) 820ms;
 }
 
 .ob-vf-curve[data-lit="true"] .ob-vf-cone-wiper {
@@ -1840,7 +1836,10 @@ body::before {
   transform-box: fill-box;
   transform-origin: left center;
   transform: scaleX(0);
-  transition: transform 1500ms var(--ob-ease);
+  /* Tracks `.ob-vf-line` exactly — the wash is revealed by the same wipe that
+     draws the line, so these two numbers move together or the fill lags the
+     stroke. */
+  transition: transform 760ms var(--ob-ease);
 }
 
 .ob-vf-curve[data-lit="true"] .ob-vf-wiper {
@@ -1862,8 +1861,9 @@ body::before {
   box-shadow: 0 0 0 4px var(--ob-accent-wash), 0 0 16px 2px var(--ob-accent-glow);
   opacity: 0;
   transform: scale(0.3);
-  /* 1420, so the head lands as the line reaches it rather than ahead of it. */
-  transition: opacity var(--ob-base) var(--ob-ease) 1420ms, transform 520ms var(--ob-ease) 1420ms;
+  /* 720, so the head lands as the line reaches it rather than ahead of it. Was
+     1420 against a 1500ms draw; the draw is 760 now and this tracks it. */
+  transition: opacity var(--ob-base) var(--ob-ease) 720ms, transform 300ms var(--ob-ease) 720ms;
 }
 
 .ob-vf-curve[data-lit="true"] .ob-vf-head {
@@ -1892,7 +1892,12 @@ body::before {
   opacity: 0;
   filter: blur(14px);
   transform: translate3d(28px, -18px, -260px) rotateY(-13deg);
-  transition: opacity 760ms var(--ob-ease), filter 760ms var(--ob-ease), transform var(--ob-enter)
+  /* 520 on the transform rather than `var(--ob-enter)` (900). The token is
+     right for a page reveal and wrong here: this scene now runs four entrances
+     inside 5.85s, and a 900ms arrival is a third of a beat. Scene-local
+     numbers, NOT a retuned token — `--ob-enter` is used across the whole app
+     and nothing else here wants to be faster. */
+  transition: opacity 420ms var(--ob-ease), filter 420ms var(--ob-ease), transform 520ms
     var(--ob-ease);
   /* No `transition-delay` here any more. This pane is the LAST of the three
      things the model beat draws — line, cone, then the number — and its arrival
@@ -1972,74 +1977,10 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
-/* --- the scan card -------------------------------------------------------- */
-
-/* Same footprint as the three-card row it sits under — see `.ob-vf-pane`
-   below, whose `left`/`width`/`top` this reproduces as one box (200*3 +
-   13*2 = 626) rather than three. That is what makes the handoff read as one
-   object resolving: the scan card fills, and the cards that land on top of it
-   cover the exact space it occupies, rather than replacing it. It stays
-   mounted for the whole field beat — entrance only, same trigger as
-   `.ob-vf-pane` but no matching exit until the beat itself ends. */
-.ob-vf-scan {
-  position: absolute;
-  width: 626px;
-  left: 26px;
-  top: 240px;
-  opacity: 0;
-  filter: blur(16px);
-  transition: opacity 620ms var(--ob-ease), filter 620ms var(--ob-ease);
-}
-
-.ob-vf-scan[data-in="true"] {
-  opacity: 1;
-  filter: none;
-}
-
-.ob-vf-scan .ob-vf-glass {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-  padding: 0 28px;
-  height: 214px;
-  -webkit-backdrop-filter: blur(24px) saturate(120%);
-  backdrop-filter: blur(24px) saturate(120%);
-}
-
-.ob-vf-scan-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.ob-vf-scan-pct {
-  font-size: var(--ob-xs);
-  color: var(--ob-accent-bright);
-  font-variant-numeric: tabular-nums;
-}
-
-.ob-vf-scan-track {
-  display: block;
-  flex: none;
-  width: 100%;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--ob-glass-edge);
-  overflow: hidden;
-}
-
-/* Accent, not the muted grey `.ob-vf-bar` uses below: that bar reports a
-   static fact (coverage), this one reports a live state (analysis in
-   progress) — blue's job here is live/active, one of its three. */
-.ob-vf-scan-track > span {
-  display: block;
-  height: 100%;
-  width: var(--w);
-  background: var(--ob-accent-bright);
-  box-shadow: 0 0 8px var(--ob-accent-glow);
-}
+/* The `.ob-vf-scan*` recipes were here — a 626px glass card at `top: 240px`,
+   the three-pane row's exact footprint as one box, with a blue 0→100% bar. The
+   card is deleted along with its five-second beat; the panes below open the
+   field themselves. */
 
 /* --- the competitors ----------------------------------------------------- */
 
@@ -2067,9 +2008,9 @@ body::before {
   opacity: 0;
   filter: blur(16px);
   transform: translate3d(160px, -70px, -520px) rotateY(46deg) rotateZ(5deg);
-  transition: opacity 820ms var(--ob-ease), filter 820ms var(--ob-ease), transform var(--ob-enter)
+  transition: opacity 520ms var(--ob-ease), filter 520ms var(--ob-ease), transform 560ms
     var(--ob-ease);
-  transition-delay: calc(var(--i) * 190ms);
+  transition-delay: calc(var(--i) * 120ms);
 }
 
 /* The ENTRANCE keeps all of its depth — each card still swings in from -520px
@@ -2166,7 +2107,9 @@ body::before {
   transition: opacity var(--ob-base) var(--ob-ease), transform var(--ob-base) var(--ob-ease);
   /* Lands after its own pane has arrived, top to bottom, so the card is read as
      a card first and a list of findings second. */
-  transition-delay: calc(var(--i) * 190ms + var(--j) * 130ms + 520ms);
+  /* Tracks the pane stagger above it — `--i` must match `.ob-vf-pane`'s step or
+     a card's metrics start arriving before the card does. */
+  transition-delay: calc(var(--i) * 120ms + var(--j) * 80ms + 300ms);
 }
 
 .ob-vf-metric + .ob-vf-metric {
@@ -2231,9 +2174,12 @@ body::before {
   opacity: 0;
   filter: blur(13px);
   transform: translate3d(0, 26px, -230px) scale(0.93);
-  transition: opacity 720ms var(--ob-ease), filter 720ms var(--ob-ease), transform var(--ob-enter)
+  /* 420/520 and a 110ms step, was 720/900 and 210. Four strips at the old
+     stagger took 1770ms to finish landing, which no longer fits a 1550ms
+     verify beat — and the rows have to resolve INSIDE that beat. */
+  transition: opacity 420ms var(--ob-ease), filter 420ms var(--ob-ease), transform 520ms
     var(--ob-ease);
-  transition-delay: calc(var(--i) * 210ms + 240ms);
+  transition-delay: calc(var(--i) * 110ms + 130ms);
 }
 
 /* Same deal as the panes: the focus-in from -230px keeps its depth, the landing
@@ -2270,7 +2216,7 @@ body::before {
      and the row turns into texture. */
   opacity: 0.55;
   filter: blur(4px);
-  transition-delay: calc(var(--i) * 150ms);
+  transition-delay: calc(var(--i) * 90ms);
 }
 
 .ob-vf-strip .ob-vf-glass {
@@ -2869,6 +2815,10 @@ body::before {
    further and the pair stops reading as cause and effect. */
 .ob-start-lede {
   margin-top: 32px;
+}
+
+.ob-start-headline-accent {
+  color: var(--ob-accent);
 }
 
 /* --- Preview runs — four finished briefs beside the composer ------------- */

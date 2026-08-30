@@ -76,7 +76,8 @@ export function CofounderChat() {
           <div>
             <ScrollReveal>
               <h2 id="chat-headline" className="ob-h1 max-w-[15ch]">
-                {CHAT_SECTION.headline}
+                Think out loud with your{' '}
+                <span style={{ color: 'var(--ob-accent)' }}>Cofounder.</span>
               </h2>
             </ScrollReveal>
 
@@ -215,7 +216,7 @@ function Composer() {
           type="button"
           className="ob-btn ob-btn-primary"
           onClick={submit}
-          disabled={!value.trim() || submitting}
+          disabled={submitting}
         >
           {submitting ? CHAT_SECTION.submittingLabel : CHAT_SECTION.submitLabel}
           <ArrowUpRight size={16} className="ob-arrow" aria-hidden="true" />

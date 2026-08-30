@@ -8,22 +8,18 @@ import { useEffect, useState } from 'react';
 /**
  * Transparent over the hero, condensing into a bordered pill on scroll.
  *
- * The primary CTA is deliberately withheld until the hero's own primary button
- * has scrolled away — the system allows exactly one filled button on screen at
- * a time, and this is how that rule survives a fixed header.
+ * The account link is permanent — it is not the page's CTA, so it never
+ * competes with the hero's one filled button and has nothing to wait for.
  */
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
-  const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
     let frame = 0;
 
     const read = () => {
       frame = 0;
-      const y = window.scrollY;
-      setScrolled(y > 24);
-      setPastHero(y > window.innerHeight * 0.72);
+      setScrolled(window.scrollY > 24);
     };
 
     const onScroll = () => {
@@ -40,7 +36,7 @@ export function SiteNav() {
   }, []);
 
   return (
-    <header className="ob-nav" data-scrolled={scrolled} data-past-hero={pastHero}>
+    <header className="ob-nav" data-scrolled={scrolled}>
       <div className="ob-nav-inner">
         {/* One glyph definition in the repo. A2 re-authored `LogoMark` and
             deliberately left this call site to A4 — this is that dedupe. */}
@@ -50,15 +46,14 @@ export function SiteNav() {
           <Link href={HERO.secondary.href} className="ob-btn ob-btn-bare">
             {HERO.secondary.label}
           </Link>
-          {/* **Ghost, not primary (A15).** Measured at 1440×900 and 1280×900,
-              this and the hero's `Start with an idea` were both in view at
-              once — two filled blue buttons saying the same thing, which is
-              rule 11's exact failure. The hero's is the page's one primary;
-              this is the persistent way back to it, so it takes the quieter
-              treatment and the eye keeps a single target. */}
+          {/* **Ghost, not primary (A15).** A filled button here would sit
+              alongside the hero's `Start with an idea` at 1440×900 and
+              1280×900 — two primaries on one screen, rule 11's exact failure.
+              Now that it says `Sign In` it is no longer a second CTA at all,
+              so it stays mounted rather than waiting out the hero. */}
           <span className="ob-nav-cta">
             <a href="#start" className="ob-btn ob-btn-ghost">
-              Start
+              Sign In
             </a>
           </span>
         </div>

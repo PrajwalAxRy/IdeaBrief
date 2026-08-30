@@ -20,13 +20,21 @@ describe('validate session — timing', () => {
   });
 
   it('runs long enough to read and short enough to sit through', () => {
-    /* Pillar 01's session lands at ~14s. Pillar 02 used to run shorter than
-       that on the theory that it's denser per beat, but the scan card needs
-       five real seconds to read as genuinely working the field rather than a
-       flicker, so this one now runs well past it. Both still play once and
-       rest, so neither is a loop the visitor has to escape. */
-    expect(validateTotalMs).toBeGreaterThan(9_000);
-    expect(validateTotalMs).toBeLessThan(19_000);
+    /* **6s is an owner-set ceiling, not a derived one**, and it is the binding
+       constraint on every duration in this scene — the CSS transitions were
+       compressed to fit it, not the other way round. It went 18.1s (scan card)
+       → 13.1s (card deleted) → 12.65s (`wake` 700→250) → 5.85s (this).
+
+       The floor is the real assertion. Below ~4s the beats stop being beats:
+       the model's line/cone/callout sequence alone needs 1.78s, and the four
+       assumption rows need 1.48s to resolve one at a time rather than as one
+       state change. A number under that means something got truncated.
+
+       Reading time is NOT what this bounds. `rest` is terminal and holds
+       forever, so the reader has unlimited time with the final frame; this
+       only measures how long the scene narrates. */
+    expect(validateTotalMs).toBeGreaterThan(4_000);
+    expect(validateTotalMs).toBeLessThan(6_000);
   });
 
   it('opens on a frame with no data, so the panel is an instrument first', () => {
