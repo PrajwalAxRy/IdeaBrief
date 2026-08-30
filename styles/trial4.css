@@ -1,0 +1,754 @@
+/* ============================================================================
+   TRIAL 4 — the Obsidian workspace, scoped to /trial4.
+   ----------------------------------------------------------------------------
+   IMPORTED INTO @layer components from app/trial4/layout.tsx. Not unlayered.
+
+   Unlayered, a `.t4-rail { margin: 0 }` silently beats every Tailwind spacing
+   utility on the same element regardless of specificity. It produces no error
+   and the page still looks plausible, so it is only ever caught by measuring a
+   computed style. See references/pitfalls.md §1.
+
+   **This file adds no token and no colour value.** `styles/tokens.css` is the
+   only file in the repository permitted to hold one, and Obsidian is already
+   global on `:root` — so unlike `/trial1`–`/trial3`, which each carry a rival
+   light system, this route needs no scoping wrapper, no `data-theme`, and no
+   second namespace. Every `.ob-*` recipe in `obsidian.css` is available here as
+   it stands, and the classes below are only what the skill does not specify:
+   the shape of a three-column workspace.
+
+   Tailwind is for LAYOUT ONLY — flex, grid, spacing, sizing. Every colour,
+   border, radius and type value below reads a token.
+
+   1  Shell          2  Top bar + stage rail   3  Session rail
+   4  Thread         5  Composer               6  Brief rail
+   7  Stage preview  8  Reduced motion
+   ========================================================================= */
+
+@layer components {
+  /* ==========================================================================
+     1. SHELL
+
+     One viewport, three columns, no page scroll — each column scrolls itself.
+     That is the whole reason this is a workspace and not a page: the stage rail
+     and the brief must never leave the screen, because the brief filling in as
+     you talk is the thing being demonstrated.
+
+     Columns are separated by a 1px rule and nothing else (rule 2). There is no
+     background step between them, which is why `--ob-canvas` runs edge to edge
+     and the hairlines carry the entire layout.
+     ======================================================================== */
+
+  .t4-app {
+    display: grid;
+    grid-template-rows: var(--ob-header-h) minmax(0, 1fr);
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--ob-canvas);
+  }
+
+  .t4-body {
+    display: grid;
+    grid-template-columns: 288px minmax(0, 1fr) 392px;
+    min-height: 0;
+  }
+
+  /* Every scrolling region in the route. `min-height: 0` is load-bearing: a
+     grid item defaults to `min-height: auto`, so without it the column grows to
+     its content and the whole shell scrolls instead of the panel. */
+  .t4-scroll {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ob-hairline-strong) transparent;
+  }
+
+  .t4-scroll::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .t4-scroll::-webkit-scrollbar-thumb {
+    background: var(--ob-hairline);
+    border-radius: var(--ob-r-pill);
+    border: 3px solid var(--ob-canvas);
+  }
+
+  .t4-scroll:hover::-webkit-scrollbar-thumb {
+    background: var(--ob-hairline-strong);
+  }
+
+  /* The mono strip that heads every column. Same height in all three so the
+     three hairlines under them read as one continuous rule across the app. */
+  .t4-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 52px;
+    padding-inline: 20px;
+    border-bottom: 1px solid var(--ob-hairline);
+    flex: none;
+  }
+
+  .t4-col {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  /* ==========================================================================
+     2. TOP BAR AND STAGE RAIL
+
+     Define → Validate → Roadmap sits dead centre of the bar, above all three
+     columns, and never scrolls. It is the primary navigation of the product, so
+     it gets the one position on the screen that is impossible to lose.
+
+     Three states, and the distinction between the last two is the point:
+
+       done     the run has passed this stage
+       current  where the RUN is — carries the live dot, the accent's third job
+       ahead    not reached yet; clicking still opens a preview, so this is a
+                dimmed state and never a disabled one
+
+     Which stage is on SCREEN is tracked separately, as `[data-view]`, and reads
+     as a bordered surface step. A stage can be `ahead` and viewed at the same
+     time — that is exactly what a preview is — and collapsing the two into one
+     state is what would make the rail lie about where the run is.
+     ======================================================================== */
+
+  .t4-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+    padding-inline: 20px;
+    border-bottom: 1px solid var(--ob-hairline);
+    background: var(--ob-void);
+  }
+
+  .t4-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .t4-bar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+
+  .t4-stages {
+    display: flex;
+    align-items: center;
+  }
+
+  .t4-stage-join {
+    width: 32px;
+    height: 1px;
+    background: var(--ob-hairline);
+    flex: none;
+  }
+
+  .t4-stage-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border: 1px solid transparent;
+    border-radius: var(--ob-r-tag);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--ob-fast) var(--ob-ease), border-color var(--ob-fast) var(--ob-ease),
+      color var(--ob-fast) var(--ob-ease);
+  }
+
+  .t4-stage-link:hover {
+    background: var(--ob-hover-wash);
+  }
+
+  .t4-stage-link:active {
+    transform: scale(0.99);
+  }
+
+  .t4-stage-link:focus-visible {
+    outline: 2px solid var(--ob-accent);
+    outline-offset: 2px;
+    transition: none;
+  }
+
+  .t4-stage-link[data-view="true"] {
+    background: var(--ob-surface);
+    border-color: var(--ob-hairline);
+  }
+
+  .t4-stage-num {
+    font-family: var(--ob-font-mono);
+    font-size: var(--ob-meta-sm);
+    font-weight: var(--ob-weight-meta);
+    letter-spacing: var(--ob-tracking-meta);
+    line-height: var(--ob-leading-flat);
+    color: var(--ob-dim);
+  }
+
+  .t4-stage-label {
+    font-size: var(--ob-sm);
+    line-height: var(--ob-leading-flat);
+    letter-spacing: var(--ob-tracking-snug);
+    color: var(--ob-muted);
+  }
+
+  .t4-stage-link[data-state="current"] .t4-stage-label,
+  .t4-stage-link[data-view="true"] .t4-stage-label {
+    color: var(--ob-text);
+  }
+
+  .t4-stage-link[data-state="ahead"] .t4-stage-label {
+    color: var(--ob-dim);
+  }
+
+  .t4-stage-link[data-state="ahead"]:hover .t4-stage-label {
+    color: var(--ob-muted);
+  }
+
+  /* "PREVIEW" on a stage the run has not reached. Mono, micro-label size —
+     10px is only ever legal inside another element, which this is. */
+  .t4-stage-tag {
+    font-family: var(--ob-font-mono);
+    font-size: var(--ob-meta-xs);
+    font-weight: var(--ob-weight-meta);
+    letter-spacing: var(--ob-tracking-meta);
+    line-height: var(--ob-leading-flat);
+    text-transform: uppercase;
+    color: var(--ob-dim);
+  }
+
+  /* The tick on a stage the run has finished. Drawn rather than a glyph so it
+     inherits the hairline weight the rest of the layout is carved with. */
+  .t4-stage-done {
+    width: 9px;
+    height: 5px;
+    border-left: 1px solid var(--ob-muted);
+    border-bottom: 1px solid var(--ob-muted);
+    transform: rotate(-45deg) translate(1px, -1px);
+    flex: none;
+  }
+
+  /* ==========================================================================
+     3. SESSION RAIL — previous chats
+     ======================================================================== */
+
+  .t4-rail {
+    border-right: 1px solid var(--ob-hairline);
+    background: var(--ob-void);
+  }
+
+  .t4-rail-list {
+    padding: 8px 10px 24px;
+  }
+
+  /* A bare text action, not a button. `.ob-btn-bare` is 24px of vertical
+     padding at `--ob-body`, which does not fit a 52px column head. */
+  .t4-new {
+    font-size: var(--ob-sm);
+    line-height: var(--ob-leading-flat);
+    letter-spacing: var(--ob-tracking-snug);
+    color: var(--ob-muted);
+    cursor: pointer;
+    padding: 6px 8px;
+    margin-right: -8px;
+    border-radius: var(--ob-r-tag);
+    white-space: nowrap;
+    transition: color var(--ob-fast) var(--ob-ease), background var(--ob-fast) var(--ob-ease);
+  }
+
+  .t4-new:hover {
+    color: var(--ob-text);
+    background: var(--ob-hover-wash);
+  }
+
+  .t4-new:active {
+    transform: scale(0.98);
+  }
+
+  .t4-new:focus-visible {
+    outline: 2px solid var(--ob-accent);
+    outline-offset: 1px;
+    transition: none;
+  }
+
+  .t4-group {
+    padding: 18px 10px 8px;
+  }
+
+  .t4-session {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 11px 12px;
+    border: 1px solid transparent;
+    border-radius: var(--ob-r-card);
+    cursor: pointer;
+    transition: background var(--ob-fast) var(--ob-ease), border-color var(--ob-fast) var(--ob-ease);
+  }
+
+  .t4-session:hover {
+    background: var(--ob-hover-wash);
+  }
+
+  .t4-session:focus-visible {
+    outline: 2px solid var(--ob-accent);
+    outline-offset: -1px;
+    transition: none;
+  }
+
+  .t4-session[aria-current="true"] {
+    background: var(--ob-surface);
+    border-color: var(--ob-hairline);
+  }
+
+  .t4-session-title {
+    display: block;
+    font-size: var(--ob-sm);
+    line-height: var(--ob-leading-snug);
+    letter-spacing: var(--ob-tracking-snug);
+    color: var(--ob-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .t4-session:hover .t4-session-title,
+  .t4-session[aria-current="true"] .t4-session-title {
+    color: var(--ob-text);
+  }
+
+  .t4-session-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  /* ==========================================================================
+     4. THREAD — the conversation
+     ======================================================================== */
+
+  .t4-main {
+    background: var(--ob-canvas);
+  }
+
+  .t4-thread-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .t4-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    padding: 32px 40px 40px;
+    max-width: 760px;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  .t4-turn {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .t4-turn[data-role="user"] {
+    align-items: flex-end;
+  }
+
+  /* A turn arriving. `--ob-base` and the house ease: structural-and-fast, which
+     is the only register a state change is allowed to use (rule 9). */
+  .t4-turn-in {
+    animation: t4-turn-in var(--ob-base) var(--ob-ease) both;
+  }
+
+  @keyframes t4-turn-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ==========================================================================
+     5. COMPOSER — seeds, input, and the approve hand-off
+     ======================================================================== */
+
+  .t4-foot {
+    border-top: 1px solid var(--ob-hairline);
+    padding: 16px 40px 20px;
+    background: var(--ob-void);
+    flex: none;
+  }
+
+  .t4-foot-inner {
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  .t4-seeds {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .t4-composer-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 14px 14px 14px 18px;
+  }
+
+  /* The end of the script. The composer is replaced rather than joined, so the
+     approve action is the only primary button on the screen — the system allows
+     exactly one per viewport, and a live Send next to a live Approve is the
+     usual way that rule gets broken. */
+  .t4-approve {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 18px 18px 22px;
+    border: 1px solid var(--ob-hairline-accent);
+    border-radius: var(--ob-r-lg);
+    background: var(--ob-surface);
+  }
+
+  .t4-approve-line {
+    color: var(--ob-text);
+  }
+
+  /* ==========================================================================
+     6. BRIEF RAIL — the standing summary
+
+     Nine fields, in a fixed order, filling as the conversation reaches them. A
+     field the conversation has not reached is drawn as hairline bars and
+     labelled, never guessed at — "nothing is invented to fill a field" is the
+     product definition's oldest rule and this rail is where it is most visible.
+     ======================================================================== */
+
+  .t4-brief {
+    border-left: 1px solid var(--ob-hairline);
+    background: var(--ob-void);
+  }
+
+  .t4-ticks {
+    display: flex;
+    gap: 3px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--ob-hairline);
+    flex: none;
+  }
+
+  .t4-tick {
+    height: 3px;
+    flex: 1;
+    border-radius: var(--ob-r-pill);
+    background: var(--ob-hairline);
+    transition: background var(--ob-base) var(--ob-ease);
+  }
+
+  .t4-tick[data-on="true"] {
+    background: var(--ob-muted);
+  }
+
+  .t4-fields {
+    padding: 4px 20px 32px;
+  }
+
+  .t4-field {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--ob-hairline);
+  }
+
+  .t4-field:last-child {
+    border-bottom: 0;
+  }
+
+  .t4-field-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 9px;
+  }
+
+  .t4-field-value {
+    font-size: var(--ob-sm);
+    line-height: var(--ob-leading-body);
+    letter-spacing: var(--ob-tracking-snug);
+    color: var(--ob-muted);
+  }
+
+  /* An empty field, drawn. Two bars of unequal width read as a withheld
+     sentence; one bar reads as a loading skeleton, which would be a lie — there
+     is nothing on its way until the conversation asks. */
+  .t4-field-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .t4-field-bar {
+    height: 1px;
+    background: var(--ob-hairline);
+  }
+
+  /* The field that just landed. Accent, doing its verification job: this value
+     came out of the transcript a second ago and the reader needs to find it
+     without hunting. It decays to nothing — a permanent highlight would make
+     nine fields into nine highlights. */
+  .t4-field-fresh {
+    animation: t4-land 1400ms var(--ob-ease) both;
+    margin-inline: -12px;
+    padding-inline: 12px;
+    border-radius: var(--ob-r-tag);
+  }
+
+  @keyframes t4-land {
+    0% {
+      background: var(--ob-accent-wash);
+      box-shadow: inset 2px 0 0 var(--ob-accent);
+    }
+    70% {
+      background: var(--ob-accent-wash);
+      box-shadow: inset 2px 0 0 var(--ob-accent);
+    }
+    100% {
+      background: transparent;
+      box-shadow: inset 2px 0 0 transparent;
+    }
+  }
+
+  /* ==========================================================================
+     7. STAGE PREVIEW — Validate and Roadmap, before they exist
+
+     Both fill the centre column when their stage is selected. The rails do not
+     move, so this reads as changing view on one run rather than as leaving the
+     page — and there are no dead links to two routes that do not exist yet.
+
+     Every fragment below is drawn in markup (rule 8). The structure is real and
+     the prose is withheld as hairline bars, which is what separates a preview
+     from a broken screen.
+     ======================================================================== */
+
+  .t4-preview {
+    padding: 56px 40px 64px;
+    max-width: 760px;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  .t4-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--ob-hairline);
+    border-bottom: 1px solid var(--ob-hairline);
+  }
+
+  .t4-stat {
+    padding: 22px 0 20px;
+  }
+
+  .t4-stat + .t4-stat {
+    border-left: 1px solid var(--ob-hairline);
+    padding-left: 24px;
+  }
+
+  .t4-stat-num {
+    font-family: var(--ob-font-mono);
+    font-size: var(--ob-fig-md);
+    font-weight: var(--ob-weight);
+    letter-spacing: var(--ob-tracking-fig);
+    line-height: var(--ob-leading-flat);
+    color: var(--ob-text);
+  }
+
+  /* `.ob-btn-bare .ob-arrow` translates up and to the RIGHT, which is correct
+     for an outbound ↗ and wrong for a back ←. Its own class rather than an
+     override, so nothing here reaches into a landing recipe. */
+  .t4-back-arrow {
+    display: inline-block;
+    transition: transform var(--ob-base) var(--ob-ease);
+  }
+
+  .ob-btn-bare:hover .t4-back-arrow {
+    transform: translateX(-4px);
+  }
+
+  /* The fragment card: a mono header bar on `--ob-void` over a body on
+     `--ob-surface`. The house container for all code-drawn product UI. */
+  .t4-frag {
+    border: 1px solid var(--ob-hairline);
+    border-radius: var(--ob-r-card);
+    overflow: hidden;
+  }
+
+  .t4-frag-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--ob-hairline);
+    background: var(--ob-void);
+  }
+
+  .t4-frag-body {
+    background: var(--ob-surface);
+  }
+
+  /* Validate — findings rows. */
+  .t4-fnd {
+    display: grid;
+    grid-template-columns: 62px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 16px;
+    padding: 16px;
+    border-bottom: 1px solid var(--ob-hairline);
+  }
+
+  .t4-fnd:last-child {
+    border-bottom: 0;
+  }
+
+  .t4-fnd-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding-top: 5px;
+  }
+
+  .t4-fnd-bar {
+    height: 1px;
+    background: var(--ob-hairline-strong);
+  }
+
+  /* Roadmap — five bars against a milestone axis. */
+  .t4-rm {
+    padding: 20px 16px 14px;
+  }
+
+  .t4-rm-rows {
+    position: relative;
+  }
+
+  /* The gridlines sit behind the bars and start where the track does — the
+     152px name column plus the 16px gap. `--ob-grid` is the figure-axis value,
+     which is what this is. */
+  .t4-rm-grid {
+    position: absolute;
+    inset: 0 0 0 168px;
+    pointer-events: none;
+  }
+
+  .t4-rm-gridline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--ob-grid);
+  }
+
+  /* Above the gridlines. A bar is opaque, so without this the line reads
+     straight through the middle of every phase. */
+  .t4-rm-row {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 152px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    padding: 7px 0;
+  }
+
+  .t4-rm-name {
+    color: var(--ob-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .t4-rm-track {
+    position: relative;
+    height: 20px;
+  }
+
+  .t4-rm-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border: 1px solid var(--ob-hairline-strong);
+    border-radius: var(--ob-r-tag);
+    background: var(--ob-raised);
+  }
+
+  /* Marks are positioned from the same fraction the gridlines are, not laid out
+     with `space-between` — see the component. `translateX(-50%)` centres an
+     interior mark on its line; the two ends flush to the track instead, so the
+     first and last labels cannot hang outside the fragment. */
+  .t4-rm-axis {
+    position: relative;
+    height: 17px;
+    margin-top: 10px;
+    margin-left: 168px;
+    border-top: 1px solid var(--ob-hairline);
+    padding-top: 8px;
+  }
+
+  .t4-rm-tick {
+    position: absolute;
+    top: 8px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .t4-rm-tick[data-edge="start"] {
+    transform: none;
+  }
+
+  .t4-rm-tick[data-edge="end"] {
+    transform: translateX(-100%);
+  }
+
+  /* ==========================================================================
+     8. REDUCED MOTION
+
+     Both animations here are `animation`, which the global blanket in
+     `obsidian.css` only snaps to its END keyframe. For `t4-land` the end
+     keyframe is transparent, so the blanket already resolves it correctly and
+     it needs no rule — stated rather than omitted, because an absent end state
+     is otherwise indistinguishable from a forgotten one.
+
+     `t4-turn-in` ends fully settled for the same reason. What the blanket
+     cannot reach is `scroll-behavior`, which is neither a transition nor an
+     animation, so the transcript's auto-scroll has to be pinned by hand.
+     ======================================================================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    .t4-scroll {
+      scroll-behavior: auto;
+    }
+
+    .t4-turn-in {
+      animation: none;
+    }
+  }
+}

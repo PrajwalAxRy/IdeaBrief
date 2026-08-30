@@ -35,6 +35,18 @@
    class. */
 @import "./roadmap-experiment.css" layer(components);
 
+/* `/trial3` only, and the one stylesheet here that is NOT Obsidian. Audacity
+   is the light sibling system; every token it declares is `--au-*` and every
+   token is scoped to `[data-theme='audacity']` rather than `:root`, because a
+   second `:root` block would win on source order and restyle the whole dark
+   app. It comes last so it can win back the five things `@layer base` below
+   declares globally — `color-scheme: dark`, the body background and colour,
+   `-webkit-font-smoothing: antialiased`, and the `--ob-accent` focus ring and
+   selection — all of which otherwise leak into the light subtree. That win is
+   on LAYER ORDER, not specificity: this file and the base block are in
+   different layers and `components` is declared after `base`. */
+@import "./audacity.css" layer(components);
+
 /* Everything below MUST stay inside `@layer base`. Unlayered rules beat every
    layered rule regardless of specificity — an unlayered `body` once silently
    zeroed out every Tailwind spacing utility in the app. */

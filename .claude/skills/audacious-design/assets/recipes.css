@@ -1,0 +1,1082 @@
+/* ============================================================================
+   AUDACIOUS — component recipes
+   ----------------------------------------------------------------------------
+   IMPORT THIS INTO @layer components. Not unlayered.
+
+       @import "./audacious.css" layer(components);
+
+   Unlayered, a `.ad-card { margin: 0 }` silently beats every Tailwind spacing
+   utility on the same element regardless of specificity. It produces no error
+   and the page still looks plausible, so it is only ever caught by measuring a
+   computed style. See references/pitfalls.md §1.
+
+   Tailwind is for LAYOUT ONLY — flex, grid, spacing, sizing. Every colour,
+   border, shadow and type value in this file reads a token. No literals.
+   ========================================================================= */
+
+/* ============================================================================
+   0. GROUND RULES FOR A LIGHT CANVAS
+   Two one-line settings that most starters get wrong in the same direction,
+   and that only misbehave on a light ground — which is why neither shows up in
+   a dark system's setup and both have to be stated here.
+   ========================================================================= */
+
+/* `-webkit-font-smoothing: antialiased` is a DARK-THEME correction: it thins
+   glyphs to counter the optical bloom of light text on a dark ground. On paper
+   there is no bloom to counter, so it just renders type under-baked — and this
+   system feels it more than most, because the display step sits at weight 500
+   rather than 600 and has no margin to give away.
+
+   The failure is insidious: the page looks washed out, and the reflex fix is to
+   bump display to weight 600, which is the one thing rule 6 forbids. Check this
+   FIRST when type reads too light. Most Next.js/Tailwind starters ship the
+   `antialiased` class on <body> — remove it there too, or this loses. */
+:where(html) {
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* Form controls, scrollbars and <select> popups render from the UA's own dark
+   palette unless told otherwise, which puts a slab of cool grey-black on warm
+   paper — a rule-2 break that no token file can reach. */
+:where(html) {
+  color-scheme: light;
+}
+
+/* ============================================================================
+   1. TYPE
+   These exist so a component always has a token-backed way to say a size.
+   `text-[15px]` is the leak that puts an unnamed step into the system.
+   ========================================================================= */
+
+/* Weight 500, not 600 — and this is deliberate, not an oversight. Past ~72px
+   added weight reads as mass rather than emphasis, and on white a semibold
+   92px headline is a black slab that costs the page its paper. Authority here
+   is scale. See the WEIGHTS note in tokens.css. */
+.ad-display {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-display);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-display);
+  line-height: var(--ad-leading-display);
+  color: var(--ad-ink);
+  text-wrap: balance;
+}
+
+.ad-h1 {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-h1);
+  font-weight: var(--ad-w-semibold);
+  letter-spacing: var(--ad-tracking-tight);
+  line-height: var(--ad-leading-tight);
+  color: var(--ad-ink);
+  text-wrap: balance;
+}
+
+.ad-h2 {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-h2);
+  font-weight: var(--ad-w-semibold);
+  letter-spacing: var(--ad-tracking-tight);
+  line-height: var(--ad-leading-tight);
+  color: var(--ad-ink);
+}
+
+.ad-h3 {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-h3);
+  font-weight: var(--ad-w-semibold);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-snug);
+  color: var(--ad-ink);
+}
+
+.ad-lead {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-lead);
+  font-weight: var(--ad-w-regular);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-lead);
+  color: var(--ad-body);
+  text-wrap: pretty;
+}
+
+.ad-sub {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sub);
+  font-weight: var(--ad-w-regular);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-snug);
+  color: var(--ad-body);
+}
+
+.ad-body {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-body-size);
+  font-weight: var(--ad-w-regular);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-body);
+  color: var(--ad-body);
+  text-wrap: pretty;
+}
+
+.ad-sm {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  font-weight: var(--ad-w-regular);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-snug);
+  color: var(--ad-body);
+}
+
+.ad-xs {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-xs);
+  font-weight: var(--ad-w-regular);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-snug);
+  color: var(--ad-body);
+}
+
+/* The metadata layer. Never carries a sentence — uppercase mono at sentence
+   length is unreadable. If your mono string has a verb in it, use sans. */
+.ad-meta,
+.ad-meta-sm,
+.ad-meta-xs {
+  font-family: var(--ad-font-mono);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-meta);
+  line-height: var(--ad-leading-meta);
+  text-transform: uppercase;
+  color: var(--ad-muted);
+}
+.ad-meta    { font-size: var(--ad-meta); }
+.ad-meta-sm { font-size: var(--ad-meta-sm); }
+.ad-meta-xs { font-size: var(--ad-meta-xs); }
+
+/* Figure numerals. Mono so digits are tabular; a number is not a heading, so
+   it never takes the display tier's tracking. */
+.ad-fig-xl,
+.ad-fig-lg,
+.ad-fig-md,
+.ad-fig-sm {
+  font-family: var(--ad-font-mono);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-fig);
+  line-height: var(--ad-leading-flat);
+  font-variant-numeric: tabular-nums;
+  color: var(--ad-ink);
+}
+.ad-fig-xl { font-size: var(--ad-fig-xl); }
+.ad-fig-lg { font-size: var(--ad-fig-lg); }
+.ad-fig-md { font-size: var(--ad-fig-md); }
+.ad-fig-sm { font-size: var(--ad-fig-sm); }
+
+/* Long-form prose. The ONE place the text budget is uncapped — give it a
+   measure so the line length stays readable. */
+.ad-prose {
+  max-width: var(--ad-measure);
+}
+.ad-prose > * + * {
+  margin-top: 1em;
+}
+
+/* ============================================================================
+   2. LAYOUT AND BANDS
+   Rule 5: sections separate by ground change, not by a rule.
+   ========================================================================= */
+
+.ad-container {
+  width: 100%;
+  max-width: var(--ad-container);
+  margin-inline: auto;
+  padding-inline: var(--ad-gutter);
+}
+
+.ad-container-wide {
+  width: 100%;
+  max-width: var(--ad-container-wide);
+  margin-inline: auto;
+  padding-inline: var(--ad-gutter);
+}
+
+.ad-section {
+  padding-block: var(--ad-section);
+}
+.ad-section-tight {
+  padding-block: var(--ad-section-tight);
+}
+
+/* The bands. Alternate these — never two of the same in a row, which produces
+   an accidental 256px void where a section boundary should be. */
+.ad-band-paper  { background: var(--ad-paper); }
+.ad-band-canvas { background: var(--ad-canvas); }
+.ad-band-linen  { background: var(--ad-linen); }
+
+/* A dark band. Sets its own ground because .ad-invert only remaps tokens. */
+.ad-invert {
+  background: var(--ad-canvas);
+  color: var(--ad-body);
+}
+
+/* ============================================================================
+   3. SURFACES
+   Rule 3, the one-step rule: an element sits at least one tier from its ground.
+   A bordered card on --ad-inset has a 1.05:1 border and is invisible.
+   ========================================================================= */
+
+/* The base unit. White card — belongs on a canvas or linen band. */
+.ad-card {
+  background: var(--ad-paper);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-lg);
+}
+
+/* A tinted panel — belongs INSIDE a white card, or on a paper band. */
+.ad-panel {
+  background: var(--ad-linen);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-md);
+}
+
+/* The deepest recess: code blocks, empty states. Note it has NO border —
+   at 1.05:1 the border would not render, so the tier step does the work. */
+.ad-well {
+  background: var(--ad-inset);
+  border-radius: var(--ad-r-md);
+}
+
+/* Large panel — hero product surface, a full-width feature container. */
+.ad-panel-xl {
+  background: var(--ad-paper);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-xl);
+}
+
+/* The house unit. Sonarly's pattern, and the best answer to "how do I explain
+   this without a paragraph": drawn UI fragment on tint, one sentence below. */
+.ad-bento {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ad-paper);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-lg);
+}
+.ad-bento__visual {
+  min-height: 200px;
+  padding: 24px;
+  background: var(--ad-linen);
+  border-bottom: 1px solid var(--ad-line);
+}
+.ad-bento__body {
+  padding: 24px;
+}
+.ad-bento__body > * + * {
+  margin-top: 8px;
+}
+
+/* Icon card — the bento's sibling, for an ABSTRACT concept with no UI to draw
+   (deliverability, compliance, uptime). A single 64px line icon at 3px stroke
+   in --ad-accent, centred in a tall empty area, no tinted panel behind it.
+
+   The accent is legitimate here: it is a MARK, not text, and at 3.39:1 it
+   clears the 3.0 threshold for graphical objects. It would fail as a label.
+
+   Reach for .ad-bento first. If the concept has a real interface, draw the
+   interface — an icon is what you use when there is genuinely nothing to show. */
+.ad-card-icon {
+  position: relative;
+  overflow: hidden;
+  background: var(--ad-paper);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-lg);
+}
+.ad-card-icon__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 256px;
+}
+.ad-card-icon__visual svg {
+  width: 64px;
+  height: 64px;
+  color: var(--ad-accent);
+  stroke-width: 3;
+}
+.ad-card-icon__body {
+  padding: 0 24px 24px;
+}
+.ad-card-icon__body > * + * {
+  margin-top: 8px;
+}
+/* Corner affordance marker. Decorative, so it takes --ad-faint, which is
+   explicitly not-text-safe and therefore correct for exactly this. */
+.ad-card-icon__corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: var(--ad-faint);
+}
+
+/* The hero product panel's bloom. ONE per page, behind the panel, never free-
+   floating. Sits behind its parent's content, so the parent needs a stacking
+   context of its own or the bloom paints over the page (pitfalls.md §10). */
+.ad-bloom {
+  position: relative;
+  isolation: isolate;
+}
+.ad-bloom::before {
+  content: '';
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  background: var(--ad-bloom);
+  pointer-events: none;
+}
+
+/* The one border meant to be CHOSEN — highlighted plan, selected card.
+   Near-black, not accent: the accent marks focus, not selection. */
+.ad-card-chosen {
+  border-color: var(--ad-line-ink);
+  box-shadow: inset 0 0 0 1px var(--ad-line-ink);
+}
+
+/* Elevation. Rule 7: before adding one, answer what it floats ABOVE.
+   "Nothing, it's in the grid" means it gets a border and no shadow. */
+.ad-lift       { box-shadow: var(--ad-lift); }
+.ad-lift-panel { box-shadow: var(--ad-lift-panel); }
+
+/* ============================================================================
+   4. BUTTONS
+   Rule 4: near-black is the action, the accent is the pointer.
+   Exactly one .ad-btn--primary visible per viewport.
+   ========================================================================= */
+
+.ad-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-flat);
+  border: 1px solid transparent;
+  border-radius: var(--ad-r-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--ad-dur-fast) var(--ad-ease-out),
+    border-color var(--ad-dur-fast) var(--ad-ease-out),
+    color var(--ad-dur-fast) var(--ad-ease-out);
+}
+
+/* Hover LIGHTENS. On a bright ground a black control going darker reads dead;
+   going lighter reads pressed-ready. */
+.ad-btn--primary {
+  background: var(--ad-action);
+  color: var(--ad-on-action);
+}
+.ad-btn--primary:hover {
+  background: var(--ad-action-hover);
+}
+
+.ad-btn--secondary {
+  background: transparent;
+  border-color: var(--ad-line-strong);
+  color: var(--ad-ink);
+}
+.ad-btn--secondary:hover {
+  background: var(--ad-linen);
+  border-color: var(--ad-ink);
+}
+
+.ad-btn:active {
+  transform: translateY(1px);
+}
+
+.ad-btn:disabled,
+.ad-btn[aria-disabled='true'] {
+  color: var(--ad-faint);
+  background: var(--ad-linen);
+  border-color: var(--ad-line);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* The accent's main job. Appears beside the primary constantly — this pairing
+   IS the CTA block: black button, accent link, nothing else. */
+.ad-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-snug);
+  color: var(--ad-accent-text);   /* never --ad-accent: that is 3.39:1 */
+  cursor: pointer;
+}
+.ad-link__arrow {
+  transition: transform var(--ad-dur-fast) var(--ad-ease-out);
+}
+.ad-link:hover .ad-link__arrow {
+  transform: translateX(3px);
+}
+
+/* Inline prose link — underlined, because colour alone is not an affordance. */
+.ad-link-inline {
+  color: var(--ad-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--ad-accent-line);
+}
+.ad-link-inline:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ============================================================================
+   5. EYEBROWS
+   Pick ONE variant per page, not per section.
+   ========================================================================= */
+
+.ad-eyebrow {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  font-weight: var(--ad-w-regular);
+  letter-spacing: var(--ad-tracking-snug);
+  color: var(--ad-muted);
+}
+
+/* NEVER rotate this pill's hue per section. The third reference does exactly
+   that and it is the one thing from it not to copy — it turns the accent into
+   decoration and rule 4 stops meaning anything. */
+.ad-eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-xs);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-snug);
+  line-height: var(--ad-leading-flat);
+  color: var(--ad-accent-text);
+  background: var(--ad-accent-wash);
+  border-radius: var(--ad-r-pill);
+}
+
+/* Credibility badge — an eyebrow carrying a logo ("Backed by <investor>",
+   "SOC 2 compliant"). Deliberately NEUTRAL, not accent: the claim is the
+   borrowed authority, and tinting it orange spends the accent on something
+   that is already doing its own work. */
+.ad-badge-credibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  font-weight: var(--ad-w-regular);
+  line-height: var(--ad-leading-flat);
+  color: var(--ad-body);
+  background: var(--ad-linen);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-pill);
+}
+.ad-badge-credibility__mark {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* The friction-remover under a CTA pair — "No card required", "One command to
+   install". This is text that EARNS its place: it answers the objection the
+   button just raised. Not the same thing as filler. */
+.ad-hint {
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-xs);
+  font-weight: var(--ad-w-regular);
+  letter-spacing: var(--ad-tracking-snug);
+  color: var(--ad-muted);
+}
+
+/* ============================================================================
+   6. CHIPS AND STATUS
+   ========================================================================= */
+
+.ad-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  font-family: var(--ad-font-mono);
+  font-size: var(--ad-meta-xs);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-meta);
+  line-height: var(--ad-leading-flat);
+  text-transform: uppercase;
+  color: var(--ad-muted);
+  background: var(--ad-linen);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-sm);
+  white-space: nowrap;
+}
+
+.ad-chip--accent {
+  color: var(--ad-accent-text);
+  background: var(--ad-accent-wash);
+  border-color: var(--ad-accent-line);
+}
+
+/* Never place a --critical chip inside an accent-marked card: the two hues are
+   close enough to collide and the status stops reading as a status. */
+.ad-chip--positive { color: var(--ad-positive); background: var(--ad-positive-wash); border-color: transparent; }
+.ad-chip--caution  { color: var(--ad-caution);  background: var(--ad-caution-wash);  border-color: transparent; }
+.ad-chip--critical { color: var(--ad-critical); background: var(--ad-critical-wash); border-color: transparent; }
+.ad-chip--info     { color: var(--ad-info);     background: var(--ad-info-wash);     border-color: transparent; }
+
+/* A discarded item goes faint and stops mattering. It does NOT go red — red is
+   a failed state, not a rejected one. */
+.ad-discarded {
+  color: var(--ad-faint);
+  text-decoration: line-through;
+  text-decoration-color: var(--ad-line-strong);
+}
+
+/* The only pulsing thing in the system. */
+.ad-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ad-r-pill);
+  background: var(--ad-accent);
+  flex-shrink: 0;
+}
+.ad-dot--live {
+  animation: ad-pulse 2s var(--ad-ease-inout) infinite;
+}
+@keyframes ad-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--ad-accent-ring); }
+  50%      { box-shadow: 0 0 0 5px transparent; }
+}
+
+/* ============================================================================
+   7. SEGMENTED CONTROL
+   The thumb is the one place a shadow does affordance work, not decoration.
+   ========================================================================= */
+
+.ad-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--ad-linen);
+  border-radius: var(--ad-r-pill);
+}
+.ad-segmented__item {
+  padding: 7px 18px;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  font-weight: var(--ad-w-medium);
+  line-height: var(--ad-leading-flat);
+  color: var(--ad-body);
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-r-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--ad-dur-fast) var(--ad-ease-out),
+    color var(--ad-dur-fast) var(--ad-ease-out);
+}
+.ad-segmented__item:hover {
+  color: var(--ad-ink);
+}
+.ad-segmented__item[aria-selected='true'] {
+  color: var(--ad-ink);
+  background: var(--ad-paper);
+  box-shadow: var(--ad-lift);
+}
+
+/* ============================================================================
+   8. TABS
+   The active rule is one of the accent's three jobs.
+   ========================================================================= */
+
+.ad-tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--ad-line);
+}
+.ad-tabs__item {
+  position: relative;
+  padding: 14px 0;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  font-weight: var(--ad-w-medium);
+  color: var(--ad-muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color var(--ad-dur-fast) var(--ad-ease-out);
+}
+.ad-tabs__item:hover {
+  color: var(--ad-ink);
+}
+.ad-tabs__item[aria-selected='true'] {
+  color: var(--ad-ink);
+}
+.ad-tabs__item[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ad-accent);
+}
+
+/* ============================================================================
+   9. ACCORDION
+   Bottom border only, no card. Cards around accordion rows double the border
+   count for nothing.
+   ========================================================================= */
+
+.ad-accordion__row {
+  border-bottom: 1px solid var(--ad-line);
+}
+.ad-accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 20px 0;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sub);
+  font-weight: var(--ad-w-medium);
+  color: var(--ad-ink);
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.ad-accordion__icon {
+  flex-shrink: 0;
+  color: var(--ad-muted);
+  transition: transform var(--ad-dur-base) var(--ad-ease-out);
+}
+.ad-accordion__trigger[aria-expanded='true'] .ad-accordion__icon {
+  transform: rotate(45deg);
+}
+.ad-accordion__content {
+  padding-bottom: 20px;
+  max-width: var(--ad-measure);
+}
+
+/* ============================================================================
+   10. INPUTS
+   ========================================================================= */
+
+.ad-input {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-body-size);
+  letter-spacing: var(--ad-tracking-snug);
+  color: var(--ad-ink);
+  background: var(--ad-paper);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-md);
+  transition:
+    border-color var(--ad-dur-fast) var(--ad-ease-out),
+    box-shadow var(--ad-dur-fast) var(--ad-ease-out);
+}
+.ad-input::placeholder {
+  color: var(--ad-faint);
+}
+.ad-input:hover {
+  border-color: var(--ad-line-strong);
+}
+.ad-input:focus {
+  outline: none;
+  border-color: var(--ad-accent-line);
+  box-shadow: 0 0 0 3px var(--ad-accent-ring);
+}
+.ad-input[aria-invalid='true'] {
+  border-color: var(--ad-critical);
+}
+
+/* ============================================================================
+   11. ROWS AND LISTS
+   The third tier of the card system — a bordered row inside a tinted panel.
+   ========================================================================= */
+
+.ad-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--ad-paper);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-md);
+}
+.ad-row__icon {
+  flex-shrink: 0;
+  color: var(--ad-muted);
+}
+.ad-row--marked {
+  border-color: var(--ad-accent-line);
+}
+
+/* A table that reads as rules, not as a grid of boxes. */
+.ad-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ad-table th {
+  padding: 10px 12px;
+  font-family: var(--ad-font-mono);
+  font-size: var(--ad-meta);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-meta);
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--ad-muted);
+  border-bottom: 1px solid var(--ad-line);
+}
+.ad-table td {
+  padding: 12px;
+  font-size: var(--ad-sm);
+  color: var(--ad-body);
+  border-bottom: 1px solid var(--ad-line);
+}
+.ad-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ============================================================================
+   12. STEP / JOURNEY
+   Connector-linked step cards. The connector is a hairline; the active step is
+   accent-marked. This replaces "here's how the flow works" as a paragraph.
+   ========================================================================= */
+
+.ad-steps {
+  position: relative;
+  display: grid;
+  gap: 16px;
+}
+/* The connector sits BEHIND the cards. Note it is on the container, not on a
+   pseudo-element of each card — a per-card connector overhangs the last one. */
+.ad-steps::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  inset-inline: 12%;
+  height: 1px;
+  background: var(--ad-line);
+  z-index: 0;
+}
+.ad-step {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  background: var(--ad-paper);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-md);
+}
+.ad-step__index {
+  font-family: var(--ad-font-mono);
+  font-size: var(--ad-meta);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-meta);
+  color: var(--ad-faint);
+}
+.ad-step--active {
+  border-color: var(--ad-accent-line);
+}
+.ad-step--active .ad-step__index {
+  color: var(--ad-accent-text);
+}
+
+/* ============================================================================
+   13. STAT ROW
+   Oversized figure numerals. Replaces "it's fast / cheap / accurate".
+   ========================================================================= */
+
+.ad-stat__value {
+  font-family: var(--ad-font-mono);
+  font-size: var(--ad-fig-xl);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-fig);
+  line-height: var(--ad-leading-flat);
+  font-variant-numeric: tabular-nums;
+  color: var(--ad-ink);
+}
+.ad-stat__label {
+  margin-top: 8px;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-sm);
+  color: var(--ad-body);
+}
+/* A figure without a source is a claim without a receipt. */
+.ad-stat__source {
+  margin-top: 4px;
+  font-family: var(--ad-font-mono);
+  font-size: var(--ad-meta-xs);
+  letter-spacing: var(--ad-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ad-faint);
+}
+
+/* ============================================================================
+   14. MARQUEE
+   Must carry real information — real logos, real sources. Never filler words.
+   ========================================================================= */
+
+.ad-marquee {
+  position: relative;
+  overflow: hidden;
+  /* The edge fade. mask-image beats two gradient overlays: an overlay has to
+     know the band colour, so it breaks the moment the section moves.
+
+     THE ONE COMMENTED EXCEPTION TO RULE 1 in this file. The #000 here is not a
+     colour — in a mask it is an alpha value meaning "fully opaque", and it
+     renders nothing. It cannot be tokenised without making the token lie about
+     what it is. A rule-1 grep will flag this line; this comment is the answer.
+     If a second consumer appears, that is a missing token, not an exception. */
+  mask-image: linear-gradient(to right, transparent, #000 96px, #000 calc(100% - 96px), transparent);
+}
+.ad-marquee__track {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  width: max-content;
+  animation: ad-marquee 42s linear infinite;
+}
+.ad-marquee:hover .ad-marquee__track {
+  animation-play-state: paused;
+}
+@keyframes ad-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }   /* requires the track duplicated once */
+}
+
+/* ============================================================================
+   15. MOTION
+   One reveal recipe, used everywhere. See references/motion.md.
+   ========================================================================= */
+
+.ad-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--ad-dur-reveal) var(--ad-ease-out),
+    transform var(--ad-dur-reveal) var(--ad-ease-out);
+}
+.ad-reveal[data-revealed='true'] {
+  opacity: 1;
+  transform: none;
+}
+/* Stagger by index: style={{ '--ad-i': i }}. Cap the index at 6 — beyond that
+   the last item waits over half a second and the group stops reading as a group.
+   The `, 0` fallback is not decorative: an undefined custom property voids the
+   WHOLE declaration, so without it a missing --ad-i kills transition-delay
+   silently. See pitfalls.md §2. */
+.ad-reveal[style*='--ad-i'] {
+  transition-delay: calc(var(--ad-i, 0) * var(--ad-stagger));
+}
+
+/* ============================================================================
+   16. FOCUS
+   Rings must not inherit a hover transition — a ring that fades in over 320ms
+   reads as lag. Every interactive element gets this at BUILD time.
+   ========================================================================= */
+
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--ad-accent);
+  outline-offset: 2px;
+  border-radius: var(--ad-r-sm);
+  transition: none;
+}
+
+::selection {
+  background: var(--ad-accent-wash);
+  color: var(--ad-ink);
+}
+
+/* ============================================================================
+   17. PAPER TOOTH
+   The one ambient texture this system permits, and it is permitted precisely
+   because it does not MOVE. On a dark canvas grain reads as film; on warm paper
+   it reads as stock, which is what the grounds are already pretending to be.
+
+   ONE global element, never per-section — a second one double-exposes and the
+   grain visibly doubles where they overlap.
+   ========================================================================= */
+
+.ad-tooth {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  /* NOT optional. This is a fixed positioned element, so it paints ABOVE all
+     static in-flow content — that is correct for grain and fatal for clicks.
+     Related trap when verifying: elementFromPoint SKIPS pointer-events:none
+     and reports whatever is behind, so it is not a paint-order test here. */
+  pointer-events: none;
+  opacity: var(--ad-tooth-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23t)'/%3E%3C/svg%3E");
+}
+
+/* ============================================================================
+   18. STICKY SCROLLYTELLING
+   The house layout for 2–4 sequential ideas. A sticky left column, a normally
+   scrolling right column, and an observer band across the viewport middle
+   deciding which panel is live. It gives the "pinned" feel WITHOUT ever taking
+   the scrollbar from the user — which is the whole reason it is here instead
+   of scroll-jacking. See references/motion.md §4b for the observer.
+   ========================================================================= */
+
+.ad-scrolly {
+  display: grid;
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+  gap: 96px;
+  align-items: start;
+}
+
+.ad-scrolly__aside {
+  position: sticky;
+  /* 22vh, not 0 — pinning to the very top reads as a stuck header rather than
+     as a column travelling with the reader. */
+  top: 22vh;
+}
+
+.ad-scrolly__panels {
+  display: flex;
+  flex-direction: column;
+  gap: 160px;
+}
+
+/* Dim the inactive panels rather than hiding them: the reader can see what is
+   coming, which is the argument for this layout over a tab strip. */
+.ad-scrolly__panel {
+  opacity: var(--ad-dim-inactive);
+  transition: opacity var(--ad-dur-slow) var(--ad-ease-out);
+}
+.ad-scrolly__panel[data-active='true'] {
+  opacity: 1;
+}
+
+/* The rail ticks are REAL buttons — they scroll their panel into view. A rail
+   the reader can see but not use is decoration pretending to be navigation. */
+.ad-scrolly__tick {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  width: 100%;
+  padding-block: 10px;
+  text-align: left;
+  color: var(--ad-muted);
+  border-top: 1px solid var(--ad-line);
+  transition:
+    color var(--ad-dur-fast) var(--ad-ease-out),
+    border-color var(--ad-dur-fast) var(--ad-ease-out);
+}
+.ad-scrolly__tick:hover {
+  color: var(--ad-body);
+  border-color: var(--ad-line-strong);
+}
+/* Active tick: the accent doing job 2 (active state), as a MARK on the rule —
+   not as the label's colour, which would need --ad-accent-text anyway. */
+.ad-scrolly__tick[data-active='true'] {
+  color: var(--ad-ink);
+  border-color: var(--ad-accent);
+}
+
+/* ============================================================================
+   19. SECTION NUMERAL
+   `01`, `02` — mono, uppercase, sitting above or beside a section head.
+
+   NEVER the accent. A numeral is an index, not an action, a verification or a
+   live state, and tinting one spends the accent on wayfinding that greyscale
+   already handles. This is the single most common way a one-hue system leaks
+   into a two-hue system.
+   ========================================================================= */
+
+.ad-numeral {
+  font-family: var(--ad-font-mono);
+  font-size: var(--ad-meta);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-meta);
+  line-height: var(--ad-leading-meta);
+  text-transform: uppercase;
+  color: var(--ad-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+   20. FOOTER WORDMARK
+   An oversized stroke-only wordmark as the page's closing graphic. Stroke, not
+   fill: at this size a filled wordmark is a black slab and reads as an error
+   state, while an outline reads as a watermark pressed into the paper.
+   ========================================================================= */
+
+.ad-watermark {
+  /* DELIBERATE off-scale exception — one of the very few this system permits,
+     and it must stay unrepeatable. This is a piece of art, not a step: the size
+     is tuned so the baseline clips against the footer edge. It is exempted by
+     name in the type audit (SKILL.md "Closing the scale"); if a SECOND
+     consumer ever appears, that is a missing token, not a second exception.
+
+     It also borrows --ad-tracking-display, which is otherwise permitted on the
+     --ad-display step ONLY. That is consistent rather than a violation: this is
+     larger than display, so the optical argument for -0.024em applies more
+     strongly here, not less. It does not license the value anywhere smaller. */
+  font-size: clamp(120px, 19vw, 260px);
+  line-height: 0.78;
+  font-family: var(--ad-font-sans);
+  font-weight: var(--ad-w-medium);
+  letter-spacing: var(--ad-tracking-display);
+  color: transparent;
+  -webkit-text-stroke: 1px var(--ad-line-strong);
+  user-select: none;
+  display: block;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   21. REDUCED MOTION
+   Ambient motion stops. Auto-advancing content must resolve to a static FULL
+   state, not a frozen partial one — a reveal stuck at opacity 0 is a blank page.
+
+   THIS BLOCK STAYS LAST IN THE FILE. It overrides by source order at equal
+   specificity, so a new animated recipe added below it would silently win and
+   the override would fail with no error anywhere.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-marquee__track,
+  .ad-dot--live {
+    animation: none;
+  }
+  .ad-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  /* Resolve, don't freeze: every panel readable, none dimmed. The JS half must
+     also skip attaching the observer — see references/motion.md §6. */
+  .ad-scrolly__panel {
+    opacity: 1;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

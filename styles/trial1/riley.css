@@ -1,0 +1,915 @@
+/* ============================================================================
+   RILEY — component recipes, scoped to /trial1
+   ----------------------------------------------------------------------------
+   IMPORTED INTO @layer components from app/trial1/layout.tsx. Not unlayered.
+
+   Unlayered, a `.rl-card { margin: 0 }` silently beats every Tailwind spacing
+   utility on the same element regardless of specificity. It produces no error
+   and the page still looks plausible, so it is only ever caught by measuring a
+   computed style. See references/pitfalls.md §1.
+
+   Tailwind is for LAYOUT ONLY — flex, grid, spacing, sizing. Every colour,
+   border, shadow and type value in this file reads a token. No literals.
+
+   Sections 1–17 are the skill's paste-ready recipes, trimmed to what /trial1
+   actually renders. Section 18 is new: the workspace shell, whose shape the
+   skill does not specify. Every invented piece is marked INVENTED with the
+   reasoning, per rule 11.
+   ========================================================================= */
+
+/* ============================================================================
+   0. SCOPING
+   Riley owns /trial1 and nothing else. `.rl-` classes can never collide with
+   `.ob-`, so those stay global — but a bare-element or `:where(a, button)`
+   selector WOULD reach an obsidian route if this sheet were ever loaded
+   globally. Everything that is not a `.rl-` class is nested under `.rl-app`.
+   ========================================================================= */
+
+@layer components {
+  /* ==========================================================================
+     1. TYPE
+     These exist so a component always has a token-backed way to say a size.
+     `text-[15px]` is the leak that puts an unnamed step into the system.
+     ======================================================================= */
+
+  .rl-h1 {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-h1);
+    font-weight: var(--rl-w-semibold);
+    letter-spacing: var(--rl-tracking-tight);
+    line-height: var(--rl-leading-tight);
+    color: var(--rl-ink);
+    text-wrap: balance;
+  }
+
+  .rl-h2 {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-h2);
+    font-weight: var(--rl-w-semibold);
+    letter-spacing: var(--rl-tracking-tight);
+    line-height: var(--rl-leading-tight);
+    color: var(--rl-ink);
+  }
+
+  .rl-h3 {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-h3);
+    font-weight: var(--rl-w-semibold);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-snug);
+    color: var(--rl-ink);
+  }
+
+  .rl-lead {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-lead);
+    font-weight: var(--rl-w-regular);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-lead);
+    color: var(--rl-body);
+    text-wrap: pretty;
+  }
+
+  .rl-sub {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sub);
+    font-weight: var(--rl-w-regular);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-snug);
+    color: var(--rl-body);
+  }
+
+  .rl-body {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-body-size);
+    font-weight: var(--rl-w-regular);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-body);
+    color: var(--rl-body);
+    text-wrap: pretty;
+  }
+
+  .rl-sm {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sm);
+    font-weight: var(--rl-w-regular);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-snug);
+    color: var(--rl-body);
+  }
+
+  .rl-xs {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-xs);
+    font-weight: var(--rl-w-regular);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-snug);
+    color: var(--rl-body);
+  }
+
+  /* Emphasis inside running text. Weight, not colour — an inline span that goes
+     --rl-ink AND bold reads as a second heading mid-paragraph. */
+  .rl-strong {
+    font-weight: var(--rl-w-medium);
+    color: var(--rl-ink);
+  }
+
+  /* The metadata layer. Never carries a sentence — uppercase mono at sentence
+     length is unreadable. If your mono string has a verb in it, use sans. */
+  .rl-meta,
+  .rl-meta-sm,
+  .rl-meta-xs {
+    font-family: var(--rl-font-mono);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-meta);
+    line-height: var(--rl-leading-meta);
+    text-transform: uppercase;
+    color: var(--rl-muted);
+  }
+  .rl-meta    { font-size: var(--rl-meta); }
+  .rl-meta-sm { font-size: var(--rl-meta-sm); }
+  .rl-meta-xs { font-size: var(--rl-meta-xs); }
+
+  /* --rl-muted is 4.44:1 on --rl-linen and 4.02:1 on --rl-inset — both under
+     AA. The skill's answer is "use --rl-body on the two darker grounds", so
+     this is that answer as a modifier rather than as a rule everyone has to
+     remember. Apply it to any meta/label sitting on a tinted panel. */
+  .rl-on-tint {
+    color: var(--rl-body);
+  }
+
+  /* Figure numerals. Mono so digits are tabular; a number is not a heading, so
+     it never takes the display tier's tracking. */
+  .rl-fig-md,
+  .rl-fig-sm {
+    font-family: var(--rl-font-mono);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-fig);
+    line-height: var(--rl-leading-flat);
+    font-variant-numeric: tabular-nums;
+    color: var(--rl-ink);
+  }
+  .rl-fig-md { font-size: var(--rl-fig-md); }
+  .rl-fig-sm { font-size: var(--rl-fig-sm); }
+
+  /* ==========================================================================
+     3. SURFACES
+     Rule 3, the one-step rule: an element sits at least one tier from its
+     ground. A bordered card on --rl-inset has a 1.05:1 border and is invisible.
+     ======================================================================= */
+
+  .rl-card {
+    background: var(--rl-paper);
+    border: 1px solid var(--rl-line);
+    border-radius: var(--rl-r-lg);
+  }
+
+  .rl-panel {
+    background: var(--rl-linen);
+    border: 1px solid var(--rl-line);
+    border-radius: var(--rl-r-md);
+  }
+
+  /* The deepest recess. Note it has NO border — at 1.05:1 the border would not
+     render, so the tier step does the work. */
+  .rl-well {
+    background: var(--rl-inset);
+    border-radius: var(--rl-r-md);
+  }
+
+  /* The one border meant to be CHOSEN — the selected chat, the highlighted
+     plan. Near-black, not accent: the accent marks focus, not selection. */
+  .rl-card-chosen {
+    border-color: var(--rl-line-ink);
+    box-shadow: inset 0 0 0 1px var(--rl-line-ink);
+  }
+
+  .rl-lift       { box-shadow: var(--rl-lift); }
+  .rl-lift-panel { box-shadow: var(--rl-lift-panel); }
+
+  /* ==========================================================================
+     4. BUTTONS
+     Rule 4: near-black is the action, the accent is the pointer.
+     Exactly one .rl-btn--primary visible per viewport — here that is the
+     composer's send control. The rail's "New idea" is deliberately secondary.
+     ======================================================================= */
+
+  .rl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sm);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-flat);
+    border: 1px solid transparent;
+    border-radius: var(--rl-r-pill);
+    cursor: pointer;
+    transition:
+      background-color var(--rl-dur-fast) var(--rl-ease-out),
+      border-color var(--rl-dur-fast) var(--rl-ease-out),
+      color var(--rl-dur-fast) var(--rl-ease-out);
+  }
+
+  /* Hover LIGHTENS. On a bright ground a black control going darker reads dead;
+     going lighter reads pressed-ready. */
+  .rl-btn--primary {
+    background: var(--rl-action);
+    color: var(--rl-on-action);
+  }
+  .rl-btn--primary:hover {
+    background: var(--rl-action-hover);
+  }
+
+  .rl-btn--secondary {
+    background: transparent;
+    border-color: var(--rl-line-strong);
+    color: var(--rl-ink);
+  }
+  .rl-btn--secondary:hover {
+    background: var(--rl-linen);
+    border-color: var(--rl-ink);
+  }
+
+  /* A borderless control for chrome — the top bar's icon actions, the rail's
+     collapse. Not a third button style: no fill, no border, hover tints only. */
+  /* --rl-body, not --rl-muted. The quiet button's two call sites sit on paper
+     (top bar) and on linen (rail footer), and --rl-muted is 4.44:1 on linen —
+     under AA. A control that changes ground has to take the colour that is safe
+     on the darker of the two. */
+  .rl-btn--quiet {
+    background: transparent;
+    color: var(--rl-body);
+    padding: 8px 12px;
+  }
+  .rl-btn--quiet:hover {
+    background: var(--rl-linen);
+    color: var(--rl-ink);
+  }
+
+  .rl-btn--sm {
+    padding: 7px 14px;
+    font-size: var(--rl-xs);
+  }
+
+  /* The composer's send control. Square-ish and icon-only, so it takes the
+     medium radius rather than the pill — a 36px pill button reads as a token
+     rather than a control. */
+  .rl-btn--icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: var(--rl-r-md);
+  }
+
+  .rl-btn:active {
+    transform: translateY(1px);
+  }
+
+  .rl-btn:disabled,
+  .rl-btn[aria-disabled='true'] {
+    color: var(--rl-faint);
+    background: var(--rl-linen);
+    border-color: var(--rl-line);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .rl-btn--quiet:disabled,
+  .rl-btn--quiet[aria-disabled='true'] {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  /* The accent's main job. Appears beside the primary constantly. */
+  .rl-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sm);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-snug);
+    color: var(--rl-accent-text);   /* never --rl-accent: that is 3.39:1 */
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  .rl-link__arrow {
+    transition: transform var(--rl-dur-fast) var(--rl-ease-out);
+  }
+  .rl-link:hover .rl-link__arrow {
+    transform: translateX(3px);
+  }
+
+  /* ==========================================================================
+     5. EYEBROWS AND HINTS
+     ======================================================================= */
+
+  .rl-eyebrow {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sm);
+    font-weight: var(--rl-w-regular);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-snug);
+    color: var(--rl-muted);
+  }
+
+  /* The friction-remover under a control — "Enter to send". This is text that
+     EARNS its place: it answers the question the control just raised. */
+  .rl-hint {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-xs);
+    font-weight: var(--rl-w-regular);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-snug);
+    color: var(--rl-muted);
+  }
+
+  /* ==========================================================================
+     6. CHIPS AND STATUS
+     ======================================================================= */
+
+  .rl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    font-family: var(--rl-font-mono);
+    font-size: var(--rl-meta-xs);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-meta);
+    line-height: var(--rl-leading-flat);
+    text-transform: uppercase;
+    color: var(--rl-muted);
+    background: var(--rl-linen);
+    border: 1px solid var(--rl-line);
+    border-radius: var(--rl-r-sm);
+    white-space: nowrap;
+  }
+
+  /* On a linen or inset ground the neutral chip's own linen fill vanishes and
+     --rl-muted drops under AA. Paper fill restores both in one move. */
+  .rl-chip--on-tint {
+    background: var(--rl-paper);
+    color: var(--rl-body);
+  }
+
+  .rl-chip--accent {
+    color: var(--rl-accent-text);
+    background: var(--rl-accent-wash);
+    border-color: var(--rl-accent-line);
+  }
+
+  /* Never place a --critical chip inside an accent-marked card: the two hues
+     are close enough to collide and the status stops reading as a status. */
+  .rl-chip--positive { color: var(--rl-positive); background: var(--rl-positive-wash); border-color: transparent; }
+  .rl-chip--caution  { color: var(--rl-caution);  background: var(--rl-caution-wash);  border-color: transparent; }
+  .rl-chip--info     { color: var(--rl-info);     background: var(--rl-info-wash);     border-color: transparent; }
+
+  /* The only pulsing thing in the system. */
+  .rl-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--rl-r-pill);
+    background: var(--rl-accent);
+    flex-shrink: 0;
+  }
+  .rl-dot--live {
+    animation: rl-pulse 2s var(--rl-ease-inout) infinite;
+  }
+  @keyframes rl-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--rl-accent-ring); }
+    50%      { box-shadow: 0 0 0 5px transparent; }
+  }
+
+  /* ==========================================================================
+     11. ROWS
+     The third tier of the card system — a bordered row inside a tinted panel.
+     ======================================================================= */
+
+  .rl-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--rl-paper);
+    border: 1px solid var(--rl-line);
+    border-radius: var(--rl-r-md);
+  }
+  .rl-row__icon {
+    flex-shrink: 0;
+    color: var(--rl-muted);
+  }
+
+  /* ==========================================================================
+     18. THE WORKSPACE SHELL — INVENTED
+     ----------------------------------------------------------------------
+     Riley specifies cards, chips, the segmented control, inputs and rows, but
+     not a three-pane application shell. Everything below was derived rather
+     than referenced, and is called out as such per rule 11.
+
+     Two deliberate departures from the skill, both because this is an app
+     surface rather than a landing page:
+
+     a) PANES CARRY A HAIRLINE AS WELL AS A GROUND CHANGE. Rule 5 bans a rule
+        between two full-width sections, and it is right about that — but that
+        rule governs stacked bands, where the eye reads a ground change as a
+        boundary because the boundary is horizontal and full-bleed. On a
+        vertical split, one tier of warm tint at a 1.15:1 edge is not a
+        boundary anyone perceives; it just looks like uneven lighting. The
+        panes get both, and the hairline is --rl-line so it stays a whisper.
+
+     b) NO SECTION PADDING. --rl-section is 128px of vertical air between
+        stacked bands. An app shell is viewport-height with three independently
+        scrolling columns, so its rhythm comes from pane padding (24px) and row
+        gaps instead.
+     ======================================================================= */
+
+  /* The shell. Fixed-fluid-fixed, exactly viewport height, and it is the SHELL
+     that never scrolls — each pane owns its own overflow. A single page-level
+     scrollbar here would drag the composer and the summary off screen together,
+     which is the one thing a workspace must not do. */
+  /* The root layout's obsidian `body` rule paints a near-black canvas under
+     every route in the app. `.rl-app` covers the viewport, but overscroll and
+     the scrollbar gutter still flash it warm-black at the edges. `:has()` makes
+     the override self-scoping in the one way a bare `body` rule can be: it
+     cannot match a document that does not contain the workspace, so this file
+     staying loaded on some future shared route could not repaint an obsidian
+     page by accident. */
+  body:has(.rl-app) {
+    background: var(--rl-canvas);
+    overflow: hidden;
+  }
+
+  .rl-app {
+    display: grid;
+    grid-template-columns: var(--rl-rail) minmax(0, 1fr) var(--rl-aside);
+    grid-template-rows: var(--rl-topbar) minmax(0, 1fr);
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--rl-canvas);
+    font-family: var(--rl-font-sans);
+    color: var(--rl-body);
+    /* Not decorative. The root layout's obsidian `body` rule sets
+       `line-height: var(--ob-leading-body)` — 1.6, which is not one of Riley's
+       seven leading values — and it inherits into anything here whose recipe
+       does not set its own. The type audit caught it on `.rl-hint` as a stray
+       13px/1.6. Re-anchoring the subtree is the fix; the alternative is
+       remembering to write line-height into every recipe forever. */
+    line-height: var(--rl-leading-body);
+  }
+
+  /* --- Top bar ---------------------------------------------------------- */
+
+  .rl-topbar {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: var(--rl-rail) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 24px;
+    padding-right: 24px;
+    background: var(--rl-paper);
+    border-bottom: 1px solid var(--rl-line);
+  }
+
+  /* The wordmark block sits in the rail column so its right edge lines up with
+     the rail's hairline below it — the top bar and the rail read as one
+     L-shaped chrome rather than two unrelated strips. */
+  .rl-topbar__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding-inline: 24px;
+    border-right: 1px solid var(--rl-line);
+  }
+  .rl-topbar__wordmark {
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sub);
+    font-weight: var(--rl-w-semibold);
+    letter-spacing: var(--rl-tracking-tight);
+    line-height: var(--rl-leading-flat);
+    color: var(--rl-ink);
+  }
+  /* The mark is a filled near-black square, NOT the accent. Rule 4: the accent
+     has three jobs and "being the logo" is not one of them. */
+  .rl-topbar__mark {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--rl-r-sm);
+    background: var(--rl-action);
+    color: var(--rl-on-action);
+    flex-shrink: 0;
+  }
+
+  /* --- Stage switcher — INVENTED (shape), specified (parts) --------------
+     The three stages are PEERS, not steps. No ordinals, no connectors, no
+     left-to-right arrow: the user asked for something you can move through in
+     either direction, and a numbered stepper says the opposite in a way no
+     amount of copy undoes. Riley's segmented control is exactly the right
+     primitive for a set of equal siblings where one is current, so this is
+     .rl-segmented with two additions: a per-item status chip, and a real
+     disabled state for the stages that have no page behind them yet.
+
+     Note what is NOT accent-marked. The current stage is carried by the paper
+     thumb and its lift, the same way the skill's segmented control does it.
+     Adding an accent rule under the active item on top of that would be the
+     accent doing a job the thumb is already doing.
+     -------------------------------------------------------------------- */
+
+  .rl-stage {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    background: var(--rl-linen);
+    border-radius: var(--rl-r-pill);
+  }
+  .rl-stage__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sm);
+    font-weight: var(--rl-w-medium);
+    line-height: var(--rl-leading-flat);
+    color: var(--rl-body);
+    background: transparent;
+    border: 0;
+    border-radius: var(--rl-r-pill);
+    cursor: pointer;
+    transition:
+      background-color var(--rl-dur-fast) var(--rl-ease-out),
+      color var(--rl-dur-fast) var(--rl-ease-out);
+  }
+  .rl-stage__item:hover {
+    color: var(--rl-ink);
+  }
+  .rl-stage__item[aria-current='page'] {
+    color: var(--rl-ink);
+    background: var(--rl-paper);
+    box-shadow: var(--rl-lift);
+  }
+  /* Unavailable, and still fully legible.
+     --rl-faint is the token the system nominates for a disabled control, and it
+     was the first thing tried here — but it measures 3.38:1 on the linen track,
+     and WCAG's exemption for inactive controls is a bad excuse in this specific
+     case: the *entire job* of these two items is to tell a first-time reader
+     that Validate and Roadmap exist. Greying out the only place the product
+     names its own shape is a worse outcome than the rule was written to
+     prevent. So the unavailable state is carried by the missing thumb, the
+     `not-allowed` cursor and the "Soon" flag — not by dimming the label. */
+  .rl-stage__item[aria-disabled='true'] {
+    color: var(--rl-body);
+    cursor: not-allowed;
+  }
+  .rl-stage__item[aria-disabled='true']:hover {
+    color: var(--rl-body);
+  }
+  /* The per-stage status marker. Smaller and quieter than a .rl-chip because it
+     lives inside a control rather than beside one. */
+  .rl-stage__flag {
+    font-family: var(--rl-font-mono);
+    font-size: var(--rl-meta-xs);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-meta);
+    line-height: var(--rl-leading-flat);
+    text-transform: uppercase;
+    color: var(--rl-body);   /* 6.30:1 on the linen track; --rl-muted is 4.44 */
+  }
+  .rl-stage__item[aria-current='page'] .rl-stage__flag {
+    color: var(--rl-accent-text);   /* accent job: active/live */
+  }
+
+  /* --- Panes ------------------------------------------------------------- */
+
+  .rl-pane {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Left rail: linen, one tier below the canvas thread it sits beside. */
+  .rl-rail {
+    display: flex;
+    flex-direction: column;
+    background: var(--rl-linen);
+    border-right: 1px solid var(--rl-line);
+  }
+  .rl-rail__head {
+    padding: 20px 16px 12px;
+  }
+  .rl-rail__group {
+    padding: 0 12px 8px;
+  }
+  .rl-rail__label {
+    padding: 16px 4px 8px;
+  }
+  .rl-rail__foot {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--rl-line);
+  }
+
+  /* A history row. Transparent on the linen ground by default — a bordered card
+     per row would put 14 hairlines in a 280px column and turn the rail into a
+     ladder. Hover lifts it one tier to paper; selection adds the CHOSEN border,
+     which is near-black rather than accent because this is a selection, not a
+     live state. */
+  .rl-chat {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--rl-r-md);
+    cursor: pointer;
+    transition:
+      background-color var(--rl-dur-fast) var(--rl-ease-out),
+      border-color var(--rl-dur-fast) var(--rl-ease-out);
+  }
+  .rl-chat:hover {
+    background: var(--rl-paper);
+    border-color: var(--rl-line);
+  }
+  .rl-chat[aria-current='true'] {
+    background: var(--rl-paper);
+    border-color: var(--rl-line-ink);
+    box-shadow: inset 0 0 0 1px var(--rl-line-ink);
+  }
+  .rl-chat__title {
+    display: block;
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-sm);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-snug);
+    color: var(--rl-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rl-chat__meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+  }
+
+  /* Centre: the thread. Canvas ground, and it is the only pane with a measure —
+     a chat that runs the full width of a 1440px viewport is unreadable at any
+     type size. */
+  .rl-thread {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .rl-thread__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .rl-thread__measure {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+    padding: 28px 32px 8px;
+  }
+
+  /* A turn. The assistant speaks as flat prose directly on the canvas; the user
+     speaks in a paper card. That asymmetry is the invented part and it is
+     deliberate: two mirrored bubbles make the product look like a chat toy,
+     whereas an unboxed assistant voice reads as the document the product is
+     actually building, with the user's asides sitting on top of it. */
+  .rl-turn + .rl-turn {
+    margin-top: 28px;
+  }
+  .rl-turn__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .rl-turn--user {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .rl-turn--user .rl-turn__body {
+    max-width: 520px;
+    padding: 14px 16px;
+    background: var(--rl-paper);
+    border: 1px solid var(--rl-line);
+    border-radius: var(--rl-r-lg);
+  }
+  .rl-turn__body > * + * {
+    margin-top: 12px;
+  }
+
+  /* The typing indicator. Three dots on the accent, because "the model is
+     working right now" is the live state — the accent's second job. Reserved
+     height so the thread does not jump when the reply lands. */
+  .rl-typing {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 20px;
+  }
+  .rl-typing span {
+    width: 5px;
+    height: 5px;
+    border-radius: var(--rl-r-pill);
+    background: var(--rl-accent);
+    animation: rl-typing 1.2s var(--rl-ease-inout) infinite;
+  }
+  .rl-typing span:nth-child(2) { animation-delay: 0.15s; }
+  .rl-typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes rl-typing {
+    0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+    30%           { opacity: 1;    transform: translateY(-3px); }
+  }
+
+  /* --- Composer ---------------------------------------------------------- */
+
+  /* The dock is opaque canvas with a top hairline: the thread scrolls under it,
+     so a translucent dock would show half a sentence bleeding through. It gets
+     no shadow — it is pinned to the pane, not floating above the page. */
+  .rl-dock {
+    flex-shrink: 0;
+    padding: 12px 32px 20px;
+    background: var(--rl-canvas);
+    border-top: 1px solid var(--rl-line);
+  }
+  .rl-dock__measure {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  .rl-composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 10px 10px 10px 14px;
+    background: var(--rl-paper);
+    border: 1px solid var(--rl-line);
+    border-radius: var(--rl-r-lg);
+    transition:
+      border-color var(--rl-dur-fast) var(--rl-ease-out),
+      box-shadow var(--rl-dur-fast) var(--rl-ease-out);
+  }
+  .rl-composer:hover {
+    border-color: var(--rl-line-strong);
+  }
+  /* The focus ring goes on the WRAPPER, not the textarea, because the textarea
+     is borderless inside it — :focus-within is what makes the whole control
+     read as one field. */
+  .rl-composer:focus-within {
+    border-color: var(--rl-accent-line);
+    box-shadow: 0 0 0 3px var(--rl-accent-ring);
+  }
+  .rl-composer__field {
+    flex: 1;
+    min-height: 0;
+    max-height: 168px;
+    padding: 8px 0;
+    font-family: var(--rl-font-sans);
+    font-size: var(--rl-body-size);
+    letter-spacing: var(--rl-tracking-snug);
+    line-height: var(--rl-leading-lead);
+    color: var(--rl-ink);
+    background: transparent;
+    border: 0;
+    resize: none;
+  }
+  .rl-composer__field:focus {
+    outline: none;   /* the wrapper carries the ring */
+  }
+  .rl-composer__field::placeholder {
+    color: var(--rl-faint);
+  }
+
+  /* --- Right pane: the summary ------------------------------------------ */
+
+  /* Paper, so every panel inside it can be linen and still clear one step. */
+  .rl-aside {
+    background: var(--rl-paper);
+    border-left: 1px solid var(--rl-line);
+  }
+  .rl-aside__head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 20px 24px 16px;
+    background: var(--rl-paper);
+    border-bottom: 1px solid var(--rl-line);
+  }
+  .rl-aside__body {
+    padding: 20px 24px 32px;
+  }
+  .rl-aside__body > * + * {
+    margin-top: 20px;
+  }
+  .rl-aside__section > * + * {
+    margin-top: 10px;
+  }
+
+  /* The coverage meter. Track is --rl-inset with no border (1.05:1 — the tier
+     step does the work); fill is --rl-accent, which is the accent's third job:
+     the one thing in the pane the eye should land on. */
+  .rl-meter {
+    height: 6px;
+    border-radius: var(--rl-r-pill);
+    background: var(--rl-inset);
+    overflow: hidden;
+  }
+  .rl-meter__fill {
+    height: 100%;
+    border-radius: var(--rl-r-pill);
+    background: var(--rl-accent);
+    transition: width var(--rl-dur-slow) var(--rl-ease-out);
+  }
+
+  /* An open question. Bottom-border rows rather than cards — the accordion
+     lesson: boxing a short list doubles the border count for nothing. */
+  .rl-open {
+    display: flex;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rl-line);
+  }
+  .rl-open:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .rl-open__index {
+    flex-shrink: 0;
+    font-family: var(--rl-font-mono);
+    font-size: var(--rl-meta);
+    font-weight: var(--rl-w-medium);
+    letter-spacing: var(--rl-tracking-meta);
+    line-height: var(--rl-leading-body);
+    /* --rl-muted, not --rl-faint. These are ordinals a reader uses to refer to
+       a question out loud ("the second one"), so they are text, and --rl-faint
+       is 3.07:1 on paper. */
+    color: var(--rl-muted);
+  }
+
+  /* ==========================================================================
+     16. FOCUS — scoped to .rl-app so it can never reach an obsidian route.
+     Rings must not inherit a hover transition: a ring that fades in over 320ms
+     reads as lag.
+     ======================================================================= */
+
+  .rl-app :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--rl-accent);
+    outline-offset: 2px;
+    border-radius: var(--rl-r-sm);
+    transition: none;
+  }
+  /* The composer's ring belongs to the wrapper, so the textarea must not draw a
+     second one inside it. */
+  .rl-composer__field:focus-visible {
+    outline: none;
+  }
+
+  .rl-app ::selection {
+    background: var(--rl-accent-wash);
+    color: var(--rl-ink);
+  }
+
+  /* ==========================================================================
+     17. REDUCED MOTION
+     Ambient motion stops. Anything that auto-advances resolves to a static FULL
+     state, not a frozen partial one.
+     ======================================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+    .rl-dot--live {
+      animation: none;
+    }
+    /* Not `animation: none` — that would leave all three dots at their initial
+       0.25 opacity, i.e. a permanently half-drawn indicator. Hold them solid
+       instead, which still reads as "working". */
+    .rl-typing span {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    .rl-app *,
+    .rl-app *::before,
+    .rl-app *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

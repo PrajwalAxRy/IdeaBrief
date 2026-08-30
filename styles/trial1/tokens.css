@@ -1,0 +1,193 @@
+/* ============================================================================
+   RILEY — design tokens, scoped to /trial1
+   ----------------------------------------------------------------------------
+   This is the ONLY file in the /trial1 tree permitted to contain a colour
+   value, a font-size, or a line-height. A literal anywhere else is a bug.
+
+   WHY THIS ISN'T IN styles/globals.css
+   ------------------------------------
+   The repo root belongs to `obsidian-design` and `globals.css` puts `--ob-*` on
+   `:root` for every route in the app. Riley owns `/trial1` only. Two things
+   follow, and both are deliberate:
+
+   1. This file is imported by `app/trial1/layout.tsx`, not by `globals.css`.
+      Next only ships a nested layout's CSS on the routes under it, so no
+      obsidian route pays for these bytes and no obsidian rule is touched.
+      It also means /trial2 and /trial3 can be built in parallel against their
+      own copies without three processes editing one shared stylesheet.
+
+   2. The tokens land on `:root` anyway. That is safe because the two systems
+      share no variable names — `--rl-*` against `--ob-*` — so neither can
+      shadow the other. What is NOT safe is a bare-element rule, so every
+      selector in the recipe file that isn't a `.rl-` class is scoped under
+      `.rl-app`. See riley.css §0.
+
+   Contrast figures in the comments were computed, not estimated.
+   ========================================================================= */
+
+@layer base {
+  :root {
+    /* ------------------------------------------------------------------------
+       GROUNDS — four warm levels. Rule 2: no cool grey exists here.
+       ------------------------------------------------------------------- */
+    --rl-paper:          #FFFFFF;   /* card faces; the brighter band            */
+    --rl-canvas:         #FAF9F7;   /* page ground — the default                */
+    --rl-linen:          #F4F1EB;   /* tinted panel; the dimmer band            */
+    --rl-inset:          #EBE6DD;   /* wells: code blocks, empty states         */
+
+    /* ------------------------------------------------------------------------
+       HAIRLINES
+       --rl-line vs each ground: paper 1.30 · canvas 1.24 · linen 1.15 ·
+       inset 1.05. That last value is why the one-step rule exists.
+       ------------------------------------------------------------------- */
+    --rl-line:           #E7E1D7;
+    --rl-line-strong:    #D6CEC0;
+    --rl-line-ink:       #1A1714;   /* the one border meant to be CHOSEN        */
+
+    /* ------------------------------------------------------------------------
+       TEXT — four levels. Worst-ground ratio in the comment.
+       ------------------------------------------------------------------- */
+    --rl-ink:            #1A1714;   /* 14.36 — headlines, values. Never #000    */
+    --rl-body:           #57514A;   /*  6.30 — all running prose                */
+    --rl-muted:          #776E64;   /*  4.02 — AA on paper/canvas ONLY          */
+    --rl-faint:          #8C8175;   /*  3.07 — NEVER text                       */
+
+    /* ------------------------------------------------------------------------
+       ACCENT — one hue, three jobs: link · active/live · focal point.
+       There is no accent-filled button: white on --rl-accent is 3.39.
+       ------------------------------------------------------------------- */
+    --rl-accent:         #F05A28;   /* MARKS ONLY — dot, rule, bar, fill        */
+    --rl-accent-text:    #AE3D12;   /*  4.86 worst — ALL accent text and links  */
+    --rl-accent-solid:   #C43F15;   /*  5.16 w/ white — the rare filled control */
+    --rl-accent-wash:    #FDF0EA;
+    --rl-accent-line:    rgba(240, 90, 40, 0.35);
+    --rl-accent-ring:    rgba(240, 90, 40, 0.14);
+
+    /* ------------------------------------------------------------------------
+       ACTION — near-black. Rule 4: this is the button, not the accent.
+       Hover LIGHTENS: on a bright ground a black control going darker reads
+       dead.
+       ------------------------------------------------------------------- */
+    --rl-action:         #1A1714;   /* 17.85 with white                         */
+    --rl-action-hover:   #332D27;
+    --rl-on-action:      #FFFFFF;
+
+    /* ------------------------------------------------------------------------
+       SEMANTIC — four, and they are not the accent.
+       ------------------------------------------------------------------- */
+    --rl-positive:       #1A6B42;
+    --rl-positive-wash:  #E8F4ED;
+    --rl-caution:        #7E5205;
+    --rl-caution-wash:   #FDF3E2;
+    --rl-critical:       #B32D1B;
+    --rl-critical-wash:  #FBEDEA;
+    --rl-info:           #1B559A;
+    --rl-info-wash:      #E8F0FA;
+
+    /* ------------------------------------------------------------------------
+       ELEVATION — exactly two, both earned. Warm-tinted, NOT rgba(0,0,0,x):
+       a neutral-black shadow on warm paper turns the paper grey at the edges.
+       ------------------------------------------------------------------- */
+    --rl-lift:
+      0 1px 2px -1px rgba(61, 48, 36, 0.10),
+      0 3px 8px -2px rgba(61, 48, 36, 0.08);
+    --rl-lift-panel:
+      0 1px 2px -1px rgba(61, 48, 36, 0.10),
+      0 6px 16px -4px rgba(61, 48, 36, 0.10),
+      0 20px 44px -8px rgba(61, 48, 36, 0.10);
+
+    /* ------------------------------------------------------------------------
+       RADII — decreases as you nest.
+       ------------------------------------------------------------------- */
+    --rl-r-sm:            8px;
+    --rl-r-md:           12px;
+    --rl-r-lg:           16px;
+    --rl-r-xl:           24px;
+    --rl-r-pill:        999px;
+
+    /* ------------------------------------------------------------------------
+       TYPE — 16 steps in 4 tiers. There is no seventeenth.
+       ------------------------------------------------------------------- */
+    --rl-display:        clamp(44px, 5.2vw, 64px);
+    --rl-h1:             clamp(32px, 3.4vw, 44px);
+    --rl-h2:             clamp(24px, 2.2vw, 32px);
+    --rl-h3:             20px;
+    --rl-lead:           19px;
+
+    --rl-sub:            17px;
+    --rl-body-size:      16px;      /* NB: --rl-body is the COLOUR token        */
+    --rl-sm:             14px;
+    --rl-xs:             13px;
+
+    --rl-meta:           12px;
+    --rl-meta-sm:        11px;
+    --rl-meta-xs:        10px;
+
+    --rl-fig-xl:         clamp(36px, 3.6vw, 52px);
+    --rl-fig-lg:         40px;
+    --rl-fig-md:         30px;
+    --rl-fig-sm:         24px;
+
+    /* ------------------------------------------------------------------------
+       TRACKING — roughly half as tight as a dark system.
+       ------------------------------------------------------------------- */
+    --rl-tracking-display: -0.02em;
+    --rl-tracking-tight:   -0.015em;
+    --rl-tracking-snug:    -0.008em;
+    --rl-tracking-normal:   0;
+    --rl-tracking-meta:     0.08em;
+    --rl-tracking-fig:     -0.01em;
+
+    /* ------------------------------------------------------------------------
+       LEADING — seven values. Nothing between them.
+       ------------------------------------------------------------------- */
+    --rl-leading-display:  1.04;
+    --rl-leading-flat:     1;
+    --rl-leading-tight:    1.12;
+    --rl-leading-snug:     1.3;
+    --rl-leading-meta:     1.4;
+    --rl-leading-lead:     1.5;
+    --rl-leading-body:     1.65;
+
+    --rl-w-regular:      400;
+    --rl-w-medium:       500;
+    --rl-w-semibold:     600;
+    --rl-w-bold:         700;   /* --rl-display only */
+
+    /* FONTS — the root layout exposes Geist as `--font-geist`, not
+       `--font-geist-sans` as the skill's paste-ready file assumes. Getting this
+       wrong is silent: the var resolves to nothing, the whole font-family
+       declaration is voided, and the page falls back to the UI sans while still
+       looking broadly plausible. */
+    --rl-font-sans:      var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+    --rl-font-mono:      var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+    /* ------------------------------------------------------------------------
+       LAYOUT
+       ------------------------------------------------------------------- */
+    --rl-container:       1200px;
+    --rl-container-wide:  1320px;
+    --rl-measure:          680px;
+    --rl-gutter:            40px;
+    --rl-section:          128px;
+    --rl-section-tight:     96px;
+
+    /* Workspace geometry. The three-pane shell is a fixed-fluid-fixed grid;
+       these two are the fixed columns and they are tokens rather than Tailwind
+       literals because both rails and the top bar have to agree on them. */
+    --rl-rail:             280px;
+    --rl-aside:            360px;
+    --rl-topbar:            64px;
+
+    /* ------------------------------------------------------------------------
+       MOTION
+       ------------------------------------------------------------------- */
+    --rl-dur-fast:        150ms;
+    --rl-dur-base:        220ms;
+    --rl-dur-slow:        320ms;
+    --rl-dur-reveal:      500ms;
+    --rl-stagger:         100ms;
+    --rl-ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+    --rl-ease-inout:      cubic-bezier(0.65, 0, 0.35, 1);
+  }
+}

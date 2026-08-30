@@ -1,0 +1,1125 @@
+/* ============================================================================
+   TRIAL 2 — Audacious, scoped.
+   ----------------------------------------------------------------------------
+   Obsidian owns `:root` for the whole app. A second `:root` block here would
+   win by source order and restyle every dark page in the tree, so every
+   Audacious token is declared on the `.ad-root` WRAPPER instead. Nothing
+   outside a `.ad-root` subtree can see an `--ad-*` value, and nothing inside it
+   should ever read an `--ob-*` one — the two systems share no tokens.
+
+   The file is self-contained (tokens + recipes) and uniquely named so that the
+   /trial1 and /trial3 work happening in parallel cannot collide with it.
+
+   Recipes are wrapped in `@layer components` by hand. Tailwind's layer order is
+   declared in `styles/globals.css`, which the root layout loads first, so this
+   file joins the existing `components` layer rather than starting a new one.
+   Unlayered, `.ad-card { margin: 0 }` would silently beat every Tailwind
+   spacing utility on the same element with no error anywhere.
+   ============================================================================ */
+
+/* --------------------------------------------------------------------------
+   0 · TOKENS
+   Every colour value in the Audacious surface lives in this block and nowhere
+   else. Warm neutrals only — no #F9FAFB, no #E5E7EB, no cool grey of any kind.
+   -------------------------------------------------------------------------- */
+.ad-root {
+  /* Grounds — four warm levels, each one step from its neighbour. */
+  --ad-paper: #ffffff;
+  --ad-canvas: #faf9f7;
+  --ad-linen: #f4f1eb;
+  --ad-inset: #ebe6dd;
+
+  /* Hairlines. `line` measures 1.30:1 on paper and 1.05:1 on inset — which is
+     why a bordered thing must always sit at least one tier away from its
+     ground, and why this shell alternates canvas / paper / linen across its
+     three columns rather than bordering same-on-same. */
+  --ad-line: #e7e1d7;
+  --ad-line-strong: #d6cec0;
+  --ad-line-ink: #1a1714;
+
+  /* Text — four levels. `--ad-muted` passes AA on paper and canvas only, so
+     secondary copy on linen and inset uses `--ad-body`. `--ad-faint` is never
+     text you have to read; here it carries exactly one thing, the ruled-out
+     assumption, where being hard to read is the point. */
+  --ad-ink: #1a1714;
+  --ad-body: #57514a;
+  --ad-muted: #776e64;
+  --ad-faint: #8c8175;
+
+  /* Accent — one hue, three jobs: link, active/live, focal point. There is no
+     accent-filled button; white on #F05A28 is 3.39:1 and cannot be fixed. */
+  --ad-accent: #f05a28;
+  --ad-accent-text: #ae3d12;
+  --ad-accent-solid: #c43f15;
+  --ad-accent-wash: #fdf0ea;
+  --ad-accent-line: rgba(240, 90, 40, 0.35);
+
+  /* Action — near-black carries every primary button. */
+  --ad-action: #1a1714;
+  --ad-action-hover: #332d27;
+  --ad-on-action: #ffffff;
+
+  /* Semantic. */
+  --ad-positive: #1a6b42;
+  --ad-positive-wash: #e8f4ed;
+  --ad-caution: #7e5205;
+  --ad-caution-wash: #fdf3e2;
+  --ad-critical: #b32d1b;
+  --ad-critical-wash: #fbedea;
+  --ad-info: #1b559a;
+  --ad-info-wash: #e8f0fa;
+
+  /* Elevation — two shadows, both warm-tinted. A neutral-black shadow on warm
+     paper greys the edges and quietly undoes the whole palette. */
+  --ad-lift: 0 1px 2px rgba(60, 44, 28, 0.05), 0 8px 20px -6px rgba(60, 44, 28, 0.1);
+  --ad-lift-panel: 0 2px 6px rgba(60, 44, 28, 0.06), 0 24px 60px -18px rgba(60, 44, 28, 0.22);
+
+  /* Type — sixteen steps in four tiers. A seventeenth is a bug. */
+  --ad-display: clamp(56px, 6.6vw, 92px);
+  --ad-h1: clamp(38px, 4.2vw, 58px);
+  --ad-h2: clamp(26px, 2.6vw, 38px);
+  --ad-h3: 22px;
+  --ad-lead: 20px;
+  --ad-sub: 17px;
+  --ad-body-size: 16px;
+  --ad-sm: 14px;
+  --ad-xs: 13px;
+  --ad-meta: 12px;
+  --ad-meta-sm: 11px;
+  --ad-meta-xs: 10px;
+  --ad-fig-xl: clamp(36px, 3.6vw, 52px);
+  --ad-fig-lg: 40px;
+  --ad-fig-md: 30px;
+  --ad-fig-sm: 24px;
+
+  /* Leading — seven values. Nothing between them; a stray 1.55 is how one size
+     ends up rendering at four different leadings on one screen. */
+  --ad-leading-display: 1.04;
+  --ad-leading-flat: 1;
+  --ad-leading-tight: 1.12;
+  --ad-leading-snug: 1.3;
+  --ad-leading-meta: 1.4;
+  --ad-leading-lead: 1.5;
+  --ad-leading-body: 1.65;
+
+  /* Tracking. -0.024em is permitted on the display step ONLY. */
+  --ad-tracking-display: -0.024em;
+  --ad-tracking-head: -0.015em;
+  --ad-tracking-snug: -0.008em;
+  --ad-tracking-meta: 0.08em;
+  --ad-tracking-fig: -0.01em;
+
+  /* Radii — decreasing as you nest. 18px is assured; 24px is friendly, and the
+     difference between those two words is most of the system. */
+  --ad-r-sm: 6px;
+  --ad-r-md: 10px;
+  --ad-r-lg: 14px;
+  --ad-r-xl: 18px;
+  --ad-r-pill: 999px;
+
+  --ad-font: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --ad-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Shell geometry. The three columns are fixed / fluid / fixed so the
+     transcript is the only thing that reflows. */
+  --ad-rail-w: 296px;
+  --ad-summary-w: 372px;
+  --ad-topbar-h: 60px;
+}
+
+@layer components {
+  /* ------------------------------------------------------------------------
+     1 · ROOT
+     `color-scheme: light` is set here rather than on <html>, which Obsidian
+     holds at `dark`. It is inherited, so every scrollbar, text cursor and form
+     control inside this subtree renders from the light UA palette instead of
+     the dark one.
+
+     `-webkit-font-smoothing` is forced back to `auto`. `globals.css` sets
+     `antialiased` on <body>; that is a dark-theme correction for the optical
+     bloom of light-on-dark, and on paper it renders weight-500 type visibly
+     under-baked. This is the single most likely reason a correctly built light
+     page still looks washed out.
+     ------------------------------------------------------------------------ */
+  .ad-root {
+    color-scheme: light;
+    background: var(--ad-canvas);
+    color: var(--ad-body);
+    font-family: var(--ad-font);
+    font-size: var(--ad-body-size);
+    line-height: var(--ad-leading-body);
+    letter-spacing: var(--ad-tracking-snug);
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ad-root ::selection {
+    background: var(--ad-accent-wash);
+    color: var(--ad-ink);
+  }
+
+  /* The global ring is `--ob-accent` electric blue, which is a token from the
+     other system and would read as a foreign object on paper. `transition:
+     none` is required rather than tidy: a ring that fades in over 320ms is a
+     usability bug and it also makes the computed value impossible to measure. */
+  .ad-root :focus-visible {
+    outline: 2px solid var(--ad-accent);
+    outline-offset: 2px;
+    transition: none;
+  }
+
+  /* ------------------------------------------------------------------------
+     2 · TYPE RECIPES
+     `globals.css` sets h1–h6 to `--ob-text` (near-white) at weight 400 inside
+     `@layer base`. Every heading in this subtree therefore has to carry a
+     recipe class — a bare <h2> would paint near-white on paper.
+     ------------------------------------------------------------------------ */
+  .ad-display {
+    font-size: var(--ad-display);
+    font-weight: 500;
+    line-height: var(--ad-leading-display);
+    letter-spacing: var(--ad-tracking-display);
+    color: var(--ad-ink);
+    text-wrap: balance;
+  }
+
+  .ad-h1 {
+    font-size: var(--ad-h1);
+    font-weight: 600;
+    line-height: var(--ad-leading-tight);
+    letter-spacing: var(--ad-tracking-head);
+    color: var(--ad-ink);
+    text-wrap: balance;
+  }
+
+  .ad-h2 {
+    font-size: var(--ad-h2);
+    font-weight: 600;
+    line-height: var(--ad-leading-tight);
+    letter-spacing: var(--ad-tracking-head);
+    color: var(--ad-ink);
+    text-wrap: balance;
+  }
+
+  .ad-h3 {
+    font-size: var(--ad-h3);
+    font-weight: 600;
+    line-height: var(--ad-leading-snug);
+    letter-spacing: var(--ad-tracking-snug);
+    color: var(--ad-ink);
+  }
+
+  .ad-lead {
+    font-size: var(--ad-lead);
+    font-weight: 400;
+    line-height: var(--ad-leading-lead);
+    letter-spacing: var(--ad-tracking-snug);
+    color: var(--ad-body);
+  }
+
+  .ad-sub {
+    font-size: var(--ad-sub);
+    line-height: var(--ad-leading-body);
+  }
+
+  .ad-body {
+    font-size: var(--ad-body-size);
+    line-height: var(--ad-leading-body);
+  }
+
+  .ad-sm {
+    font-size: var(--ad-sm);
+    line-height: var(--ad-leading-body);
+  }
+
+  .ad-xs {
+    font-size: var(--ad-xs);
+    line-height: var(--ad-leading-body);
+  }
+
+  /* The metadata layer. Mono, uppercase, +0.08em — it carries ids, counts,
+     timestamps, stage labels and status, and it never carries a sentence. */
+  .ad-meta {
+    font-family: var(--ad-mono);
+    font-size: var(--ad-meta);
+    font-weight: 500;
+    line-height: var(--ad-leading-meta);
+    letter-spacing: var(--ad-tracking-meta);
+    text-transform: uppercase;
+    color: var(--ad-muted);
+  }
+
+  .ad-meta-sm {
+    font-family: var(--ad-mono);
+    font-size: var(--ad-meta-sm);
+    font-weight: 500;
+    line-height: var(--ad-leading-meta);
+    letter-spacing: var(--ad-tracking-meta);
+    text-transform: uppercase;
+  }
+
+  /* `--ad-muted` measures 4.44:1 on linen and 4.02:1 on inset — under AA on
+     both. It is only universal on paper (5.00) and canvas (4.75). Secondary
+     copy sitting on either of the two darker grounds takes `--ad-body`
+     instead, which is what this class is for. Porting a dark system's muted
+     tone straight onto light and using it everywhere is the single most common
+     accessibility failure in this genre.
+
+     It has to sit AFTER `.ad-meta` rather than before it: both are single
+     classes, so specificity ties and source order decides. Declared above, it
+     lost silently and the audit still read 4.44:1 with the class applied. */
+  .ad-on-linen {
+    color: var(--ad-body);
+  }
+
+  /* ------------------------------------------------------------------------
+     3 · BUTTONS
+     Primary is near-black and hover LIGHTENS — on a light ground a black
+     control going lighter reads as pressed-ready, while darkening reads as
+     dead. Exactly one primary is visible per viewport: the composer's Send.
+     ------------------------------------------------------------------------ */
+  .ad-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--ad-font);
+    font-size: var(--ad-sm);
+    font-weight: 500;
+    letter-spacing: var(--ad-tracking-snug);
+    line-height: var(--ad-leading-flat);
+    padding: 10px 18px;
+    border-radius: var(--ad-r-pill);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  }
+
+  .ad-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  .ad-btn-primary {
+    background: var(--ad-action);
+    color: var(--ad-on-action);
+  }
+
+  .ad-btn-primary:hover:not(:disabled) {
+    background: var(--ad-action-hover);
+  }
+
+  .ad-btn-primary:active:not(:disabled) {
+    background: var(--ad-ink);
+  }
+
+  .ad-btn-secondary {
+    background: transparent;
+    border-color: var(--ad-line-strong);
+    color: var(--ad-ink);
+  }
+
+  .ad-btn-secondary:hover:not(:disabled) {
+    background: var(--ad-linen);
+    border-color: var(--ad-line-ink);
+  }
+
+  .ad-btn-secondary:active:not(:disabled) {
+    background: var(--ad-inset);
+  }
+
+  /* The accent's first job. It sits beside the primary constantly and is the
+     reason there is no accent-filled button anywhere. */
+  .ad-btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: var(--ad-font);
+    font-size: var(--ad-sm);
+    font-weight: 500;
+    letter-spacing: var(--ad-tracking-snug);
+    color: var(--ad-accent-text);
+    white-space: nowrap;
+  }
+
+  .ad-btn-link .ad-arrow {
+    transition: transform 150ms ease;
+  }
+
+  .ad-btn-link:hover .ad-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ------------------------------------------------------------------------
+     4 · CHIPS, DOTS, HINTS
+     ------------------------------------------------------------------------ */
+  .ad-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--ad-mono);
+    font-size: var(--ad-meta-xs);
+    font-weight: 500;
+    letter-spacing: var(--ad-tracking-meta);
+    line-height: var(--ad-leading-flat);
+    text-transform: uppercase;
+    padding: 5px 8px;
+    border-radius: var(--ad-r-sm);
+    border: 1px solid var(--ad-line);
+    background: var(--ad-linen);
+    color: var(--ad-body);
+    white-space: nowrap;
+  }
+
+  .ad-chip-accent {
+    background: var(--ad-accent-wash);
+    border-color: var(--ad-accent-line);
+    color: var(--ad-accent-text);
+  }
+
+  .ad-chip-positive {
+    background: var(--ad-positive-wash);
+    border-color: transparent;
+    color: var(--ad-positive);
+  }
+
+  .ad-chip-caution {
+    background: var(--ad-caution-wash);
+    border-color: transparent;
+    color: var(--ad-caution);
+  }
+
+  /* The only pulsing thing in the system. Job 2: live state. */
+  .ad-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--ad-r-pill);
+    background: var(--ad-accent);
+    flex: none;
+    animation: ad-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* The settled sibling. Semantic green, and deliberately NOT animated — the
+     pulse is what distinguishes "happening now" from "has happened", and two
+     pulsing dots on one screen would erase that distinction. */
+  .ad-dot-settled {
+    background: var(--ad-positive);
+    animation: none;
+  }
+
+  @keyframes ad-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(0.82);
+    }
+  }
+
+  /* Text that earns its place: it answers the objection the control raised. */
+  .ad-hint {
+    font-size: var(--ad-xs);
+    line-height: var(--ad-leading-body);
+    color: var(--ad-muted);
+  }
+
+  /* ------------------------------------------------------------------------
+     5 · TOP BAR
+     Paper on canvas — one step, plus a hairline that measures 1.30:1 against
+     paper, which is the only ground it is genuinely visible on.
+     ------------------------------------------------------------------------ */
+  .ad-topbar {
+    flex: none;
+    height: var(--ad-topbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: var(--ad-paper);
+    border-bottom: 1px solid var(--ad-line);
+  }
+
+  .ad-wordmark {
+    font-size: var(--ad-sub);
+    font-weight: 600;
+    letter-spacing: var(--ad-tracking-head);
+    color: var(--ad-ink);
+  }
+
+  .ad-topbar-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ad-r-pill);
+    background: var(--ad-canvas);
+    border: 1px solid var(--ad-line);
+  }
+
+  /* ------------------------------------------------------------------------
+     6 · STAGE RAIL — the primary navigation
+     Define → Validate → Roadmap, always visible, never scrolled away. Three
+     equal cells on linen; the live cell steps UP to paper and takes a 2px
+     accent rule along its top edge (job 2, active state).
+
+     The numerals are figure-tier mono, not display type: a number is not a
+     heading, and mono keeps the digits tabular. This is where the screen gets
+     its scale — an app shell has no hero to spend a 92px line on.
+
+     Numerals are NOT accent. A section numeral is an index, not an action, a
+     verification or a live state, and tinting one is the single most common way
+     a one-hue system leaks into a two-hue system.
+     ------------------------------------------------------------------------ */
+  .ad-stagerail {
+    flex: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--ad-linen);
+    border-bottom: 1px solid var(--ad-line);
+  }
+
+  .ad-stage {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    width: 100%;
+    text-align: left;
+    padding: 20px 28px 22px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--ad-line);
+    border-top: 2px solid transparent;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .ad-stage:last-child {
+    border-right: none;
+  }
+
+  .ad-stage:hover:not(.ad-stage-live) {
+    background: var(--ad-paper);
+  }
+
+  .ad-stage:active:not(.ad-stage-live) {
+    background: var(--ad-inset);
+  }
+
+  .ad-stage-live {
+    background: var(--ad-paper);
+    border-top-color: var(--ad-accent);
+    cursor: default;
+  }
+
+  .ad-stage-num {
+    font-family: var(--ad-mono);
+    font-size: var(--ad-fig-lg);
+    font-weight: 500;
+    line-height: var(--ad-leading-flat);
+    letter-spacing: var(--ad-tracking-fig);
+    font-variant-numeric: tabular-nums;
+    color: var(--ad-faint);
+    flex: none;
+    transition: color 150ms ease;
+  }
+
+  .ad-stage-live .ad-stage-num,
+  .ad-stage:hover .ad-stage-num {
+    color: var(--ad-ink);
+  }
+
+  .ad-stage-name {
+    font-size: var(--ad-h3);
+    font-weight: 600;
+    line-height: var(--ad-leading-snug);
+    letter-spacing: var(--ad-tracking-snug);
+    color: var(--ad-ink);
+    display: block;
+  }
+
+  .ad-stage-note {
+    font-family: var(--ad-mono);
+    font-size: var(--ad-meta-sm);
+    font-weight: 500;
+    letter-spacing: var(--ad-tracking-meta);
+    line-height: var(--ad-leading-meta);
+    text-transform: uppercase;
+    /* On linen, `--ad-muted` is 4.44:1 and fails AA — `--ad-body` is the
+       correct secondary tone on the two darker grounds. */
+    color: var(--ad-body);
+    display: block;
+    margin-top: 4px;
+  }
+
+  .ad-stage-live .ad-stage-note {
+    color: var(--ad-accent-text);
+  }
+
+  /* ------------------------------------------------------------------------
+     7 · SHELL
+     Canvas rail | paper transcript | linen summary. Every column is one tier
+     from the one beside it, which is what makes the borders legible rather
+     than decorative.
+     ------------------------------------------------------------------------ */
+  .ad-shell {
+    flex: 1;
+    display: grid;
+    grid-template-columns: var(--ad-rail-w) minmax(0, 1fr) var(--ad-summary-w);
+    min-height: 0;
+  }
+
+  .ad-col {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .ad-col-rail {
+    background: var(--ad-canvas);
+    border-right: 1px solid var(--ad-line);
+  }
+
+  .ad-col-main {
+    background: var(--ad-paper);
+  }
+
+  .ad-col-summary {
+    background: var(--ad-linen);
+    border-left: 1px solid var(--ad-line);
+  }
+
+  /* `color-scheme: light` alone gets the UA scrollbar off the dark palette but
+     leaves it at full chrome width in three separate columns, which reads as
+     three seams the design did not ask for. The thumb is `--ad-line-strong`,
+     the same value a hovered control's border takes — a scrollbar is a
+     hairline that happens to move. */
+  .ad-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ad-line-strong) transparent;
+  }
+
+  .ad-scroll::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .ad-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .ad-scroll::-webkit-scrollbar-thumb {
+    background: var(--ad-line-strong);
+    border-radius: var(--ad-r-pill);
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  .ad-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--ad-faint);
+    background-clip: content-box;
+  }
+
+  .ad-colhead {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px 14px;
+  }
+
+  /* ------------------------------------------------------------------------
+     8 · CHAT RAIL
+     ------------------------------------------------------------------------ */
+  .ad-railgroup {
+    padding: 4px 12px 14px;
+  }
+
+  .ad-railgroup-label {
+    padding: 10px 8px 6px;
+  }
+
+  .ad-chatrow {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 11px 12px;
+    border-radius: var(--ad-r-md);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .ad-chatrow:hover {
+    background: var(--ad-paper);
+    border-color: var(--ad-line);
+  }
+
+  .ad-chatrow:active {
+    background: var(--ad-linen);
+  }
+
+  .ad-chatrow-live {
+    background: var(--ad-paper);
+    border-color: var(--ad-line-ink);
+    cursor: default;
+  }
+
+  .ad-chatrow-title {
+    font-size: var(--ad-sm);
+    font-weight: 500;
+    line-height: var(--ad-leading-snug);
+    letter-spacing: var(--ad-tracking-snug);
+    color: var(--ad-ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ad-chatrow-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 7px;
+  }
+
+  /* ------------------------------------------------------------------------
+     9 · TRANSCRIPT
+     ------------------------------------------------------------------------ */
+  .ad-thread {
+    padding: 28px 40px 40px;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .ad-ideahead {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ad-line);
+  }
+
+  .ad-turn-role {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+  }
+
+  /* The user's turn is a linen well inside the paper column — one step down,
+     which is what distinguishes it without a second border or a bubble tail. */
+  .ad-turn-user .ad-turn-body {
+    background: var(--ad-linen);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-lg);
+    padding: 14px 18px;
+    color: var(--ad-ink);
+    font-size: var(--ad-body-size);
+    line-height: var(--ad-leading-body);
+  }
+
+  /* The assistant's turn is unboxed prose on paper. It is the thing being read,
+     so it gets the measure and none of the chrome. */
+  .ad-turn-agent .ad-turn-body {
+    color: var(--ad-body);
+    font-size: var(--ad-body-size);
+    line-height: var(--ad-leading-body);
+    max-width: 62ch;
+  }
+
+  .ad-turn-agent .ad-turn-body strong {
+    color: var(--ad-ink);
+    font-weight: 600;
+  }
+
+  .ad-turn-body p + p {
+    margin-top: 14px;
+  }
+
+  /* The streaming caret. It is `--ad-accent` doing job 2 — live state — and it
+     is the only accent mark inside the transcript. */
+  .ad-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    vertical-align: -0.14em;
+    margin-left: 2px;
+    background: var(--ad-accent);
+    animation: ad-blink 1s steps(2, start) infinite;
+  }
+
+  @keyframes ad-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     10 · COMPOSER
+     Space is reserved for the reply before it arrives — the composer is pinned
+     out of the scroll container, so nothing about it moves while text streams.
+     ------------------------------------------------------------------------ */
+  .ad-composer-wrap {
+    flex: none;
+    padding: 16px 40px 20px;
+    background: var(--ad-paper);
+    border-top: 1px solid var(--ad-line);
+  }
+
+  .ad-composer-inner {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .ad-composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 12px 12px 12px 18px;
+    background: var(--ad-paper);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-xl);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .ad-composer:focus-within {
+    border-color: var(--ad-accent-line);
+    box-shadow: 0 0 0 3px var(--ad-accent-wash);
+  }
+
+  .ad-composer textarea {
+    flex: 1;
+    resize: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--ad-font);
+    font-size: var(--ad-sub);
+    line-height: var(--ad-leading-body);
+    letter-spacing: var(--ad-tracking-snug);
+    color: var(--ad-ink);
+    padding: 6px 0;
+    max-height: 168px;
+  }
+
+  .ad-composer textarea::placeholder {
+    color: var(--ad-muted);
+  }
+
+  .ad-composer-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  /* ------------------------------------------------------------------------
+     11 · SUMMARY PANEL
+     Linen column; cards inside it step UP to paper. The reverse — a linen card
+     on a linen band — is the pairing that scores 1.15:1 and disappears.
+     ------------------------------------------------------------------------ */
+  .ad-sumbody {
+    padding: 0 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .ad-card {
+    background: var(--ad-paper);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-lg);
+    padding: 16px 18px;
+  }
+
+  .ad-card-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  /* Radius decreases as you nest: `--ad-r-md` rows inside an `--ad-r-lg` card. */
+  .ad-sumrow {
+    display: flex;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--ad-r-md);
+    font-size: var(--ad-sm);
+    line-height: var(--ad-leading-body);
+    color: var(--ad-body);
+  }
+
+  .ad-sumrow + .ad-sumrow {
+    margin-top: 2px;
+  }
+
+  .ad-sumrow-mark {
+    flex: none;
+    margin-top: 5px;
+    width: 7px;
+    height: 7px;
+    border-radius: var(--ad-r-pill);
+    border: 1.5px solid var(--ad-line-strong);
+  }
+
+  .ad-sumrow-confirmed .ad-sumrow-mark {
+    background: var(--ad-positive);
+    border-color: var(--ad-positive);
+  }
+
+  .ad-sumrow-open .ad-sumrow-mark {
+    border-color: var(--ad-caution);
+  }
+
+  /* The failure case, and it is deliberately here. A summary where everything
+     was confirmed proves nothing — the assumption the conversation ruled OUT is
+     the evidence that anything was actually tested. It is never
+     `--ad-critical`: a discarded assumption is a non-event, not the user's
+     fault, and red would also collide with the accent's hue.
+
+     It recedes via the strikethrough and a `--ad-faint` MARK, not via faint
+     body text. `--ad-faint` is 3.07:1 at worst and is never text you have to
+     read — "quiet" and "illegible" are different requirements, and the first
+     attempt here conflated them at 3.81:1. */
+  .ad-sumrow-ruled {
+    color: var(--ad-muted);
+  }
+
+  .ad-sumrow-ruled .ad-sumrow-mark {
+    border-color: var(--ad-faint);
+    background: transparent;
+  }
+
+  .ad-sumrow-ruled s {
+    text-decoration-color: var(--ad-faint);
+    text-decoration-thickness: 1px;
+  }
+
+  /* Structural, 320ms — the new row announces itself once and then stops. */
+  .ad-sumrow-new {
+    animation: ad-landed 1400ms ease-out;
+  }
+
+  @keyframes ad-landed {
+    0% {
+      background: var(--ad-accent-wash);
+    }
+    60% {
+      background: var(--ad-accent-wash);
+    }
+    100% {
+      background: transparent;
+    }
+  }
+
+  .ad-figrow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .ad-fig {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ad-fig-num {
+    font-family: var(--ad-mono);
+    font-size: var(--ad-fig-sm);
+    font-weight: 500;
+    line-height: var(--ad-leading-flat);
+    letter-spacing: var(--ad-tracking-fig);
+    font-variant-numeric: tabular-nums;
+    color: var(--ad-ink);
+  }
+
+  /* ------------------------------------------------------------------------
+     12 · LOCKED STAGE PREVIEW
+     What Validate and Roadmap look like from Define: the real artifact drawn in
+     code, dimmed and inert, under the one display-scale line on the screen.
+     A screenshot of the finished page would have been the wrong answer twice —
+     it ages, and it can't show a locked state.
+     ------------------------------------------------------------------------ */
+  .ad-preview {
+    padding: 56px 40px 64px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .ad-preview-head {
+    max-width: 620px;
+  }
+
+  .ad-preview-art {
+    position: relative;
+    margin-top: 40px;
+    border-radius: var(--ad-r-xl);
+    border: 1px solid var(--ad-line);
+    background: var(--ad-linen);
+    padding: 22px;
+    overflow: hidden;
+  }
+
+  /* The fragment is genuinely dimmed rather than covered by a scrim, so the
+     locked state survives a screenshot and reads at a glance. */
+  .ad-preview-art-inner {
+    /* Dimmed, not desaturated. A `saturate()` here would be doing nothing —
+       the fragment is already near-neutral — while dropping the filled bars
+       far enough that the artifact read as empty rather than as locked. */
+    opacity: 0.62;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .ad-fragment {
+    background: var(--ad-paper);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-lg);
+    overflow: hidden;
+  }
+
+  .ad-frag-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+  }
+
+  .ad-frag-row + .ad-frag-row {
+    border-top: 1px solid var(--ad-line);
+  }
+
+  .ad-frag-bar {
+    height: 6px;
+    border-radius: var(--ad-r-pill);
+    background: var(--ad-inset);
+    flex: none;
+  }
+
+  .ad-frag-fill {
+    height: 100%;
+    border-radius: var(--ad-r-pill);
+    background: var(--ad-ink);
+  }
+
+  .ad-frag-title {
+    font-size: var(--ad-sm);
+    font-weight: 500;
+    color: var(--ad-ink);
+    letter-spacing: var(--ad-tracking-snug);
+    line-height: var(--ad-leading-snug);
+  }
+
+  /* Roadmap fragment — five phases against a milestone axis. */
+  .ad-frag-axis {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    padding: 11px 16px;
+  }
+
+  .ad-frag-axis + .ad-frag-axis {
+    border-top: 1px solid var(--ad-line);
+  }
+
+  .ad-frag-track {
+    height: 22px;
+    border-radius: var(--ad-r-sm);
+    background: var(--ad-inset);
+    position: relative;
+  }
+
+  .ad-frag-phase {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: var(--ad-r-sm);
+    background: var(--ad-ink);
+  }
+
+  .ad-lockbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-radius: var(--ad-r-lg);
+    background: var(--ad-inset);
+  }
+
+  /* ------------------------------------------------------------------------
+     13 · REVEAL
+     One recipe for everything that enters. Structural: 320ms, triggered.
+     ------------------------------------------------------------------------ */
+  .ad-enter {
+    animation: ad-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes ad-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     14 · REDUCED MOTION
+     Ambient motion stops; auto-advancing content resolves to its static full
+     state rather than a frozen partial one. The transcript's scripted reply is
+     handled in the component, which drops to a single commit when the query
+     matches — a frozen half-sentence would be worse than no animation.
+     ------------------------------------------------------------------------ */
+  @media (prefers-reduced-motion: reduce) {
+    .ad-root .ad-dot,
+    .ad-root .ad-caret,
+    .ad-root .ad-sumrow-new,
+    .ad-root .ad-enter {
+      animation: none;
+    }
+
+    .ad-root .ad-enter {
+      opacity: 1;
+      transform: none;
+    }
+
+    .ad-root .ad-caret {
+      opacity: 1;
+    }
+
+    .ad-root * {
+      transition-duration: 1ms !important;
+    }
+  }
+}

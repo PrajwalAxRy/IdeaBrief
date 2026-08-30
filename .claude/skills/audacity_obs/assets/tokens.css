@@ -1,0 +1,278 @@
+/* ============================================================================
+   AUDACITY — tokens.
+   ----------------------------------------------------------------------------
+   The light, warm sibling of Obsidian. Same bones — hairlines carve the layout,
+   weight-400 display type, one accent with three jobs, no shadows — inverted
+   onto warm paper and re-tuned rather than merely lightened.
+
+   The only file in a project permitted to contain a colour value.
+
+   SCOPING. Declared on :root, which is right when the whole app is Audacity.
+   To introduce it alongside an existing system, swap the selector for an
+   attribute scope and put that attribute on a wrapper element:
+
+       [data-theme='audacity'] { … }        <div data-theme="audacity">
+
+   Every name is prefixed `--au-` so a token can never be read by accident from
+   outside the scope. NEVER mix `--au-*` and `--ob-*` in one tree: Obsidian is
+   the dark system and its tokens are frequently declared globally on :root.
+
+   FONTS. `--au-font` / `--au-font-mono` expect Geist and Geist Mono to be
+   loaded as CSS variables. With next/font:
+
+       import { Geist, Geist_Mono } from 'next/font/google';
+       const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
+       const mono  = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
+       <html className={`${geist.variable} ${mono.variable}`}>
+
+   Substitutes if Geist is unavailable, in order: Instrument Sans, Schibsted
+   Grotesk, Onest. Avoid Inter — too neutral to carry weight-400 display type.
+   ============================================================================ */
+
+:root {
+  /* --- Surfaces — four levels ------------------------------------------
+     Same DIRECTION as Obsidian, mirrored. --au-void is the *toasted* end of
+     the paper — warmer and deeper than the canvas — and carries the hero band
+     and footer. Cards step the other way, toward white. With no shadows in the
+     system, "recessed" and "elevated" are both steps along this one axis, and
+     a hero band reading deeper than the page is what makes content float.
+
+     Every value is warm. There is no cool grey anywhere in this system: a
+     neutral #F5F5F5 next to these reads blue and instantly breaks the paper. */
+  --au-canvas: #faf6f0; /* page ground — warm paper. The default. */
+  --au-void: #f1e9de; /* toasted paper — hero band, footer, deeper surfaces */
+  --au-surface: #fffcf7; /* cards, panels, inputs */
+  --au-raised: #ffffff; /* the one level above a card */
+
+  /* --- Hairlines — the structural line work.
+     --au-hairline is the most-used value in the system: it IS the layout.
+     Tuned to sit ~4-5% below the canvas in lightness. Push it darker and the
+     page turns into a wireframe; lighter and the layout stops being carved.
+
+     MEASURED CONTRAST vs each ground — this is the constraint the tier rule
+     exists to work around, not a mistake:
+
+                     canvas   void  surface  raised
+       --au-hairline   1.27   1.14     1.34    1.37
+       -strong         1.82   1.63     1.92    1.96
+
+     At 1.14 a hairline inside a --au-void band does not render on a real
+     display. Do not solve that with a darker token or a 2px border — step the
+     tier instead. See references/light-surfaces.md §2.4. */
+  --au-hairline: #e6dbcb;
+  --au-hairline-strong: #c8b79c;
+  --au-hairline-accent: rgba(191, 68, 19, 0.42);
+
+  /* --- Text — three levels and a dim.
+     Body copy is --au-muted, never --au-text. The contrast between an espresso
+     headline and warm-taupe prose is doing real work. All four are warm-black
+     rather than black: pure #000 on warm paper reads as a hole in the page.
+
+     MEASURED, not estimated. Worst ground is --au-void; re-run the script in
+     references/light-surfaces.md §1 if you change any of these.
+
+                  canvas   void  surface  raised
+       --au-text   16.94  15.16    17.82   18.24
+       --au-muted   6.93   6.20     7.29    7.46
+       --au-dim     5.09   4.56     5.35    5.48
+
+     --au-dim was DARKENED from an initial #7A6B58, which measured 4.79 on the
+     canvas and looked fine — and 4.29 on --au-void, where the metadata layer
+     actually lives most often (fragment header bars, the footer). That is the
+     signature light-theme failure: it passes on the ground you checked and
+     fails on the ground it ships on. Every level here now clears AA on all
+     four grounds. */
+  --au-text: #1a1410;
+  --au-muted: #5f5347;
+  --au-dim: #766751;
+  --au-on-accent: #fff8f2;
+
+  /* --- Accent — one hue, three jobs: primary action, verification,
+     live/active. Nothing else in the system is allowed to be orange.
+
+     NOTE THE DIRECTION FLIP. Obsidian's accent *brightens* on hover, because
+     on a near-black ground brightening increases contrast. On paper it does
+     the opposite, so here hover DEEPENS. There is no `--au-accent-bright`;
+     reaching for one is how a primary button ends up unreadable on hover.
+
+     THIS ACCENT IS DARK ON PURPOSE, and it buys something specific:
+
+       --au-accent as TEXT on paper    4.81 canvas · 4.31 void
+       --au-on-accent ON the fill      4.93
+       --au-accent-deep as text        7.03 canvas · 6.29 void
+
+     A brighter orange of the kind every light-theme reference reaches for —
+     #F05A28, #FF6B35, #FC5200 — measures around 3.2–3.6:1 against warm paper.
+     That is why systems built on those oranges must split the accent into a
+     "marks only" value and a separate darker "accent text" value, and must
+     hand the filled button to a near-black instead. Audacity does not need
+     that split: one token does all three jobs, and rule 6 stays literally one
+     hue. The cost is that the accent is burnt rather than bright, and it will
+     look conservative next to those references. That is the trade, and it is
+     the right one for a system whose accent must also survive being a 1px
+     rule and a 10px chip label.
+
+     Two consequences worth stating so nobody "fixes" them:
+       - 4.31 on --au-void is above AA but not by much. Accent text at
+         --au-meta-xs inside a void band is the tightest spot in the system.
+       - Colour is not an affordance. An inline prose link needs an underline
+         as well as the hue — see .au-link-inline. */
+  --au-accent: #bf4413;
+  --au-accent-deep: #96330b; /* hover of the above — darker, not lighter */
+  --au-accent-wash: rgba(191, 68, 19, 0.1);
+  --au-accent-ring: rgba(191, 68, 19, 0.28);
+  --au-accent-glow: rgba(191, 68, 19, 0.32);
+
+  /* --- Discard. There is no red in this system: a rejected thing is a
+     non-event, not an error. It fades into the paper and leaves.
+
+     2.52 on canvas, 2.26 on void — the ONE text colour in this system below
+     AA, and deliberately so. Obsidian's equivalent measures 2.16 and is just
+     as unreadable; "stops mattering" is the job. The rule that makes it
+     legitimate rather than an accessibility bug: --au-discard must NEVER be
+     the only carrier of the fact that something was discarded. Pair it with a
+     strikethrough AND a chip reading DISCARDED in --au-dim. If a user has to
+     read the discarded text itself to understand what happened, it isn't
+     discarded — it's just illegible. */
+  --au-discard: #a99b89;
+
+  /* --- Washes.
+     SECOND DIRECTION FLIP: a hover wash on paper is a DARKENING, not a
+     lightening. A white-on-white hover is invisible. */
+  --au-hover-wash: rgba(26, 20, 16, 0.045);
+  --au-scrim: rgba(250, 246, 240, 0.78);
+
+  /* --- Fonts */
+  --au-font: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
+  --au-font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* --- Type scale — authority from scale and negative tracking, not weight.
+
+     Sixteen steps in four tiers, and there is no seventeenth: a size that is
+     not one of these is a bug. The four steps below marked NEW are the ones a
+     scale of this shape always turns out to need — omit them and they come
+     back as hardcoded 15px/17px/19px values scattered through the recipes,
+     which is exactly how a set of screens stops looking like one system. */
+
+  /* Display tier — sans, weight 400, hard negative tracking. Headings only. */
+  --au-display: clamp(58px, 7.2vw, 104px);
+  --au-h1: clamp(42px, 4.6vw, 68px);
+  --au-h2: clamp(30px, 3vw, 44px);
+  --au-h3: 23px;
+  --au-lead: 21px;
+
+  /* Text tier — sans, weight 400, --au-tracking-snug. */
+  --au-sub: 18px; /* NEW: the step between body and lead */
+  --au-body: 16px;
+  --au-sm: 14px;
+  --au-xs: 13px; /* NEW: the dense step */
+
+  /* Meta tier — mono, weight 500, --au-tracking-meta, uppercase.
+     The two below 12px are for labels sitting INSIDE another element. Never
+     set a line that has to be read at 10 or 11px. */
+  --au-meta: 12px;
+  --au-meta-sm: 11px; /* NEW */
+  --au-meta-xs: 10px; /* NEW */
+
+  /* Figure numerals — mono, weight 400, --au-tracking-fig, leading 1.
+     A separate tier because a number is not a heading: mono so digits are
+     tabular, and never the display tier's tracking. */
+  --au-fig-xl: clamp(40px, 4vw, 56px);
+  --au-fig-lg: 44px;
+  --au-fig-md: 33px;
+  --au-fig-sm: 28px;
+
+  /* Tracking — LOOSER THAN OBSIDIAN AT EVERY STEP, and this is the correction
+     most likely to be skipped when porting, because the numbers still look
+     aggressive on paper.
+
+     The mechanism is optical, not stylistic. Light type on a dark ground
+     blooms outward, so the counters and the gaps between glyphs read WIDER
+     than they measure — negative tracking claws that back and -0.035em on a
+     104px white-on-black headline reads as confident. Dark type on a bright
+     ground does the reverse: the paper bleeds inward and the counters read
+     TIGHTER than they measure. Carry -0.035em across and a 104px headline
+     closes up — the `a`, `e` and `o` bowls start filling in and the line reads
+     as one dark mass rather than as words.
+
+     Tracking is also a function of SIZE, not just of ground: at 104px a
+     counter is enormous in absolute terms and can afford -0.028em; at 44px the
+     same value is cramped. Hence four display-tier values rather than three.
+
+     Obsidian → Audacity, for reference when porting:
+       display  -0.035em → -0.028em
+       h1       -0.030em → -0.022em
+       h2       -0.025em → -0.018em
+       snug     -0.015em → -0.008em   (body; past -0.012em on paper, word
+                                       spacing starts to go at 16px) */
+  --au-tracking-display: -0.028em;
+  --au-tracking-h1: -0.022em;
+  --au-tracking-h2: -0.018em;
+  --au-tracking-snug: -0.008em;
+  --au-tracking-fig: -0.01em;
+  --au-tracking-meta: 0.1em;
+
+  /* Leading — seven values, and no eighth. A stray 1.55 or 1.7 in a recipe
+     is how one size ends up rendering at four different leadings on a single
+     page, with every individual screen still looking fine.
+
+     Two steps are looser than Obsidian's, for the same optical reason as the
+     tracking: --au-leading-display 1.02 (not 0.98 — a near-solid setting that
+     reads as sculptural in white-on-black reads as collided in ink) and
+     --au-leading-body 1.65 (not 1.6 — dark ink on a bright ground needs more
+     air between lines before a paragraph stops striping). */
+  --au-leading-display: 1.02; /* display only */
+  --au-leading-flat: 1; /* figure numerals, single-line buttons */
+  --au-leading-tight: 1.08; /* h1, h2 */
+  --au-leading-snug: 1.25; /* h3, sub-lead headings */
+  --au-leading-meta: 1.4; /* the mono meta layer */
+  --au-leading-lead: 1.5; /* leads, dense rows, table cells */
+  --au-leading-body: 1.65; /* running prose */
+
+  /* Weight — 400 everywhere is the point. 500 is the mono metadata layer only.
+
+     On paper, weight 400 renders VISUALLY LIGHTER than the same weight on a
+     dark ground, because dark-on-light does not bloom. Resist the pull to
+     nudge display type to 500 to compensate — the fix is scale and tracking,
+     and disabling the antialiasing override in the recipes (§0) buys back
+     most of the apparent weight for free. */
+  --au-weight: 400;
+  --au-weight-meta: 500;
+
+  /* --- Radius — architectural, not soft. Only buttons are pills. */
+  --au-r-tag: 4px;
+  --au-r-card: 10px;
+  --au-r-lg: 16px;
+  --au-r-pill: 999px;
+
+  /* --- Motion. One easing curve in the whole system. */
+  --au-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --au-fast: 180ms;
+  --au-base: 320ms;
+  --au-enter: 900ms;
+
+  /* Opacity of an INACTIVE panel in the sticky-scrollytelling pattern.
+     Higher than Obsidian's 0.42, because fading toward paper removes contrast
+     much faster than fading toward near-black: --au-muted at 0.42 lands near
+     3:1 and reads as disabled rather than as not-yet-your-turn. The binding
+     criterion is the ratio, not this number — see light-surfaces.md §1. */
+  --au-dim-inactive: 0.5;
+
+  /* --- Paper tooth. One global fixed pseudo-element, never per-section.
+     The one ambient texture the system permits, and permitted precisely
+     because it does NOT move. On a dark canvas grain reads as film; on warm
+     paper it reads as stock, which is what the grounds are already pretending
+     to be — so it does more work here than it does on near-black.
+
+     KEEP IT AT OR BELOW 0.03. Above that it stops being tooth and starts
+     being noise, and it dirties the 1.27:1 hairlines this system cannot
+     afford to lose. That constraint is tighter for Audacity than for a
+     card-based light system, because here the hairlines ARE the layout. */
+  --au-tooth-opacity: 0.025;
+
+  /* --- Layout */
+  --au-container: 1200px;
+  --au-measure: 680px; /* long-form prose max-width */
+  --au-gutter: 40px;
+  --au-section-gap: 160px;
+}

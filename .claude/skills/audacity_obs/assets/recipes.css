@@ -1,0 +1,883 @@
+/* ============================================================================
+   AUDACITY — component recipes.
+   ----------------------------------------------------------------------------
+   Foundations, primitives, and components. Every project needs all of this.
+   Section-specific compositions (hero collage, marquee, scrollytelling rail,
+   verification card) are documented with their CSS in ../references/motion.md
+   and ../references/media.md — build those per project.
+
+   ┌──────────────────────────────────────────────────────────────────────┐
+   │ IMPORT THIS INTO @layer components. NOT UNLAYERED.                   │
+   │                                                                       │
+   │   @import "tailwindcss";                                              │
+   │   @import "./tokens.css";                                             │
+   │   @import "./recipes.css" layer(components);   ← the layer() matters  │
+   │                                                                       │
+   │ Unlayered rules beat EVERY layered rule regardless of specificity, so │
+   │ `.au-h1 { margin: 0 }` would silently win against `mt-8` and every    │
+   │ other Tailwind utility on the same element. See references/pitfalls.md │
+   │ §1 — this is the most expensive bug in the system.                    │
+   └──────────────────────────────────────────────────────────────────────┘
+
+   No colour literal may appear below; everything reads a token.
+   No font-size or line-height literal either — both are token tiers.
+   Tailwind is for layout only — flex, grid, spacing, sizing.
+   ============================================================================ */
+
+/* ============================================================
+   0. Root + global overrides
+   ============================================================ */
+
+body {
+  background: var(--au-canvas);
+  color: var(--au-muted);
+  font-family: var(--au-font);
+  font-size: var(--au-body);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-body);
+  letter-spacing: var(--au-tracking-snug);
+  font-feature-settings: "ss01" on, "cv11" on;
+
+  /* DELIBERATELY NOT `-webkit-font-smoothing: antialiased`.
+     That override is a DARK-THEME trick: on a near-black ground light text
+     blooms, and thinning it back is a correction. On paper it thins type that
+     is already weight 400 and already rendering light, which is the single
+     fastest way to make an Audacity page look washed out and under-baked.
+     Leave subpixel rendering alone. */
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* If an existing system declares these in @layer base with its own accent,
+   they leak — see references/pitfalls.md §2. Declared here so this system
+   always owns them. */
+:focus-visible {
+  outline: 2px solid var(--au-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--au-accent);
+  color: var(--au-on-accent);
+}
+
+/* ============================================================
+   1. Structure
+   ============================================================ */
+
+.au-container {
+  width: 100%;
+  max-width: var(--au-container);
+  margin-inline: auto;
+  padding-inline: var(--au-gutter);
+}
+
+/* The single most repeated element in the system. It IS the page structure.
+   Sections are separated by this and nothing else — never a background band. */
+.au-rule {
+  border: 0;
+  border-top: 1px solid var(--au-hairline);
+  margin: 0;
+}
+
+.au-section {
+  padding-block: var(--au-section-gap);
+}
+
+/* Mono label with a hairline running off to the right. */
+.au-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.au-eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--au-hairline);
+}
+
+/* ============================================================
+   2. Typography
+   ============================================================ */
+
+.au-display {
+  font-family: var(--au-font);
+  font-size: var(--au-display);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-display);
+  letter-spacing: var(--au-tracking-display);
+  color: var(--au-text);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.au-h1 {
+  font-size: var(--au-h1);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-tight);
+  letter-spacing: var(--au-tracking-h1);
+  color: var(--au-text);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.au-h2 {
+  font-size: var(--au-h2);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-tight);
+  letter-spacing: var(--au-tracking-h2);
+  color: var(--au-text);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.au-h3 {
+  font-size: var(--au-h3);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-snug);
+  letter-spacing: var(--au-tracking-snug);
+  color: var(--au-text);
+  margin: 0;
+}
+
+.au-lead {
+  font-size: var(--au-lead);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-lead);
+  letter-spacing: var(--au-tracking-snug);
+  color: var(--au-muted);
+  margin: 0;
+}
+
+/* The three text-tier steps below .au-lead. Ship these on day one even if
+   nothing uses them yet. They exist so a component always has a token-backed
+   way to name a size — without them, the first "slightly smaller than body"
+   need becomes a `text-[15px]` Tailwind escape, and that one escape is how
+   an off-scale size gets into the system permanently. */
+.au-sub {
+  font-size: var(--au-sub);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-lead);
+  letter-spacing: var(--au-tracking-snug);
+  color: var(--au-text);
+  margin: 0;
+}
+
+.au-body {
+  font-size: var(--au-body);
+  line-height: var(--au-leading-body);
+  color: var(--au-muted);
+  margin: 0;
+}
+
+.au-sm {
+  font-size: var(--au-sm);
+  line-height: var(--au-leading-body);
+  letter-spacing: var(--au-tracking-snug);
+  margin: 0;
+}
+
+.au-xs {
+  font-size: var(--au-xs);
+  line-height: var(--au-leading-body);
+  letter-spacing: var(--au-tracking-snug);
+  margin: 0;
+}
+
+.au-body-bright {
+  color: var(--au-text);
+}
+
+/* Figure numerals. Mono for tabular digits, flat leading so a numeral sits on
+   its own baseline, and the figure tracking rather than the display tier's. */
+.au-fig {
+  font-family: var(--au-font-mono);
+  font-size: var(--au-fig-lg);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-flat);
+  letter-spacing: var(--au-tracking-fig);
+  color: var(--au-text);
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+/* Inline emphasis. Not orange — the accent is action/verification/live only. */
+.au-em {
+  color: var(--au-text);
+}
+
+/* Metadata layer — ids, counts, domains, timestamps, labels, status.
+   Never a sentence: uppercase mono at sentence length is unreadable. */
+.au-meta {
+  font-family: var(--au-font-mono);
+  font-size: var(--au-meta);
+  font-weight: var(--au-weight-meta);
+  letter-spacing: var(--au-tracking-meta);
+  line-height: var(--au-leading-meta);
+  text-transform: uppercase;
+  color: var(--au-dim);
+}
+
+/* The two micro sizes. For a label sitting INSIDE another element — a chip, a
+   citation superscript, a tag. Never for a line that has to be read. */
+.au-meta-sm {
+  font-size: var(--au-meta-sm);
+}
+
+.au-meta-xs {
+  font-size: var(--au-meta-xs);
+}
+
+.au-meta-bright {
+  color: var(--au-muted);
+}
+
+/* The one-line consequence under a block of body copy. */
+.au-proof {
+  border-left: 1px solid var(--au-hairline-strong);
+  padding-left: 20px;
+  color: var(--au-text);
+}
+
+/* Inline prose link. The underline is NOT decoration — colour alone is not an
+   affordance, and --au-accent against paper is 4.81, which reads as "a darker
+   word" to anyone who can't separate the hue. Every accent-coloured run of
+   text inside a sentence carries this. */
+.au-link-inline {
+  color: var(--au-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--au-hairline-accent);
+  transition:
+    color var(--au-fast) var(--au-ease),
+    text-decoration-color var(--au-fast) var(--au-ease);
+}
+
+.au-link-inline:hover {
+  color: var(--au-accent-deep);
+  text-decoration-color: var(--au-accent-deep);
+}
+
+/* Long-form prose. Paper at full container width is the worst case for both
+   measure and glare — cap it. */
+.au-measure {
+  max-width: var(--au-measure);
+}
+
+/* ============================================================
+   3. Buttons — exactly one filled per viewport
+   ============================================================ */
+
+.au-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 24px;
+  font-family: var(--au-font);
+  font-size: var(--au-sm);
+  font-weight: var(--au-weight);
+  line-height: var(--au-leading-flat);
+  letter-spacing: var(--au-tracking-snug);
+  border-radius: var(--au-r-pill);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--au-text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--au-base) var(--au-ease),
+    border-color var(--au-base) var(--au-ease),
+    color var(--au-base) var(--au-ease),
+    box-shadow var(--au-base) var(--au-ease),
+    transform var(--au-fast) var(--au-ease);
+}
+
+.au-btn:active {
+  transform: scale(0.98);
+}
+
+/* `transition: none` on purpose — inheriting the hover transition made the
+   focus ring fade in over 320ms, which reads as lag. A focus ring must snap.
+   The inner ring is --au-canvas, so the halo reads as a gap in the paper. */
+.au-btn:focus-visible {
+  outline: none;
+  transition: none;
+  box-shadow: 0 0 0 2px var(--au-canvas), 0 0 0 4px var(--au-accent);
+}
+
+.au-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Primary — the one saturated object on the screen, and the only permitted
+   glow. Hover DEEPENS rather than brightening: on paper, brightening the fill
+   drops the contrast of the label sitting on it. */
+.au-btn-primary {
+  background: var(--au-accent);
+  border-color: var(--au-accent);
+  color: var(--au-on-accent);
+}
+
+.au-btn-primary:hover:not(:disabled) {
+  background: var(--au-accent-deep);
+  border-color: var(--au-accent-deep);
+  box-shadow: 0 0 0 4px var(--au-accent-wash), 0 10px 34px var(--au-accent-glow);
+}
+
+.au-btn-ghost {
+  border-color: var(--au-hairline-strong);
+  color: var(--au-text);
+}
+
+.au-btn-ghost:hover:not(:disabled) {
+  border-color: var(--au-text);
+  background: var(--au-hover-wash);
+}
+
+.au-btn-bare {
+  padding-inline: 0;
+  color: var(--au-muted);
+}
+
+.au-btn-bare:hover:not(:disabled) {
+  color: var(--au-text);
+}
+
+/* Pair with an arrow glyph carrying this class. */
+.au-arrow {
+  transition: transform var(--au-base) var(--au-ease);
+}
+
+.au-btn-bare:hover .au-arrow {
+  transform: translate(3px, -3px);
+}
+
+/* ============================================================
+   4. Badges, chips, dots
+   ============================================================ */
+
+.au-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--au-hairline);
+  border-radius: var(--au-r-pill);
+  background: var(--au-surface);
+  color: var(--au-muted);
+  font-size: var(--au-sm);
+  letter-spacing: var(--au-tracking-snug);
+  transition: border-color var(--au-base) var(--au-ease);
+}
+
+.au-badge:hover {
+  border-color: var(--au-hairline-strong);
+}
+
+.au-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--au-r-pill);
+  background: var(--au-accent);
+  color: var(--au-on-accent);
+  font-family: var(--au-font-mono);
+  font-size: var(--au-meta-xs);
+  font-weight: var(--au-weight-meta);
+  letter-spacing: var(--au-tracking-meta);
+  text-transform: uppercase;
+}
+
+.au-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 3px 8px;
+  border: 1px solid var(--au-hairline);
+  border-radius: var(--au-r-tag);
+  font-family: var(--au-font-mono);
+  font-size: var(--au-meta-xs);
+  font-weight: var(--au-weight-meta);
+  letter-spacing: var(--au-tracking-meta);
+  text-transform: uppercase;
+  color: var(--au-dim);
+  white-space: nowrap;
+}
+
+.au-chip-verified {
+  border-color: var(--au-hairline-accent);
+  color: var(--au-accent);
+}
+
+/* The only pulsing thing in the system. */
+.au-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--au-accent);
+  animation: au-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes au-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--au-accent-ring);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+/* ============================================================
+   5. Surfaces — the container for code-drawn product UI
+
+   THE TIER RULE. On near-black, a hairline carried every boundary on its own
+   and surfaces were a secondary cue. On paper a hairline is a 1.14–1.37:1
+   edge, so it can carry a boundary only where the two sides are already one
+   tier apart. Read as: an element sits at least one tier from its ground, and
+   the hairline confirms the edge rather than creating it.
+
+     ground        element
+     --au-void  →  --au-surface or --au-canvas
+     --au-canvas→  --au-surface
+     --au-surface→ --au-raised, or --au-canvas for a well
+
+   Two consequences that bite:
+     - A --au-surface card on a --au-surface ground has, visually, no edge at
+       all. The reflex fix is a shadow. That breaks rule 3 and makes the page
+       generic. Step the tier.
+     - A hairline INSIDE a --au-void band (1.14:1) does not render. Don't
+       darken the token — it would wreck the 1.27 on canvas, which is the job
+       it actually has. Use a tier step, or --au-hairline-strong if the rule
+       genuinely must be a line.
+   ============================================================ */
+
+.au-frag {
+  border: 1px solid var(--au-hairline);
+  border-radius: var(--au-r-card);
+  background: var(--au-surface);
+  overflow: hidden;
+}
+
+/* The header bar sits on the TOASTED surface — deeper than the card body, the
+   mirror of Obsidian putting it on the void. The void→surface tier step is
+   what makes this boundary read; the border below is confirmation, not the
+   edge itself, and it measures 1.14:1 against the bar. Don't remove it, and
+   don't rely on it. */
+.au-frag-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--au-hairline);
+  background: var(--au-void);
+}
+
+.au-frag-body {
+  padding: 20px;
+}
+
+.au-frag-foot {
+  border-top: 1px solid var(--au-hairline);
+}
+
+.au-frag-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-block: 11px;
+}
+
+.au-frag-row + .au-frag-row {
+  border-top: 1px solid var(--au-hairline);
+}
+
+/* The deepest step — a code block, an empty state, a quoted excerpt inside a
+   card. Ships with NO border on purpose: it sits one tier below its parent,
+   and that step is a stronger edge than a 1.3:1 line. Adding a border here is
+   the tell that someone didn't trust the tier. */
+.au-well {
+  border-radius: var(--au-r-card);
+  background: var(--au-canvas);
+  padding: 16px;
+}
+
+/* Inside a --au-void band, a well steps the other way — toward the canvas is
+   the wrong direction when the ground is already toasted. */
+.au-band-void .au-well {
+  background: var(--au-surface);
+}
+
+/* ============================================================
+   6. Input
+   ============================================================ */
+
+.au-composer {
+  border: 1px solid var(--au-hairline);
+  border-radius: var(--au-r-lg);
+  background: var(--au-surface);
+  transition:
+    border-color var(--au-base) var(--au-ease),
+    box-shadow var(--au-base) var(--au-ease);
+}
+
+.au-composer:focus-within {
+  border-color: var(--au-hairline-accent);
+  box-shadow: 0 0 0 4px var(--au-accent-wash);
+}
+
+.au-composer textarea,
+.au-composer input {
+  width: 100%;
+  resize: none;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--au-text);
+  font-family: var(--au-font);
+  font-size: var(--au-sub);
+  line-height: var(--au-leading-lead);
+  letter-spacing: var(--au-tracking-snug);
+}
+
+.au-composer textarea::placeholder,
+.au-composer input::placeholder {
+  color: var(--au-dim);
+}
+
+/* Suggestion chip under an input. */
+.au-seed {
+  padding: 7px 14px;
+  border: 1px solid var(--au-hairline);
+  border-radius: var(--au-r-pill);
+  background: transparent;
+  color: var(--au-muted);
+  font-size: var(--au-xs);
+  line-height: var(--au-leading-flat);
+  letter-spacing: var(--au-tracking-snug);
+  cursor: pointer;
+  transition:
+    border-color var(--au-fast) var(--au-ease),
+    color var(--au-fast) var(--au-ease),
+    background var(--au-fast) var(--au-ease);
+}
+
+.au-seed:hover {
+  border-color: var(--au-hairline-strong);
+  color: var(--au-text);
+  background: var(--au-hover-wash);
+}
+
+.au-seed:focus-visible {
+  outline: none;
+  border-color: var(--au-accent);
+  color: var(--au-text);
+}
+
+/* ============================================================
+   7. Navigation
+   ============================================================ */
+
+.au-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  padding-top: 18px;
+  transition: padding-top var(--au-base) var(--au-ease);
+}
+
+.au-nav[data-scrolled="true"] {
+  padding-top: 10px;
+}
+
+.au-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+  max-width: var(--au-container);
+  margin-inline: auto;
+  padding: 12px var(--au-gutter);
+  border: 1px solid transparent;
+  border-radius: var(--au-r-pill);
+  transition:
+    max-width var(--au-base) var(--au-ease),
+    padding var(--au-base) var(--au-ease),
+    border-color var(--au-base) var(--au-ease),
+    background var(--au-base) var(--au-ease);
+}
+
+/* The condensed bar needs its hairline to be the STRONG one. A blurred paper
+   scrim sitting on paper has almost no edge of its own; on the dark system the
+   scrim was self-evident and a plain hairline sufficed. */
+.au-nav[data-scrolled="true"] .au-nav-inner {
+  max-width: 940px;
+  padding-inline: 20px;
+  border-color: var(--au-hairline-strong);
+  background: var(--au-scrim);
+  backdrop-filter: blur(14px);
+}
+
+.au-nav-link {
+  font-size: var(--au-sm);
+  letter-spacing: var(--au-tracking-snug);
+  color: var(--au-muted);
+  transition: color var(--au-fast) var(--au-ease);
+}
+
+.au-nav-link:hover,
+.au-nav-link:focus-visible {
+  color: var(--au-text);
+  outline: none;
+}
+
+.au-nav-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* Held back until the hero's primary has scrolled away, so exactly one filled
+   button is ever on screen. Wrap the button in a span carrying this class —
+   don't put it on the button, or it overrides the button's own transition. */
+.au-nav-cta {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition:
+    opacity var(--au-base) var(--au-ease),
+    transform var(--au-base) var(--au-ease);
+}
+
+.au-nav[data-past-hero="true"] .au-nav-cta {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.au-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--au-accent);
+  color: var(--au-on-accent);
+  border-radius: 0 0 var(--au-r-card) 0;
+  font-size: var(--au-sm);
+}
+
+.au-skip:focus {
+  left: 0;
+}
+
+/* ============================================================
+   8. Reveal primitives — JS sets data-shown, CSS does the animating
+   ============================================================ */
+
+.au-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(8px);
+  transition:
+    opacity var(--au-enter) var(--au-ease),
+    transform var(--au-enter) var(--au-ease),
+    filter var(--au-enter) var(--au-ease);
+  transition-delay: var(--au-reveal-delay, 0ms);
+}
+
+.au-reveal[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Per-word mask reveal — headlines only. The padding-bottom keeps descenders
+   from being clipped by the overflow in the resting state. */
+.au-word-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.au-word {
+  display: inline-block;
+  transform: translateY(105%);
+  transition: transform var(--au-enter) var(--au-ease);
+  transition-delay: var(--au-word-delay, 0ms);
+  white-space: pre;
+}
+
+[data-shown="true"] .au-word {
+  transform: none;
+}
+
+/* Typing caret. */
+.au-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  background: var(--au-accent);
+  animation: au-blink 1s steps(2, start) infinite;
+}
+
+@keyframes au-blink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   9. Ambient backdrop — the only atmosphere in the system.
+   Fixed, so it parallaxes against the page for free.
+
+   On paper this reads as warm light falling across the sheet rather than as a
+   glow in the dark. It runs at roughly HALF Obsidian's opacity: an accent wash
+   over near-black is nearly invisible until it is strong, while the same wash
+   over #FAF6F0 tints the whole page orange the moment it is overdone. If you
+   can name the shape of the bloom in a screenshot, it is too strong.
+   ============================================================ */
+
+.au-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.au-backdrop::before {
+  content: "";
+  position: absolute;
+  top: -30vh;
+  left: 50%;
+  width: 120vw;
+  height: 110vh;
+  transform: translateX(-50%);
+  background: radial-gradient(50% 50% at 50% 50%, var(--au-accent-wash) 0%, transparent 68%);
+  opacity: 0.45;
+  animation: au-drift 34s var(--au-ease) infinite;
+}
+
+/* A second, tighter bloom offset the other way so the field never reads as a
+   symmetrical blob. This one uses the toasted paper rather than the accent —
+   two accent blooms on a light ground stack into a visible orange cast. */
+.au-backdrop::after {
+  content: "";
+  position: absolute;
+  top: 8vh;
+  left: 22%;
+  width: 46vw;
+  height: 46vw;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, var(--au-void) 0%, transparent 70%);
+  opacity: 0.6;
+  filter: blur(40px);
+  animation: au-drift-alt 52s var(--au-ease) infinite;
+}
+
+@keyframes au-drift {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  50% {
+    transform: translateX(-46%) translateY(4vh) scale(1.08);
+  }
+}
+
+@keyframes au-drift-alt {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(14vw, 6vh) scale(1.18);
+  }
+}
+
+/* Paper tooth. ONE of these per page, on the theme root, never per-section.
+   Static — it is texture, not motion, which is why it survives
+   prefers-reduced-motion untouched.
+
+   `mix-blend-mode: multiply` is doing the real work: it lets the grain take
+   its hue from whatever ground it sits over, so one element tints correctly
+   on canvas, void and surface alike. A white or black overlay at the same
+   opacity would either wash the paper out or turn it grey — and grey paper is
+   this system's whole failure mode. */
+.au-tooth {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--au-tooth-opacity);
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The toasted band — hero, footer, and any surface meant to read deeper than
+   the page. NOT a section separator: sections are separated by a rule (rule
+   2). This is a tonal choice for a place the page changes register, and the
+   page should carry at most two or three of them. See
+   references/light-surfaces.md §3 for why a hairline-only light page still
+   needs them at all. */
+.au-band-void {
+  background: var(--au-void);
+}
+
+/* Content sits above the backdrop.
+   NOT optional. A fixed, positioned backdrop paints above every static
+   in-flow element, so any page container without this has its body copy
+   sitting UNDER the bloom. It is invisible while the bloom is subtle, which
+   is exactly how it ships. `z-index: -1` on the backdrop is not the fix — it
+   would drop the bloom behind the body background too. */
+.au-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   10. Reduced motion.
+   Everything ambient STOPS; everything structural RESOLVES to its end state.
+   Nothing is left mid-transition.
+
+   CSS cannot fix a JS-driven sequence — a typewriter or a cycling carousel
+   needs its own branch in the component. See references/motion.md §6.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .au-reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .au-word {
+    transform: none;
+  }
+}

@@ -1,0 +1,346 @@
+/* ============================================================================
+   AUDACIOUS — design tokens
+   ----------------------------------------------------------------------------
+   This is the ONLY file permitted to contain a colour value, a font-size, or a
+   line-height. A literal anywhere else is a bug.
+
+   Every contrast figure in the comments was computed with the script in
+   references/light-surfaces.md, not estimated. If you change a value, re-run it.
+
+   Paste onto :root. The .ad-invert block MUST follow in the same file.
+   ========================================================================= */
+
+:root {
+  /* --------------------------------------------------------------------------
+     GROUNDS — four warm levels. Rule 2: no cool grey exists here.
+     These replace white / gray-50 / gray-100 / gray-200. The warmth is small in
+     hex and obvious on screen the moment two of them share a viewport.
+     ----------------------------------------------------------------------- */
+  --ad-paper:          #FFFFFF;   /* card faces; the brighter alternating band */
+  --ad-canvas:         #FAF9F7;   /* page ground — the default                 */
+  --ad-linen:          #F4F1EB;   /* tinted panel; the dimmer alternating band */
+  --ad-inset:          #EBE6DD;   /* wells: code blocks, empty states          */
+
+  /* --------------------------------------------------------------------------
+     HAIRLINES
+     --ad-line contrast vs each ground:  paper 1.30 · canvas 1.24 · linen 1.15 ·
+     inset 1.05. That last value is why the one-step rule exists — a bordered
+     card sitting on --ad-inset has no visible border at all.
+     ----------------------------------------------------------------------- */
+  --ad-line:           #E7E1D7;   /* default border: cards, rows, inputs       */
+  --ad-line-strong:    #D6CEC0;   /* hover state of a bordered control         */
+  --ad-line-ink:       #1A1714;   /* the one border meant to be CHOSEN         */
+
+  /* --------------------------------------------------------------------------
+     TEXT — four levels. Worst-ground ratio in the comment.
+     ----------------------------------------------------------------------- */
+  --ad-ink:            #1A1714;   /* 14.36 — headlines, values. Never #000     */
+  --ad-body:           #57514A;   /*  6.30 — all running prose. The default    */
+  --ad-muted:          #776E64;   /*  4.02 — AA on paper/canvas ONLY.          */
+                                  /*         Use --ad-body on linen/inset.     */
+  --ad-faint:          #8C8175;   /*  3.07 — NEVER text. Disabled, icon        */
+                                  /*         strokes, decorative rules only.   */
+
+  /* --------------------------------------------------------------------------
+     ACCENT — one hue, three jobs: link · active/live · focal point.
+     There is no accent-filled button: white on --ad-accent is 3.39, which
+     cannot be made accessible at any text size.
+     ----------------------------------------------------------------------- */
+  --ad-accent:         #F05A28;   /* MARKS ONLY — dot, rule, bar, fill, series */
+  --ad-accent-text:    #AE3D12;   /*  4.86 worst — ALL accent text and links   */
+  --ad-accent-solid:   #C43F15;   /*  5.16 w/ white — the rare filled control  */
+  /* Hover of --ad-accent-solid, and note the DIRECTION: it deepens.
+     On near-black, brightening a fill raises its contrast against the ground
+     and reads as coming forward. On paper the same move lowers contrast — and
+     worse, it drags the white label on the fill below AA, so the control gets
+     less readable exactly when the pointer is on it. There is deliberately no
+     lighter accent token to reach for. Same reasoning, opposite direction, as
+     the --ad-action hover note below: on light, ink lightens and colour
+     deepens. Both are moving AWAY from the ground, not toward a brighter value. */
+  --ad-accent-deep:    #A03310;   /*  7.06 w/ white — computed, not estimated  */
+  --ad-accent-wash:    #FDF0EA;   /* chip + callout ground; pair w/ accent-text */
+  --ad-accent-line:    rgba(240, 90, 40, 0.35);
+  --ad-accent-ring:    rgba(240, 90, 40, 0.14);   /* focus ring fill           */
+
+  /* Translucent values carry FAR more weight over paper than over near-black.
+     Every alpha in this file is lower than its dark-system counterpart for that
+     reason, and porting one across is what turns a page orange. If you add an
+     rgba() token, start at roughly a third of what the dark value would be and
+     measure up — never start from the dark value and nudge down. */
+
+  /* --------------------------------------------------------------------------
+     ACTION — near-black. Rule 4: this is the button, not the accent.
+     Hover LIGHTENS: on a bright ground a black control going darker reads dead.
+     ----------------------------------------------------------------------- */
+  --ad-action:         #1A1714;   /* 17.85 with white                          */
+  --ad-action-hover:   #332D27;
+  --ad-on-action:      #FFFFFF;
+
+  /* --------------------------------------------------------------------------
+     SEMANTIC — four. Not the accent, and never inside an accent-marked card
+     (--ad-critical and --ad-accent are close enough in hue to collide).
+     All four carry white text on their solid fill.
+     ----------------------------------------------------------------------- */
+  --ad-positive:       #1A6B42;   /* 5.24 worst */
+  --ad-positive-wash:  #E8F4ED;
+  --ad-caution:        #7E5205;   /* 5.46 worst */
+  --ad-caution-wash:   #FDF3E2;
+  --ad-critical:       #B32D1B;   /* 5.11 worst */
+  --ad-critical-wash:  #FBEDEA;
+  --ad-info:           #1B559A;   /* 6.01 worst */
+  --ad-info-wash:      #E8F0FA;
+
+  /* --------------------------------------------------------------------------
+     CHART SERIES — categorical, 6. All clear 3.0 as marks on paper AND linen.
+     Series 1 is the accent on purpose: in a chart, the primary series IS the
+     focal point. Read the `dataviz` skill before building any chart.
+     ----------------------------------------------------------------------- */
+  --ad-series-1:       #E8551F;   /* paper 3.65 · linen 3.24 */
+  --ad-series-2:       #2D5FA6;   /* paper 6.37 · linen 5.65 */
+  --ad-series-3:       #3C8659;   /* paper 4.42 · linen 3.92 */
+  --ad-series-4:       #8B5CB8;   /* paper 4.86 · linen 4.31 */
+  --ad-series-5:       #B0801A;   /* paper 3.53 · linen 3.13 */
+  --ad-series-6:       #2A8A96;   /* paper 4.06 · linen 3.60 */
+
+  /* --------------------------------------------------------------------------
+     ELEVATION — exactly two, and both must be earned. Border is the default.
+     Warm-tinted, NOT rgba(0,0,0,x): a neutral-black shadow on warm paper turns
+     the paper grey at the edges and quietly undoes rule 2.
+     ----------------------------------------------------------------------- */
+  --ad-lift:
+    0 1px 2px -1px rgba(61, 48, 36, 0.10),
+    0 3px 8px -2px rgba(61, 48, 36, 0.08);
+  --ad-lift-panel:
+    0 1px 2px -1px rgba(61, 48, 36, 0.10),
+    0 6px 16px -4px rgba(61, 48, 36, 0.10),
+    0 20px 44px -8px rgba(61, 48, 36, 0.10);
+
+  /* THE ONE PERMITTED BLOOM — hero product panel only, nowhere else.
+     A bounded glow behind a panel reads as the product emitting light; the same
+     gradient floating free on the page is the decorative orb this system bans
+     (media.md §9). Accent-keyed and warm on purpose: the reference this came
+     from used a blue→green→amber bloom, which on warm paper would put an
+     uncontrolled cool hue on the ground and break rule 2. */
+  --ad-bloom: radial-gradient(
+    58% 58% at 50% 46%,
+    rgba(240, 90, 40, 0.16) 0%,
+    rgba(240, 90, 40, 0.05) 46%,
+    transparent 72%
+  );
+
+  /* --------------------------------------------------------------------------
+     RADII — decreases as you nest. A --ad-r-md panel inside a --ad-r-lg card.
+     Equal radii nested read as a mistake; larger-inside-smaller reads as a bug.
+
+     Tightened one notch from the ancestor system. 24px on a card is friendly;
+     18px is assured, and the difference between those two words is most of what
+     separates this from the SaaS default. Softness is not warmth — the warmth
+     is already in the grounds, and doubling it in the geometry reads as a
+     product apologising for itself.
+     ----------------------------------------------------------------------- */
+  --ad-r-sm:            6px;      /* chips, small buttons        */
+  --ad-r-md:           10px;      /* rows, inner panels          */
+  --ad-r-lg:           14px;      /* cards                       */
+  --ad-r-xl:           18px;      /* large panels, hero cards    */
+  --ad-r-pill:        999px;      /* buttons and badges ONLY     */
+
+  /* --------------------------------------------------------------------------
+     TYPE — 16 steps in 4 tiers. There is no seventeenth.
+     Four are clamp()s; resolve them through the browser when auditing.
+     ----------------------------------------------------------------------- */
+
+  /* Display tier — headings only. Weight is size-dependent: see WEIGHTS below.
+     The display step is where this system spends its nerve. 64px is a headline;
+     92px is a position. Everything below the display step stays close to the
+     ancestor system, because the ambition belongs in ONE place — inflating the
+     whole scale produces a page that shouts evenly and therefore says nothing. */
+  --ad-display:        clamp(56px, 6.6vw, 92px);
+  --ad-h1:             clamp(38px, 4.2vw, 58px);
+  --ad-h2:             clamp(26px, 2.6vw, 38px);
+  --ad-h3:             22px;
+  --ad-lead:           20px;      /* weight 400 — hero subcopy, section intro  */
+
+  /* Text tier — weight 400, --ad-tracking-snug. */
+  --ad-sub:            17px;
+  --ad-body-size:      16px;      /* NB: --ad-body is the COLOUR token         */
+  --ad-sm:             14px;
+  --ad-xs:             13px;
+
+  /* Meta tier — mono, weight 500, uppercase, --ad-tracking-meta. */
+  --ad-meta:           12px;      /* the layer's home size                     */
+  --ad-meta-sm:        11px;      /* micro-label inside another element        */
+  --ad-meta-xs:        10px;      /* chips, superscripts, tags                 */
+
+  /* Figure numerals — mono, weight 500, leading 1. A number is not a heading. */
+  --ad-fig-xl:         clamp(36px, 3.6vw, 52px);
+  --ad-fig-lg:         40px;
+  --ad-fig-md:         30px;
+  --ad-fig-sm:         24px;
+
+  /* --------------------------------------------------------------------------
+     TRACKING — still far looser than a dark system. -0.035em on white-on-black
+     is confident; the same value on black-on-white closes the counters.
+
+     One deliberate departure from the ancestor system, which set a flat -0.02em
+     ceiling: tracking is OPTICAL, so the ceiling is a function of size, not of
+     ground. At 92px a counter is enormous in absolute terms and -0.024em reads
+     as intent; at 38px the same value reads as cramped. Hence two values, and
+     -0.024em is permitted on the --ad-display step ONLY. Applying it to h1 or
+     h2 is the exact mistake the flat ceiling existed to prevent.
+     ----------------------------------------------------------------------- */
+  --ad-tracking-display: -0.024em;   /* --ad-display only */
+  --ad-tracking-tight:   -0.015em;   /* h1, h2            */
+  --ad-tracking-snug:    -0.008em;
+  --ad-tracking-normal:   0;
+  --ad-tracking-meta:     0.08em;
+  --ad-tracking-fig:     -0.01em;
+
+  /* --------------------------------------------------------------------------
+     LEADING — seven values. Nothing between them. A 1.55 or a 1.7 in a recipe
+     is how one size ends up rendering at four different leadings on one page.
+     Body is 1.65, not 1.6: dark ink on a bright ground needs more air.
+     ----------------------------------------------------------------------- */
+  --ad-leading-display:  1.04;
+  --ad-leading-flat:     1;
+  --ad-leading-tight:    1.12;
+  --ad-leading-snug:     1.3;
+  --ad-leading-meta:     1.4;
+  --ad-leading-lead:     1.5;
+  --ad-leading-body:     1.65;
+
+  /* WEIGHTS — authority comes from SCALE, not from weight.
+     This is the one rule inherited wholesale from the dark ancestor system,
+     where a 104px headline sits at weight 400 and is unmistakably the loudest
+     thing on the page. The mechanism is optical and ground-independent: past
+     roughly 72px, added weight stops reading as emphasis and starts reading as
+     mass. On white it also reads as ink — a 92px semibold headline is a black
+     slab, and the page loses the paper.
+
+     So weight DECREASES as size increases, which is the inverse of the instinct:
+
+       --ad-display   (56–92px)  ->  --ad-w-medium    (500)
+       --ad-h1 / --ad-h2         ->  --ad-w-semibold  (600)
+       card titles, UI, body     ->  --ad-w-regular   (400), 500 for buttons
+
+     There is no 700. The ancestor system permitted it on the hero because its
+     hero topped out at 64px, where bold still reads as emphasis. At this scale
+     it reads as a banner ad. If a headline is not carrying the page, the fix is
+     a shorter headline, never a heavier one. */
+  --ad-w-regular:      400;
+  --ad-w-medium:       500;   /* --ad-display, buttons, mono meta */
+  --ad-w-semibold:     600;   /* h1, h2, h3 — section heads       */
+
+  /* FONTS — set these to your loaded families. */
+  --ad-font-sans:      var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --ad-font-mono:      var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* --------------------------------------------------------------------------
+     LAYOUT — section padding is deliberately tighter than a hairline system.
+     A card-dense page carries its own internal whitespace; 160px on top of that
+     reads as a broken page rather than a generous one.
+     ----------------------------------------------------------------------- */
+  --ad-container:       1200px;
+  --ad-container-wide:  1320px;   /* chart-bearing / four-up sections only     */
+  --ad-measure:          680px;   /* long-form prose max-width                 */
+  --ad-gutter:            40px;
+  --ad-section:          128px;
+  --ad-section-tight:     96px;   /* never below 80                            */
+  /* For a section carrying a --ad-display headline and almost nothing else —
+     the hero and the closing CTA. A 92px line needs room around it or the
+     scale reads as an accident. Do NOT use it on a card-dense section: those
+     carry their own internal whitespace and 160px on top reads as a broken
+     page rather than a generous one. That was true in the ancestor system and
+     is still true here; this token is the exception it earned, not a repeal. */
+  --ad-section-wide:     160px;
+
+  /* --------------------------------------------------------------------------
+     MOTION — see references/motion.md.
+     ----------------------------------------------------------------------- */
+  --ad-dur-fast:        150ms;    /* hover, focus, colour swaps                */
+  --ad-dur-base:        220ms;    /* the default structural transition         */
+  --ad-dur-slow:        320ms;    /* accordion, panel, layout change           */
+  --ad-dur-reveal:      500ms;    /* the scroll reveal — one value, everywhere  */
+  --ad-stagger:         100ms;    /* delay per index in a staggered group       */
+  /* The ONE slow structural duration, for a mechanic that is itself the
+     argument: the rule drawing under a verified claim, a progress bar
+     resolving. Not a reveal — reveals stay at 500ms. If you are reaching for
+     900ms on a hover or a tab change, you want --ad-dur-slow. */
+  --ad-dur-enter:       900ms;
+  --ad-ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ad-ease-inout:      cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Opacity of an INACTIVE panel in the sticky-scrollytelling pattern. Lower
+     than this and it reads as disabled rather than as not-yet-your-turn.
+     Higher and the active panel stops winning. Measured, not guessed. */
+  --ad-dim-inactive:     0.45;
+
+  /* --------------------------------------------------------------------------
+     PAPER TOOTH — one global fixed pseudo-element, never per-section.
+     A faint grain is the one ambient texture this system permits, and it is
+     permitted precisely because it is NOT ambient motion: it does not move.
+     On a dark canvas grain reads as film; on warm paper it reads as stock,
+     which is the thing the grounds are already pretending to be. Keep it under
+     0.03 — above that it stops being tooth and starts being noise, and it will
+     dirty the 1.30:1 hairlines this system cannot afford to lose.
+     Set `pointer-events: none` and put it above the ground, below everything.
+     ----------------------------------------------------------------------- */
+  --ad-tooth-opacity:    0.025;
+}
+
+/* ============================================================================
+   INVERT — dark bands.
+   Audacious is a light system with inverted BANDS, not a dual-theme system. There
+   is no toggle and no prefers-color-scheme branch.
+
+   This remaps the SAME token names, so components don't know they're inverted.
+   A .ad-card looks correct in both. Never write a .ad-card--dark.
+
+   Earns it: the closing CTA, the footer, and AT MOST ONE mid-page band.
+   Three or more and the page stops being a light page.
+   ========================================================================= */
+
+.ad-invert {
+  --ad-paper:          #1C1917;
+  --ad-canvas:         #171412;
+  --ad-linen:          #241F1B;
+  --ad-inset:          #2C2621;
+
+  --ad-line:           #3A322C;   /* 1.19–1.46 vs the dark grounds */
+  --ad-line-strong:    #4C423A;
+  --ad-line-ink:       #FAF8F5;   /* the CHOSEN border inverts to near-white */
+
+  --ad-ink:            #FAF8F5;   /* 14.09 worst */
+  --ad-body:           #C4BBB1;   /*  7.89 worst */
+  --ad-muted:          #9C9187;   /*  4.85 worst — AA on all four dark grounds */
+  --ad-faint:          #6B6259;   /*  2.50 worst — NEVER text, same as light   */
+
+  /* The one place the accent gets to be bright: it clears AA on a dark ground. */
+  --ad-accent-text:    #FF7A4D;   /*  5.79 worst */
+  --ad-accent-wash:    rgba(240, 90, 40, 0.14);
+  --ad-accent-line:    rgba(255, 122, 77, 0.40);
+  --ad-accent-ring:    rgba(255, 122, 77, 0.18);
+  /* The deepen/brighten direction flips back inside an inverted band, because
+     the ground did. Same principle as on paper — move AWAY from the ground. */
+  --ad-accent-solid:   #D9491A;
+  --ad-accent-deep:    #F05A28;   /* "deep" by name, brighter by value, on dark */
+
+  /* The button inverts to near-white on near-black. */
+  --ad-action:         #FAF8F5;
+  --ad-action-hover:   #FFFFFF;
+  --ad-on-action:      #1C1917;
+
+  /* Semantic washes go translucent so they read on a dark ground. */
+  --ad-positive-wash:  rgba(26, 107, 66, 0.18);
+  --ad-caution-wash:   rgba(126, 82, 5, 0.22);
+  --ad-critical-wash:  rgba(179, 45, 27, 0.18);
+  --ad-info-wash:      rgba(27, 85, 154, 0.20);
+
+  /* Shadows barely read on dark — deepen and drop the warm tint toward black. */
+  --ad-lift:
+    0 1px 2px -1px rgba(0, 0, 0, 0.40),
+    0 3px 8px -2px rgba(0, 0, 0, 0.30);
+  --ad-lift-panel:
+    0 1px 2px -1px rgba(0, 0, 0, 0.40),
+    0 6px 16px -4px rgba(0, 0, 0, 0.36),
+    0 20px 44px -8px rgba(0, 0, 0, 0.32);
+}
